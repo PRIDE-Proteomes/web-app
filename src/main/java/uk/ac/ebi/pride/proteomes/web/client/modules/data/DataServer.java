@@ -31,8 +31,6 @@ public interface DataServer {
         public void onPeptideRetrieved(Peptide peptide);
 
         public void onRetrievalError(String message);
-
-        public void bindServer(DataServer server);
     }
 
     public interface TransactionHandler {
@@ -44,6 +42,8 @@ public interface DataServer {
         public void retrieveData(String query);
         public void addHandler(TransactionHandler handler);
     }
+
+    public void bind(DataClient client);
 
     public boolean isGroupCached(String id);
     public boolean isProteinCached(String accession);

@@ -26,11 +26,12 @@ public class AppController implements
                            DataServer.DataClient
 {
     private final EventBus eventBus;
-    private DataServer server = null;
+    private final DataServer server;
     private State appState;
 
-    public AppController(EventBus eventBus) {
+    public AppController(EventBus eventBus, DataServer server) {
         this.eventBus = eventBus;
+        this.server = server;
 
         eventBus.addHandler(StateChangingActionEvent.getType(), this);
         History.addValueChangeHandler(this);
@@ -47,11 +48,6 @@ public class AppController implements
             // we should act upon it. (show a popup with an error?)
         }
 
-        // If we cannot request for any data don't do anything
-        // (This should never happen)
-        if(server == null) {
-            return;
-        }
         // Check what's cached or not and notify the application that some
         // data may take some time to be retrieved, we don't want the users
         // to think that the web app is unresponsive.
@@ -118,11 +114,5 @@ public class AppController implements
     @Override
     public void onRetrievalError(String message) {
         //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void bindServer(DataServer server) {
-        if(this.server != null)
-            this.server = server;
     }
 }

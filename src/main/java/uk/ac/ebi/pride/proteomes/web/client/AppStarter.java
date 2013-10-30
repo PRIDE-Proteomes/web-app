@@ -46,7 +46,6 @@ public class AppStarter implements RunAsyncCallback {
 
     @Override
     public void onSuccess() {
-
         // Stick together the whole app first by creating the listeners to
         // the event bus, then creating the structure of the graphical elements
 
@@ -70,11 +69,9 @@ public class AppStarter implements RunAsyncCallback {
 
         WhistleBlower whistle = new WhistleBlower(eventBus);
 
-        AppController appController = new AppController(eventBus);
-        DataServer provider = new DataProvider(appController, webRoot);
-
-        appController.bindServer(provider);
-
+        DataServer provider = new DataProvider(webRoot);
+        AppController appController = new AppController(eventBus, provider);
+        provider.bind(appController);
 
         // fire first event to reach initial state
 

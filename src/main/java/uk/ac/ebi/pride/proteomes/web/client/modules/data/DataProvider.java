@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class DataProvider implements DataServer.TransactionHandler,
                                      DataServer {
-    private final DataServer.DataClient client;
+    private DataServer.DataClient client = null;
 
     private Map<String, Group> groupCache = new HashMap<String, Group>();
     private final GroupRetriever groupRetriever;
@@ -29,12 +29,15 @@ public class DataProvider implements DataServer.TransactionHandler,
     private final PeptideRetriever peptideRetriever;
 
 
-    public DataProvider(DataServer.DataClient client, String webRoot) {
-        this.client = client;
+    public DataProvider(String webRoot) {
+        groupRetriever = new GroupRetriever(webRoot);
+        groupRetriever.addHandler(this);
 
-        this.groupRetriever = new GroupRetriever(webRoot);
-        this.proteinRetriever = new ProteinRetriever(webRoot);
-        this.peptideRetriever = new PeptideRetriever(webRoot);
+        proteinRetriever = new ProteinRetriever(webRoot);
+        proteinRetriever.addHandler(this);
+
+        peptideRetriever = new PeptideRetriever(webRoot);
+        peptideRetriever.addHandler(this);
     }
 
     @Override
@@ -63,6 +66,11 @@ public class DataProvider implements DataServer.TransactionHandler,
             onDataRetrievalError(new Exception("Internal Error, " +
                     "the developers need to update " + this.getClass().getName()));
         }
+    }
+
+    @Override
+    public void bind(DataClient client) {
+        this.client = client;
     }
 
     @Override
