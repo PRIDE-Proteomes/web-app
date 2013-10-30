@@ -1,7 +1,5 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers;
 
-
-import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestException;
@@ -10,6 +8,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.Transaction;
 
+import java.util.ArrayList;
 import java.util.Collection;
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -21,7 +20,7 @@ public class PeptideRetriever implements DataServer.DataRetriever {
     private final String root;
 
     private Collection<DataServer.TransactionHandler> handlers = new
-            HashSet<DataServer.TransactionHandler>();
+            ArrayList<DataServer.TransactionHandler>();
 
     public PeptideRetriever(String webServiceRoot) {
         this.root = webServiceRoot;
