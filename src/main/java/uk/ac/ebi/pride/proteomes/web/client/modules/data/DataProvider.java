@@ -1,6 +1,5 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
-import com.google.gwt.dev.util.Pair;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Protein;
@@ -60,21 +59,33 @@ public class DataProvider implements DataServer.TransactionHandler,
                 }
             }
 
-            // If there-s any request that-s been processed completely we
+            // If there are any request that have been processed completely we
             // should return the result to the client.
             dispatchGroups();
         }
         else if(transaction.getResponse() instanceof Protein) {
-            proteinCache.put(((Protein) transaction.getResponse()).getAccession(),
-                              (Protein) transaction.getResponse());
-            //todo
-            // client.onProteinsRetrieved((Protein) transaction.getResponse());
+            Protein protein = (Protein) transaction.getResponse();
+            proteinCache.put(protein.getAccession(), protein);
+
+            for(Map<String, Boolean> batchRequest : proteinRequests) {
+                if(batchRequest.containsKey((protein.getAccession()))) {
+                    batchRequest.put(protein.getAccession(), true);
+                }
+            }
+
+            dispatchProteins();
         }
         else if(transaction.getResponse() instanceof Peptide) {
-            peptideCache.put(((Peptide) transaction.getResponse()).getSequence(),
-                              (Peptide) transaction.getResponse());
-            // todo
-            // client.onPeptidesRetrieved((Peptide) transaction.getResponse());
+            Peptide peptide = (Peptide) transaction.getResponse();
+            peptideCache.put(peptide.getSequence(), peptide);
+
+            for(Map<String, Boolean> batchRequest : peptideRequests) {
+                if(batchRequest.containsKey((peptide.getSequence()))) {
+                    batchRequest.put(peptide.getSequence(), true);
+                }
+            }
+
+            dispatchPeptides();
         }
         else {
             onDataRetrievalError(new Exception("Internal Error, " +
@@ -172,6 +183,34 @@ public class DataProvider implements DataServer.TransactionHandler,
                     groups.add(getGroup(entry.getKey()));
                 }
                 client.onGroupsRetrieved(groups);
+            }
+        }
+    }
+
+    private void dispatchProteins() {
+        for(Map<String, Boolean> batchRequest : proteinRequests) {
+            if(!batchRequest.containsValue(false)) {
+                proteinRequests.remove(batchRequest);
+
+                List<Protein> proteins = new ArrayList<Protein>();
+                for(Map.Entry<String, Boolean> entry : batchRequest.entrySet()) {
+                    proteins.add(getProtein(entry.getKey()));
+                }
+                client.onProteinsRetrieved(proteins);
+            }
+        }
+    }
+
+    private void dispatchPeptides() {
+        for(Map<String, Boolean> batchRequest : peptideRequests) {
+            if(!batchRequest.containsValue(false)) {
+                peptideRequests.remove(batchRequest);
+
+                List<Peptide> peptides = new ArrayList<Peptide>();
+                for(Map.Entry<String, Boolean> entry : batchRequest.entrySet()) {
+                    peptides.add(getPeptide(entry.getKey()));
+                }
+                client.onPeptidesRetrieved(peptides);
             }
         }
     }
