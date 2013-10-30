@@ -5,6 +5,8 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Protein;
 
+import java.util.Collection;
+
 /**
  * In this file are contained all the interfaces related to the data
  * server/provider module.
@@ -26,9 +28,9 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.Protein;
  */
 public interface DataServer {
     public interface DataClient {
-        public void onGroupRetrieved(Group group);
-        public void onProteinRetrieved(Protein protein);
-        public void onPeptideRetrieved(Peptide peptide);
+        public void onGroupsRetrieved(Collection<Group> groups);
+        public void onProteinsRetrieved(Collection<Protein> proteins);
+        public void onPeptidesRetrieved(Collection<Peptide> peptides);
 
         public void onRetrievalError(String message);
     }
@@ -49,4 +51,11 @@ public interface DataServer {
     public boolean isProteinCached(String accession);
     public boolean isPeptideCached(String sequence);
 
+    public void requestGroups(String[] ids);
+    public void requestProteins(String[] accessions);
+    public void requestPeptides(String[] sequences);
+
+    public Group getGroup(String id);
+    public Protein getProtein(String accession);
+    public Peptide getPeptide(String sequence);
 }

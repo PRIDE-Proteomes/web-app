@@ -40,6 +40,7 @@ public class StateChangingActionEvent extends
     public static Type<StateChangingActionHandler> getType() {
         return TYPE;
     }
+
     @Override
     public Type<StateChangingActionHandler> getAssociatedType() {
         return TYPE;

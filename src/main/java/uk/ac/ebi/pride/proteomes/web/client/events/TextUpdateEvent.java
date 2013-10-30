@@ -36,7 +36,6 @@ public class TextUpdateEvent extends
         return text;
     }
 
-
     public static Type<TextUpdateHandler> getType() {
         return TYPE;
     }

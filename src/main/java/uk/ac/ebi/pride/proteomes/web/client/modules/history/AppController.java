@@ -9,10 +9,13 @@ import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.events.GroupRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.TextUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
+
+import java.util.Collection;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -46,13 +49,32 @@ public class AppController implements
         catch(InconsistentStateException e) {
             // we tried to create an inconsistent state, that's bad,
             // we should act upon it. (show a popup with an error?)
+            return;
         }
 
+
+        // Check what properties have changed and only work based on that
         // Check what's cached or not and notify the application that some
         // data may take some time to be retrieved, we don't want the users
         // to think that the web app is unresponsive.
 
+        if(!State.getToken(desiredState.getSelectedGroups()).equals(
+            State.getToken(appState.getSelectedGroups()))) {
+            boolean areGroupsNotCached = true;
+
+            for(String id : desiredState.getSelectedGroups()) {
+                if(!server.isGroupCached(id)) {
+                    areGroupsNotCached = false;
+                }
+            }
+            if(areGroupsNotCached) {
+                GroupRequestEvent.fire(this);
+            }
+        }
+
         // It's time to retrieve data
+
+            server.requestGroups(desiredState.getSelectedGroups());
 
         // Check if the state is semantically correct
 
@@ -97,17 +119,17 @@ public class AppController implements
     }
 
     @Override
-    public void onGroupRetrieved(Group group) {
+    public void onGroupsRetrieved(Collection<Group> groups) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void onProteinRetrieved(Protein protein) {
+    public void onProteinsRetrieved(Collection<Protein> proteins) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void onPeptideRetrieved(Peptide peptide) {
+    public void onPeptidesRetrieved(Collection<Peptide> peptides) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

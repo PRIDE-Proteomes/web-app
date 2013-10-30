@@ -191,6 +191,20 @@ final class State {
         return builder.substring(0, builder.length());
     }
 
+    /**
+     * Used to produce a URL token from a collection of ids
+     * @param ids the collection that is needed to convert to a string
+     * @return section of URL that represents the collection
+     */
+    static String getToken(String[] ids) {
+        StringBuilder builder = new StringBuilder();
+        for(String id : ids) {
+            builder.append(id);
+            builder.append(sepValues);
+        }
+        return builder.substring(0, builder.length());
+    }
+
     boolean isValid(String groups,
                     String proteins,
                     String peptides,
