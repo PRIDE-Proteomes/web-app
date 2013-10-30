@@ -1,6 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.history;
 
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
+import uk.ac.ebi.pride.proteomes.web.client.utils.DefaultHashMap;
 
 import java.util.*;
 
@@ -28,8 +29,6 @@ public class StateChanger {
         }
     }
 
-
-
     Queue<Change> orderedChanges = new LinkedList<Change>();
 
     public void addGroupChange(Collection<String> selectedGroup) {
@@ -48,19 +47,18 @@ public class StateChanger {
             changedState = oldState;
         }
         else {
-            Map<String, String> tempState = new HashMap<String, String>();
+            DefaultHashMap<String, String> tempState = new DefaultHashMap<String, String>();
             for(Change change : orderedChanges) {
                 tempState.put(change.getKey(), change.getValue());
             }
-            changedState = new State(tempState.get("group"),
-                                     tempState.get("protein"),
-                                     tempState.get("peptide"),
-                                     tempState.get("variance"),
-                                     tempState.get("region"),
-                                     tempState.get("modification"),
-                                     tempState.get("tissue"));
+            changedState = new State(tempState.get("group", ""),
+                                     tempState.get("protein", ""),
+                                     tempState.get("peptide", ""),
+                                     tempState.get("variance", ""),
+                                     tempState.get("region", ""),
+                                     tempState.get("modification", ""),
+                                     tempState.get("tissue", ""));
         }
-
         return changedState;
     }
 }
