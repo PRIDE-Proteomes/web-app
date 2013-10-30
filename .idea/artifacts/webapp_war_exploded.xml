@@ -1,0 +1,33 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="webapp:war exploded">
+    <output-path>$PROJECT_DIR$/target/webbapp-0.1-SNAPSHOT</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="webapp/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="webapp" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: com.google.gwt:gwt-servlet:2.5.1" />
+          <element id="library" level="project" name="Maven: org.json:json:20090211" />
+          <element id="library" level="project" name="Maven: com.googlecode.gwt-test-utils:gwt-test-utils:0.44" />
+          <element id="library" level="project" name="Maven: com.google.gwt:gwt-dev:2.5.0" />
+          <element id="library" level="project" name="Maven: org.jukito:jukito:1.1" />
+          <element id="library" level="project" name="Maven: com.google.inject:guice:3.0" />
+          <element id="library" level="project" name="Maven: javax.inject:javax.inject:1" />
+          <element id="library" level="project" name="Maven: aopalliance:aopalliance:1.0" />
+          <element id="library" level="project" name="Maven: com.google.inject.extensions:guice-assistedinject:3.0" />
+          <element id="library" level="project" name="Maven: org.javassist:javassist:3.15.0-GA" />
+          <element id="library" level="project" name="Maven: org.easytesting:fest-assert-core:2.0M7" />
+          <element id="library" level="project" name="Maven: org.easytesting:fest-util:1.2.2" />
+          <element id="library" level="project" name="Maven: com.thoughtworks.paranamer:paranamer:2.5" />
+          <element id="library" level="project" name="Maven: com.google.code.javaparser:javaparser:1.0.8" />
+          <element id="library" level="project" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.1" />
+          <element id="library" level="project" name="Maven: org.antlr:antlr-runtime:3.1.1" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.6.1" />
+        </element>
+      </element>
+      <element id="gwt-compiler-output" facet="webapp/gwt/GWT" />
+    </root>
+  </artifact>
+</component>
