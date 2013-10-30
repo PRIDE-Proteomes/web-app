@@ -35,9 +35,11 @@ public class DataProvider implements DataServer.TransactionHandler,
         groupRetriever = new GroupRetriever(webRoot);
         groupRetriever.addHandler(this);
 
+        proteinRequests = new ArrayList<Map<String, Boolean>>();
         proteinRetriever = new ProteinRetriever(webRoot);
         proteinRetriever.addHandler(this);
 
+        peptideRequests = new ArrayList<Map<String, Boolean>>();
         peptideRetriever = new PeptideRetriever(webRoot);
         peptideRetriever.addHandler(this);
     }
