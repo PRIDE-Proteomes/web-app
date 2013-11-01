@@ -9,13 +9,14 @@ import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Protein;
-import uk.ac.ebi.pride.proteomes.web.client.events.GroupRequestEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.requests.GroupRequestEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.requests.PeptideRequestEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.StateChangingActionEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.TextUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
 
-import java.util.Collection;
+import java.util.*;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -31,10 +32,13 @@ public class AppController implements
     private final EventBus eventBus;
     private final DataServer server;
     private State appState;
+    private Queue<State> desiredStates;
 
     public AppController(EventBus eventBus, DataServer server) {
         this.eventBus = eventBus;
         this.server = server;
+
+        desiredStates = new LinkedList<State>();
 
         eventBus.addHandler(StateChangingActionEvent.getType(), this);
         History.addValueChangeHandler(this);
@@ -42,9 +46,10 @@ public class AppController implements
 
     @Override
     public void onStateChangingActionEvent(StateChangingActionEvent event) {
-        State desiredState = null;
+        State freshState;
+
         try {
-            desiredState = event.getChanger().change(appState);
+            freshState = event.getChanger().change(appState);
         }
         catch(InconsistentStateException e) {
             // we tried to create an inconsistent state, that's bad,
@@ -52,64 +57,35 @@ public class AppController implements
             return;
         }
 
-
-        // Check what properties have changed and only work based on that
-        // Check what's cached or not and notify the application that some
-        // data may take some time to be retrieved, we don't want the users
-        // to think that the web app is unresponsive.
-
-        if(!State.getToken(desiredState.getSelectedGroups()).equals(
-            State.getToken(appState.getSelectedGroups()))) {
-            boolean areGroupsNotCached = true;
-
-            for(String id : desiredState.getSelectedGroups()) {
-                if(!server.isGroupCached(id)) {
-                    areGroupsNotCached = false;
-                }
-            }
-            if(areGroupsNotCached) {
-                GroupRequestEvent.fire(this);
-            }
-        }
-
-        // It's time to retrieve data
-
-            server.requestGroups(desiredState.getSelectedGroups());
-
-        // Check if the state is semantically correct
-
-        // For the test app, we send the notification to update the views here
-        goTo(desiredState);
-    }
-
-    private void goTo(State newState) {
-        History.newItem(newState.getHistoryToken(), false);
-        appState = newState;
-        //TextUpdateEvent.fire(this, newState.getText());
+        desiredStates.add(freshState);
+        requestData(freshState);
     }
 
     @Override
     public void onValueChange(ValueChangeEvent<String> event) {
-        State desiredState = null;
-
         // We're in the empty landing page, we have to initialize the view to
         // show something relevant
         if(event.getValue().isEmpty()) {
             try {
                 appState = State.tokenize(event.getValue());
-            } catch (Exception e){ /* TODO */ }
+            } catch (Exception e){ /* Application error, todo */ }
 
-            TextUpdateEvent.fire(this, "No button pressed yet!");
+            //UpdateViewEvent.fire(this, "Search for a group or a protein
+            //                            first!");
         }
         else {
+            State freshState;
             try {
-                desiredState = State.tokenize(event.getValue());
+                freshState = State.tokenize(event.getValue());
             }
-            catch(InconsistentStateException e) { /* TODO */ }
+            catch(InconsistentStateException e) {
+                // we tried to create an inconsistent state, that's bad,
+                // we should act upon it. (show a popup with an error?)
+                return;
+            }
 
-            // we've "checked" the desired state is valid and have all the data
-            // to represent this
-            goTo(desiredState);
+            desiredStates.add(freshState);
+            requestData(freshState);
         }
     }
 
@@ -120,7 +96,13 @@ public class AppController implements
 
     @Override
     public void onGroupsRetrieved(Collection<Group> groups) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // Check if we're done retrieving the data needed to change the state
+
+        // Check if the state is semantically correct
+
+
+        // For the test app, we send the notification to update the views here
+        //goTo(desiredState);
     }
 
     @Override
@@ -136,5 +118,68 @@ public class AppController implements
     @Override
     public void onRetrievalError(String message) {
         //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    private void requestData(State state) {
+        // Check what information is already cached or already requested to
+        // notify the application that some data may take some time to be
+        // retrieved, we don't want the users to think that the web app is
+        // unresponsive.
+
+        boolean areGroupsNotCached = true;
+        boolean areProteinsNotCached = true;
+        boolean arePeptidesNotCached = true;
+
+        if(!State.getToken(state.getSelectedGroups()).equals(
+                State.getToken(appState.getSelectedGroups()))) {
+            for(String id : state.getSelectedGroups()) {
+                if(!server.isGroupCached(id)) {
+                    areGroupsNotCached = false;
+                    break;
+                }
+            }
+        }
+
+        if(!State.getToken(state.getSelectedProteins()).equals(
+                State.getToken(appState.getSelectedProteins()))) {
+            for(String accession : state.getSelectedProteins()) {
+                if(!server.isProteinCached(accession)) {
+                    areProteinsNotCached = false;
+                    break;
+                }
+            }
+        }
+
+        if(!State.getToken(state.getSelectedPeptides()).equals(
+                State.getToken(appState.getSelectedPeptides()))) {
+            for(String sequence : state.getSelectedPeptides()) {
+                if(!server.isPeptideCached(sequence)) {
+                    arePeptidesNotCached = false;
+                    break;
+                }
+            }
+        }
+
+        if(areGroupsNotCached) {
+            GroupRequestEvent.fire(this);
+        }
+        if(areProteinsNotCached) {
+            ProteinRequestEvent.fire(this);
+        }
+        if(arePeptidesNotCached) {
+            PeptideRequestEvent.fire(this);
+        }
+
+        // It's time to retrieve data and wait for the callback
+
+        server.requestGroups(state.getSelectedGroups());
+        server.requestProteins(state.getSelectedProteins());
+        server.requestPeptides(state.getSelectedPeptides());
+    }
+
+    private void goTo(State newState) {
+        History.newItem(newState.getHistoryToken(), false);
+        appState = newState;
+        //TextUpdateEvent.fire(this, newState.getText());
     }
 }

@@ -2,7 +2,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower;
 
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.events.StateChangingActionEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.TextUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.TextUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 
 /**

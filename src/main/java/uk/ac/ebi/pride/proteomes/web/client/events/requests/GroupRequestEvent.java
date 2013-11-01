@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.proteomes.web.client.events;
+package uk.ac.ebi.pride.proteomes.web.client.events.requests;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;

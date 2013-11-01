@@ -1,9 +1,8 @@
-package uk.ac.ebi.pride.proteomes.web.client.events;
+package uk.ac.ebi.pride.proteomes.web.client.events.updates;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
-import com.google.web.bindery.event.shared.Event;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
