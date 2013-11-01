@@ -32,13 +32,13 @@ public class AppController implements
     private final EventBus eventBus;
     private final DataServer server;
     private State appState;
-    private Queue<State> desiredStates;
+    private Queue<State> stateQueue;
 
     public AppController(EventBus eventBus, DataServer server) {
         this.eventBus = eventBus;
         this.server = server;
 
-        desiredStates = new LinkedList<State>();
+        stateQueue = new LinkedList<State>();
 
         eventBus.addHandler(StateChangingActionEvent.getType(), this);
         History.addValueChangeHandler(this);
@@ -57,7 +57,7 @@ public class AppController implements
             return;
         }
 
-        desiredStates.add(freshState);
+        stateQueue.add(freshState);
         requestData(freshState);
     }
 
@@ -72,6 +72,7 @@ public class AppController implements
 
             //UpdateViewEvent.fire(this, "Search for a group or a protein
             //                            first!");
+            // todo
         }
         else {
             State freshState;
@@ -84,7 +85,7 @@ public class AppController implements
                 return;
             }
 
-            desiredStates.add(freshState);
+            stateQueue.add(freshState);
             requestData(freshState);
         }
     }
@@ -96,28 +97,22 @@ public class AppController implements
 
     @Override
     public void onGroupsRetrieved(Collection<Group> groups) {
-        // Check if we're done retrieving the data needed to change the state
-
-        // Check if the state is semantically correct
-
-
-        // For the test app, we send the notification to update the views here
-        //goTo(desiredState);
+        processStateQueue();
     }
 
     @Override
     public void onProteinsRetrieved(Collection<Protein> proteins) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        processStateQueue();
     }
 
     @Override
     public void onPeptidesRetrieved(Collection<Peptide> peptides) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        processStateQueue();
     }
 
     @Override
     public void onRetrievalError(String message) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // todo
     }
 
     private void requestData(State state) {
@@ -175,6 +170,82 @@ public class AppController implements
         server.requestGroups(state.getSelectedGroups());
         server.requestProteins(state.getSelectedProteins());
         server.requestPeptides(state.getSelectedPeptides());
+    }
+
+
+    private void processStateQueue() {
+        // Check if the other data to represent the state arrived already
+        if(!isDataReady(stateQueue.peek())) {
+            return;
+        }
+
+        if(!isStateValid(stateQueue.peek())) {
+            //show a popup!
+            return;
+        }
+
+        // For the test app, we send the notification to update the views here
+        goTo(stateQueue.remove());
+
+        //the first state in the queue might be ready, maybe the
+        processStateQueue();
+    }
+
+    private boolean isDataReady(State state) {
+        if(state == null) {
+            return false;
+        }
+        for(String id : state.getSelectedGroups()) {
+            if(!server.isGroupCached(id)) {
+                return false;
+            }
+        }
+        for(String accession : state.getSelectedProteins()) {
+            if(!server.isProteinCached(accession)) {
+                return false;
+            }
+        }
+        for(String sequence : state.getSelectedPeptides()) {
+            if(!server.isPeptideCached(sequence)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isStateValid(State state) {
+        if(state == null) {
+            return false;
+        }
+
+        boolean isCorrect = true;
+
+        for(String accession : state.getSelectedPeptides()) {
+            for(String id : state.getSelectedGroups()) {
+                if(!server.getGroup(id).getMemberProteins().contains
+                        (accession)) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            if(!isCorrect) {
+                break;
+            }
+
+            for(String sequence : state.getSelectedPeptides()) {
+                if(!server.getProtein(accession).getPeptides().contains
+                        (server.getPeptide(sequence))) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            if(!isCorrect) {
+                break;
+            }
+        }
+        return isCorrect;
     }
 
     private void goTo(State newState) {

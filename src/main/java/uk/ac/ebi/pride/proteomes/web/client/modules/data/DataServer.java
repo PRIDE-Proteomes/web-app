@@ -34,4 +34,8 @@ public interface DataServer {
     public void requestGroups(String[] ids);
     public void requestProteins(String[] accessions);
     public void requestPeptides(String[] sequences);
+
+    public Group getGroup(String id);
+    public Protein getProtein(String accession);
+    public Peptide getPeptide(String sequence);
 }

@@ -166,6 +166,21 @@ public class DataProvider implements DataServer, TransactionHandler {
         }
     }
 
+    @Override
+    public Group getGroup(String id) {
+        return groupCache.get(id);
+    }
+
+    @Override
+    public Protein getProtein(String accession) {
+        return proteinCache.get(accession);
+    }
+
+    @Override
+    public Peptide getPeptide(String sequence) {
+        return peptideCache.get(sequence);
+    }
+
     private void dispatchGroups() {
         for(Map<String, Boolean> batchRequest : groupRequests) {
             if(!batchRequest.containsValue(false)) {
@@ -206,17 +221,5 @@ public class DataProvider implements DataServer, TransactionHandler {
                 client.onPeptidesRetrieved(peptides);
             }
         }
-    }
-
-    private Group getGroup(String id) {
-        return groupCache.get(id);
-    }
-
-    private Protein getProtein(String accession) {
-        return proteinCache.get(accession);
-    }
-
-    private Peptide getPeptide(String sequence) {
-        return peptideCache.get(sequence);
     }
 }
