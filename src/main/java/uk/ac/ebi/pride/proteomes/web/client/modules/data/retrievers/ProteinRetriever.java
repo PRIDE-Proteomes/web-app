@@ -5,8 +5,8 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Protein;
-import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.Transaction;
+import uk.ac.ebi.pride.proteomes.web.client.modules.data.TransactionHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +16,11 @@ import java.util.Collection;
  *         Date: 25/10/13
  *         Time: 15:10
  */
-public class ProteinRetriever implements DataServer.DataRetriever {
+public class ProteinRetriever implements TransactionHandler.DataRetriever {
     private final String root;
 
-    private Collection<DataServer.TransactionHandler> handlers = new
-            ArrayList<DataServer.TransactionHandler>();
+    private Collection<TransactionHandler> handlers = new
+            ArrayList<TransactionHandler>();
 
     public ProteinRetriever(String webServiceRoot) {
         this.root = webServiceRoot;
@@ -35,14 +35,14 @@ public class ProteinRetriever implements DataServer.DataRetriever {
         try {
             builder.sendRequest(null, this);
         } catch(RequestException e) {
-            for(DataServer.TransactionHandler handler : handlers) {
+            for(TransactionHandler handler : handlers) {
                 handler.onDataRetrievalError(e);
             }
         }
     }
 
     @Override
-    public void addHandler(DataServer.TransactionHandler handler) {
+    public void addHandler(TransactionHandler handler) {
         handlers.add(handler);
     }
 
@@ -57,7 +57,7 @@ public class ProteinRetriever implements DataServer.DataRetriever {
                 throw new Exception(response.getStatusText());
             }
 
-            for(DataServer.TransactionHandler handler : handlers) {
+            for(TransactionHandler handler : handlers) {
                 handler.onDataRetrieval(trans);
             }
 
@@ -69,7 +69,7 @@ public class ProteinRetriever implements DataServer.DataRetriever {
 
     @Override
     public void onError(Request request, Throwable exception) {
-        for(DataServer.TransactionHandler handler : handlers) {
+        for(TransactionHandler handler : handlers) {
             handler.onDataRetrievalError(exception);
         }
     }

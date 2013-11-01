@@ -10,12 +10,17 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.ProteinRetri
 import java.util.*;
 
 /**
+ * This class is the one responsible of retrieving data using retrievers and
+ * caching the data to speed up the application.
+ * Because we assume that the code can be interrupted while doing the
+ * requests, we use a list of batched requests per type of data requested.
+ * This allows us to handle more than one concurrent request without affecting
+ * the others.
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  *         Date: 25/10/13
  *         Time: 15:10
  */
-public class DataProvider implements DataServer.TransactionHandler,
-                                     DataServer {
+public class DataProvider implements DataServer, TransactionHandler {
     private DataServer.DataClient client = null;
 
     private Map<String, Group> groupCache = new HashMap<String, Group>();
@@ -126,6 +131,7 @@ public class DataProvider implements DataServer.TransactionHandler,
             if(isGroupCached(id)) {
                 groupRetriever.retrieveData(id);
                 // we could also check whether there's a pending request or not
+                // in another batch
             }
         }
     }
@@ -158,21 +164,6 @@ public class DataProvider implements DataServer.TransactionHandler,
                 // we could also check whether there's a pending request or not
             }
         }
-    }
-
-    @Override
-    public Group getGroup(String id) {
-        return groupCache.get(id);
-    }
-
-    @Override
-    public Protein getProtein(String accession) {
-        return proteinCache.get(accession);
-    }
-
-    @Override
-    public Peptide getPeptide(String sequence) {
-        return peptideCache.get(sequence);
     }
 
     private void dispatchGroups() {
@@ -215,5 +206,17 @@ public class DataProvider implements DataServer.TransactionHandler,
                 client.onPeptidesRetrieved(peptides);
             }
         }
+    }
+
+    private Group getGroup(String id) {
+        return groupCache.get(id);
+    }
+
+    private Protein getProtein(String accession) {
+        return proteinCache.get(accession);
+    }
+
+    private Peptide getPeptide(String sequence) {
+        return peptideCache.get(sequence);
     }
 }
