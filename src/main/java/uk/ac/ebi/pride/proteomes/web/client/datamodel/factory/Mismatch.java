@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.proteomes.web.client.datamodel;
+package uk.ac.ebi.pride.proteomes.web.client.datamodel.factory;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>

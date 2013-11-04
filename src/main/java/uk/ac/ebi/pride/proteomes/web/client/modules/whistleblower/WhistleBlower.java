@@ -1,8 +1,8 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower;
 
 import com.google.web.bindery.event.shared.EventBus;
-import uk.ac.ebi.pride.proteomes.web.client.events.StateChangingActionEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.updates.TextUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.ErrorOnUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 
 /**
@@ -12,11 +12,11 @@ import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
  */
 public class WhistleBlower implements
                         StateChangingActionEvent.StateChangingActionHandler,
-                        TextUpdateEvent.TextUpdateHandler  {
+        ErrorOnUpdateEvent.ErrorOnUpdateHandler {
 
     public WhistleBlower(EventBus eventBus) {
         eventBus.addHandler(StateChangingActionEvent.getType(), this);
-        eventBus.addHandler(TextUpdateEvent.getType(), this);
+        eventBus.addHandler(ErrorOnUpdateEvent.getType(), this);
     }
     @Override
     public void onStateChangingActionEvent(StateChangingActionEvent event) {
@@ -32,7 +32,7 @@ public class WhistleBlower implements
     }
 
     @Override
-    public void onTextUpdateEvent(TextUpdateEvent event) {
+    public void onUpdateErrorEvent(ErrorOnUpdateEvent event) {
         if(Console.VERBOSE) {
             String clName = event.getSource().getClass().toString();
             clName = clName.substring(clName.lastIndexOf(".") + 1);
@@ -40,7 +40,7 @@ public class WhistleBlower implements
             String evName = event.getClass().toString();
             evName = evName.substring(evName.lastIndexOf(".") + 1);
 
-            Console.info("(Whistler): " + evName + "(\"" + event.getText() +
+            Console.info("(Whistler): " + evName + "(\"" + event.getMessage() +
                     "\")" + " <- " + clName);
         }
     }

@@ -1,6 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.history;
 
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
+import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 
 import java.util.Collection;
 
@@ -101,9 +102,9 @@ final class State {
      */
     public static State tokenize(String value) throws
             InconsistentStateException {
-        String groupIds = null, proteinIds = null,  peptideIds = null,
-                varianceIds = null, regionIds = null, modificationIds = null,
-                tissueIds = null;
+        String groupIds = "", proteinIds = "",  peptideIds = "",
+                varianceIds = "", regionIds = "", modificationIds = "",
+                tissueIds = "";
 
         String[] tokens, dict;
 
@@ -165,11 +166,11 @@ final class State {
         return selectedVarianceIds;
     }
 
-    public String[] getSelectedModification() {
+    public String[] getSelectedModifications() {
         return selectedModificationIds;
     }
 
-    public String[] getSelectedTissue() {
+    public String[] getSelectedTissues() {
         return selectedTissueIds;
     }
 

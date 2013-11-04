@@ -6,15 +6,21 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.History;
 import com.google.web.bindery.event.shared.EventBus;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.Group;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.Peptide;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.GroupRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.PeptideRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.StateChangingActionEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.InvalidStateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
+import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
+import uk.ac.ebi.pride.proteomes.web.client.utils.RegionUtils;
 
 import java.util.*;
 
@@ -63,16 +69,18 @@ public class AppController implements
 
     @Override
     public void onValueChange(ValueChangeEvent<String> event) {
-        // We're in the empty landing page, we have to initialize the view to
-        // show something relevant
         if(event.getValue().isEmpty()) {
+            // We're in the empty landing page!
             try {
                 appState = State.tokenize(event.getValue());
-            } catch (Exception e){ /* Application error, todo */ }
+            } catch (Exception e){
+                InvalidStateEvent.fire(this, "Application Error, " +
+                                             "please contact the PRIDE team.");
+                return;
+            }
 
-            //UpdateViewEvent.fire(this, "Search for a group or a protein
-            //                            first!");
-            // todo
+            EmptyViewEvent.fire(this, "Please, select a protein or group of " +
+                                      "proteins to show its data.");
         }
         else {
             State freshState;
@@ -82,10 +90,14 @@ public class AppController implements
             catch(InconsistentStateException e) {
                 // we tried to create an inconsistent state, that's bad,
                 // we should act upon it. (show a popup with an error?)
+                InvalidStateEvent.fire(this, "The address cannot be " +
+                        "displayed. Please check that is is correct and " +
+                        "change it, or go back. If you didn't type the " +
+                        "address contact the PRIDE team about the error and " +
+                        "explained them what you were doing before this " +
+                        "message");
                 return;
             }
-
-            stateQueue.add(freshState);
             requestData(freshState);
         }
     }
@@ -112,7 +124,8 @@ public class AppController implements
 
     @Override
     public void onRetrievalError(String message) {
-        // todo
+        ErrorOnUpdateEvent.fire(this, "There was an error when contacting " +
+                                      "the server\n" + message);
     }
 
     private void requestData(State state) {
@@ -155,6 +168,9 @@ public class AppController implements
             }
         }
 
+        //update the queue with the new state that has to be processed
+        stateQueue.add(state);
+
         if(areGroupsNotCached) {
             GroupRequestEvent.fire(this);
         }
@@ -165,13 +181,23 @@ public class AppController implements
             PeptideRequestEvent.fire(this);
         }
 
-        // It's time to retrieve data and wait for the callback
-
-        server.requestGroups(state.getSelectedGroups());
-        server.requestProteins(state.getSelectedProteins());
-        server.requestPeptides(state.getSelectedPeptides());
+        // If everything is cached we go straight to update the views
+        if(areGroupsNotCached && areProteinsNotCached && arePeptidesNotCached) {
+            processStateQueue();
+        }
+        else {
+            // It's time to retrieve data and wait for the callback
+            if(areGroupsNotCached) {
+                server.requestGroups(state.getSelectedGroups());
+            }
+            if(areProteinsNotCached) {
+                server.requestProteins(state.getSelectedProteins());
+            }
+            if(arePeptidesNotCached) {
+                server.requestPeptides(state.getSelectedPeptides());
+            }
+        }
     }
-
 
     private void processStateQueue() {
         // Check if the other data to represent the state arrived already
@@ -180,14 +206,18 @@ public class AppController implements
         }
 
         if(!isStateValid(stateQueue.peek())) {
-            //show a popup!
+            InvalidStateEvent.fire(this, "The address cannot be " +
+                    "displayed. Please check that is is correct and " +
+                    "change it, or go back. If you didn't type the " +
+                    "address contact the PRIDE team about the error and " +
+                    "explained them what you were doing before this " +
+                    "message");
             return;
         }
 
-        // For the test app, we send the notification to update the views here
         goTo(stateQueue.remove());
 
-        //the first state in the queue might be ready, maybe the
+        //the first state in the queue right now might be ready, who knows?
         processStateQueue();
     }
 
@@ -245,12 +275,61 @@ public class AppController implements
                 break;
             }
         }
+
+        for(String regionId : state.getSelectedRegions()) {
+            try {
+                Region.tokenize(regionId);
+            }
+            catch(Exception e) {
+                isCorrect = false;
+            }
+
+            if(!isCorrect) {
+                break;
+            }
+        }
         return isCorrect;
     }
 
     private void goTo(State newState) {
+        // tread carefully, when should we update the appState,
+        // before or after signaling the change? Should we use some kind of
+        // flag to prevent confuzzling?
         History.newItem(newState.getHistoryToken(), false);
+
+        if(!Arrays.equals(newState.getSelectedGroups(),
+                          appState.getSelectedGroups())) {
+            GroupUpdateEvent.fire(this, server.getGroups(newState.getSelectedGroups()));
+        }
+        if(!Arrays.equals(newState.getSelectedProteins(),
+                          appState.getSelectedProteins())) {
+            ProteinUpdateEvent.fire(this, server.getProteins(newState.getSelectedProteins()));
+        }
+        if(!Arrays.equals(newState.getSelectedRegions(),
+                          appState.getSelectedRegions())) {
+            try {
+                RegionUpdateEvent.fire(this, RegionUtils.tokenize(newState.getSelectedRegions()));
+            } catch (IllegalRegionValueException e) {
+                // this should never happen (we checked before!)
+            }
+        }
+        if(!Arrays.equals(newState.getSelectedPeptides(),
+                          appState.getSelectedPeptides())) {
+            PeptideUpdateEvent.fire(this, server.getPeptides(newState.getSelectedPeptides()));
+        }
+        if(!Arrays.equals(newState.getSelectedVariances(),
+                          appState.getSelectedVariances())) {
+            VarianceUpdateEvent.fire(this, newState.getSelectedVariances());
+        }
+        if(!Arrays.equals(newState.getSelectedModifications(),
+                          appState.getSelectedModifications())) {
+            ModificationUpdateEvent.fire(this, newState.getSelectedModifications());
+        }
+        if(!Arrays.equals(newState.getSelectedTissues(),
+                          appState.getSelectedTissues())) {
+            TissueUpdateEvent.fire(this, newState.getSelectedTissues());
+        }
+
         appState = newState;
-        //TextUpdateEvent.fire(this, newState.getText());
     }
 }

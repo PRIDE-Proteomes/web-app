@@ -4,7 +4,7 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.Transaction;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.TransactionHandler;
 

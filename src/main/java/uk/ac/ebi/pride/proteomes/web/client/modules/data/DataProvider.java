@@ -1,8 +1,8 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.Group;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.Peptide;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.GroupRetriever;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.PeptideRetriever;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.ProteinRetriever;
@@ -167,6 +167,33 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
+    public List<Group> getGroups(String[] ids) {
+        List<Group> groups = new ArrayList<Group>();
+        for(String id : ids) {
+            groups.add(groupCache.get(id));
+        }
+        return groups;
+    }
+
+    @Override
+    public List<Protein> getProteins(String[] accessions) {
+        List<Protein> proteins = new ArrayList<Protein>();
+        for(String accession : accessions) {
+            proteins.add(proteinCache.get(accession));
+        }
+        return proteins;
+    }
+
+    @Override
+    public List<Peptide> getPeptides(String[] sequences) {
+        List<Peptide> peptides = new ArrayList<Peptide>();
+        for(String sequence : sequences) {
+            peptides.add(peptideCache.get(sequence));
+        }
+        return peptides;
+    }
+
+    @Override
     public Group getGroup(String id) {
         return groupCache.get(id);
     }
@@ -188,7 +215,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
                 List<Group> groups = new ArrayList<Group>();
                 for(Map.Entry<String, Boolean> entry : batchRequest.entrySet()) {
-                    groups.add(getGroup(entry.getKey()));
+                    groups.add(groupCache.get(entry.getKey()));
                 }
                 client.onGroupsRetrieved(groups);
             }
@@ -202,7 +229,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
                 List<Protein> proteins = new ArrayList<Protein>();
                 for(Map.Entry<String, Boolean> entry : batchRequest.entrySet()) {
-                    proteins.add(getProtein(entry.getKey()));
+                    proteins.add(proteinCache.get(entry.getKey()));
                 }
                 client.onProteinsRetrieved(proteins);
             }
@@ -216,7 +243,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
                 List<Peptide> peptides = new ArrayList<Peptide>();
                 for(Map.Entry<String, Boolean> entry : batchRequest.entrySet()) {
-                    peptides.add(getPeptide(entry.getKey()));
+                    peptides.add(peptideCache.get(entry.getKey()));
                 }
                 client.onPeptidesRetrieved(peptides);
             }

@@ -1,10 +1,11 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.Group;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.Peptide;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * In this file are contained the interfaces between a class that
@@ -35,7 +36,11 @@ public interface DataServer {
     public void requestProteins(String[] accessions);
     public void requestPeptides(String[] sequences);
 
-    public Group getGroup(String id);
-    public Protein getProtein(String accession);
-    public Peptide getPeptide(String sequence);
+    public List<Group> getGroups(String[] ids);
+    public List<Protein> getProteins(String[] accessions);
+    public List<Peptide> getPeptides(String[] sequences);
+
+    public Group getGroup(String ids);
+    public Protein getProtein(String accessions);
+    public Peptide getPeptide(String sequences);
 }
