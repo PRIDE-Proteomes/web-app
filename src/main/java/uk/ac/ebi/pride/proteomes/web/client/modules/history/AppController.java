@@ -39,6 +39,7 @@ public class AppController implements
     private final DataServer server;
     private State appState;
     private Queue<State> stateQueue;
+    private boolean queueBeingProcessed = false;
 
     public AppController(EventBus eventBus, DataServer server) {
         this.eventBus = eventBus;
@@ -200,6 +201,13 @@ public class AppController implements
     }
 
     private void processStateQueue() {
+        // Do a poor man's atomic region.
+        if(queueBeingProcessed) {
+            return;
+        }
+        else {
+            queueBeingProcessed = true;
+        }
         // Check if the other data to represent the state arrived already
         if(!isDataReady(stateQueue.peek())) {
             return;
@@ -216,6 +224,8 @@ public class AppController implements
         }
 
         goTo(stateQueue.remove());
+
+        queueBeingProcessed = false;
 
         //the first state in the queue right now might be ready, who knows?
         processStateQueue();
@@ -292,9 +302,10 @@ public class AppController implements
     }
 
     private void goTo(State newState) {
-        // tread carefully, when should we update the appState,
-        // before or after signaling the change? Should we use some kind of
-        // flag to prevent confuzzling?
+        // we assume the code here when it gets interrupted it cannot be
+        // executed again, otherwise we might run into data inconsistencies
+        // (the caller should guarantee this, like processStateQueue() does)
+
         History.newItem(newState.getHistoryToken(), false);
 
         if(!Arrays.equals(newState.getSelectedGroups(),
