@@ -7,6 +7,7 @@ import com.google.gwt.http.client.Response;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.Transaction;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.TransactionHandler;
+import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 
 import java.util.ArrayList;
 import java.util.Collection;

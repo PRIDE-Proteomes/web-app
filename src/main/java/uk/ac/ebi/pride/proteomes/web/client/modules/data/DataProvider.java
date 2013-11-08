@@ -128,7 +128,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
         for(String id : ids) {
             request.put(id, isGroupCached(id));
-            if(isGroupCached(id)) {
+            if(!isGroupCached(id)) {
                 groupRetriever.retrieveData(id);
                 // we could also check whether there's a pending request or not
                 // in another batch

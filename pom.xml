@@ -35,6 +35,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- PRIDE Widgets -->
+        <dependency>
+            <groupId>uk.ac.ebi.pride.widgets</groupId>
+            <artifactId>pride-gwt-widgets</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
+
         <!-- Testing Libraries -->
         <dependency>
             <groupId>junit</groupId>

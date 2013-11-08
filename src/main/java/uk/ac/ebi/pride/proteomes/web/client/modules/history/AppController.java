@@ -46,6 +46,9 @@ public class AppController implements
         this.server = server;
 
         stateQueue = new LinkedList<State>();
+        try {
+            appState = new State("", "", "", "", "", "", "");
+        } catch (InconsistentStateException e) {/**/}
 
         eventBus.addHandler(StateChangingActionEvent.getType(), this);
         History.addValueChangeHandler(this);
@@ -125,8 +128,8 @@ public class AppController implements
 
     @Override
     public void onRetrievalError(String message) {
-        ErrorOnUpdateEvent.fire(this, "There was an error when contacting " +
-                                      "the server\n" + message);
+        ErrorOnUpdateEvent.fire(this, "There was an error when trying to get " +
+                                      "data from the server:\n" + message);
     }
 
     private void requestData(State state) {
@@ -135,15 +138,15 @@ public class AppController implements
         // retrieved, we don't want the users to think that the web app is
         // unresponsive.
 
-        boolean areGroupsNotCached = true;
-        boolean areProteinsNotCached = true;
-        boolean arePeptidesNotCached = true;
+        boolean areGroupsCached = true;
+        boolean areProteinsCached = true;
+        boolean arePeptidesCached = true;
 
         if(!State.getToken(state.getSelectedGroups()).equals(
                 State.getToken(appState.getSelectedGroups()))) {
             for(String id : state.getSelectedGroups()) {
                 if(!server.isGroupCached(id)) {
-                    areGroupsNotCached = false;
+                    areGroupsCached = false;
                     break;
                 }
             }
@@ -153,7 +156,7 @@ public class AppController implements
                 State.getToken(appState.getSelectedProteins()))) {
             for(String accession : state.getSelectedProteins()) {
                 if(!server.isProteinCached(accession)) {
-                    areProteinsNotCached = false;
+                    areProteinsCached = false;
                     break;
                 }
             }
@@ -163,7 +166,7 @@ public class AppController implements
                 State.getToken(appState.getSelectedPeptides()))) {
             for(String sequence : state.getSelectedPeptides()) {
                 if(!server.isPeptideCached(sequence)) {
-                    arePeptidesNotCached = false;
+                    arePeptidesCached = false;
                     break;
                 }
             }
@@ -172,29 +175,29 @@ public class AppController implements
         //update the queue with the new state that has to be processed
         stateQueue.add(state);
 
-        if(areGroupsNotCached) {
+        if(!areGroupsCached) {
             GroupRequestEvent.fire(this);
         }
-        if(areProteinsNotCached) {
+        if(!areProteinsCached) {
             ProteinRequestEvent.fire(this);
         }
-        if(arePeptidesNotCached) {
+        if(!arePeptidesCached) {
             PeptideRequestEvent.fire(this);
         }
 
         // If everything is cached we go straight to update the views
-        if(areGroupsNotCached && areProteinsNotCached && arePeptidesNotCached) {
+        if(areGroupsCached && areProteinsCached && arePeptidesCached) {
             processStateQueue();
         }
         else {
             // It's time to retrieve data and wait for the callback
-            if(areGroupsNotCached) {
+            if(!areGroupsCached) {
                 server.requestGroups(state.getSelectedGroups());
             }
-            if(areProteinsNotCached) {
+            if(!areProteinsCached) {
                 server.requestProteins(state.getSelectedProteins());
             }
-            if(arePeptidesNotCached) {
+            if(!arePeptidesCached) {
                 server.requestPeptides(state.getSelectedPeptides());
             }
         }
@@ -322,6 +325,8 @@ public class AppController implements
                 RegionUpdateEvent.fire(this, RegionUtils.tokenize(newState.getSelectedRegions()));
             } catch (IllegalRegionValueException e) {
                 // this should never happen (we checked before!)
+                ErrorOnUpdateEvent.fire(this, "Application Error, please " +
+                                              "contact the PRIDE team.");
             }
         }
         if(!Arrays.equals(newState.getSelectedPeptides(),

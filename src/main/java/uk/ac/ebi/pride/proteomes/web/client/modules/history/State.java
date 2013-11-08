@@ -31,7 +31,8 @@ final class State {
      * @param proteinIds String representing several proteins, comma-separated.
      * @param regionIds String representing several regions, comma-separated.
      * @param peptideIds String representing several peptides, comma-separated.
-     * @param varianceIds String representing several proteins, comma-separated.
+     * @param varianceIds String representing several peptide variances,
+     *                    comma-separated.
      * @param modificationIds String representing several modifications,
      *                        comma-separated.
      * @param tissueIds String representing several tissues, comma-separated.
