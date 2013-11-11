@@ -3,15 +3,25 @@ package uk.ac.ebi.pride.proteomes.web.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.View;
+import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoveragePresenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoverageView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
+import uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderPresenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.AppController;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower.WhistleBlower;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The appController is in charge of creating the graphical structure of the
@@ -25,8 +35,7 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower.WhistleBlower;
  */
 public class AppStarter implements RunAsyncCallback {
 
-    private static final String webRoot = "http://ves-ebi-4d.ebi.ac" +
-                                          ".uk:8110/pride/ws/proteomes";
+    private static final String webServiceRoot = "/pride/ws/proteomes";
     private final EventBus eventBus;
     private HasWidgets container;
 
@@ -49,27 +58,41 @@ public class AppStarter implements RunAsyncCallback {
         // Stick together the whole app first by creating the listeners to
         // the event bus, then creating the structure of the graphical elements
 
-        //TextPresenter.View textView = new TextView();
-        //Presenter textPresenter = new TextPresenter(eventBus, textView);
+        // todo we should initialize these two lists,
+        // the placeholders usually are enough with SimplePanels
+        // The two lists should have the same size
+        List<Presenter> presenterList = new ArrayList<Presenter>();
+        List<AcceptsOneWidget> placeHolderList = new
+                ArrayList<AcceptsOneWidget>();
 
-        //ButtonsPresenter.View buttonsView = new ButtonsView();
-        //Presenter buttonsPresenter = new ButtonsPresenter(eventBus,
-        //        buttonsView);
+        View headerView = new HeaderView();
+        Presenter headerPresenter = new HeaderPresenter(eventBus,
+                                            (HeaderPresenter.View) headerView);
 
-        MainPresenter.View mainView = new MainView();
-        //Presenter mainPresenter = new MainPresenter(eventBus,
-        //                                            mainView,
-        //                                            textPresenter,
-        //                                            buttonsPresenter);
+        View coverageView = new CoverageView();
+        Presenter coveragePresenter = new CoveragePresenter(eventBus,
+                                          (CoveragePresenter.View) coverageView);
+
+        presenterList.add(headerPresenter);
+        presenterList.add(coveragePresenter);
+
+        for(Presenter p : presenterList) {
+            placeHolderList.add(new SimplePanel());
+        }
+
+        MainPresenter.View mainView = new MainView(placeHolderList);
+        Presenter mainPresenter = new MainPresenter(eventBus,
+                                                    mainView,
+                                                    presenterList);
 
         SimplePanel mainPanel = new SimplePanel();
         container.add(mainPanel);
 
-        //mainPresenter.bindToContainer(mainPanel);
+        mainPresenter.bindToContainer(mainPanel);
 
         WhistleBlower whistle = new WhistleBlower(eventBus);
 
-        DataServer provider = new DataProvider(webRoot);
+        DataServer provider = new DataProvider(webServiceRoot);
         AppController appController = new AppController(eventBus, provider);
         provider.bind(appController);
 

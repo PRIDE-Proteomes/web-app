@@ -128,8 +128,7 @@ public class AppController implements
 
     @Override
     public void onRetrievalError(String message) {
-        ErrorOnUpdateEvent.fire(this, "There was an error when trying to get " +
-                                      "data from the server:\n" + message);
+        ErrorOnUpdateEvent.fire(this, message);
     }
 
     private void requestData(State state) {

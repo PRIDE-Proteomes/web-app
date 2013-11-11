@@ -6,8 +6,8 @@ package uk.ac.ebi.pride.proteomes.web.client.datamodel.factory;
  *         Time: 16:05
  */
 public interface ModifiedLocation {
-    public int getLocation();
-    public void setLocation(int location);
+    public int getSite();
+    public void setSite(int location);
 
     public String getModification();
     public void setModification(String modification);

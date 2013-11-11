@@ -1,8 +1,12 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.main;
 
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -12,19 +16,28 @@ import java.util.Collection;
 public class MainView implements MainPresenter.View {
 
     private final Panel layout;
-    private final AcceptsOneWidget northPanel;
-    private final AcceptsOneWidget southPanel;
+    private final List<AcceptsOneWidget> panelList;
+    private PopupMask popup;
 
-    public MainView() {
+    public MainView(List<AcceptsOneWidget> panels) {
+        panelList = panels;
+
         layout = new VerticalPanel();
-
         layout.setWidth("100%");
 
-        northPanel = new SimplePanel();
-        layout.add((Widget) northPanel);
-
-        southPanel = new SimplePanel();
-        layout.add((Widget) southPanel);
+        for (AcceptsOneWidget panel : panelList) {
+            layout.add((Widget) panel);
+        }
+        popup = new PopupMask();
+        //We want to move the popup position when the window is resized
+        Window.addResizeHandler(new ResizeHandler() {
+            @Override
+            public void onResize(ResizeEvent event) {
+                if(popup.isShowing())
+                    popup.setPosition(popup.getOffsetWidth(),
+                                      popup.getOffsetHeight());
+            }
+        });
     }
 
     @Override
@@ -43,27 +56,32 @@ public class MainView implements MainPresenter.View {
     }
 
     @Override
-    public void hidePopup() {
-        // TODO
+    public void setVisible(boolean visible) {
+        asWidget().setVisible(visible);
     }
 
     @Override
-    public void showPopup() {
-        // TODO
+    public void hide() {
+        popup.hide();
     }
 
     @Override
-    public void showPopup(String message) {
-        // TODO
+    public void showLoadingMessage() {
+        popup.displayLoadingMessage();
     }
 
     @Override
-    public AcceptsOneWidget getNorthPlaceHolder() {
-        return northPanel;
+    public void showInfoMessage(String message) {
+        popup.displayMessage(message);
     }
 
     @Override
-    public AcceptsOneWidget getSouthPlaceHolder() {
-        return southPanel;
+    public AcceptsOneWidget getPlaceHolder(int i) {
+        return panelList.get(i);
+    }
+
+    @Override
+    public Widget asWidget() {
+        return layout;
     }
 }

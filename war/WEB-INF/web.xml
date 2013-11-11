@@ -1,13 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
               http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5"
          xmlns="http://java.sun.com/xml/ns/javaee">
-  
+
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>webapp.html</welcome-file>
   </welcome-file-list>
+    <!-- RESTful WS PROXY Configuration -->
+    <servlet> <!-- adapters for PRIDE web service calls /pride/ws -->
+        <servlet-name>ProxyServletWS</servlet-name>
+        <servlet-class>uk.ac.ebi.pride.web.util.servlet.proxy.ProxyServlet</servlet-class>
+        <init-param>
+            <param-name>proxyHost</param-name>
+            <param-value>ves-ebi-4d.ebi.ac.uk</param-value>
+        </init-param>
+        <init-param>
+            <param-name>proxyPort</param-name>
+            <param-value>8110</param-value>
+        </init-param>
+        <init-param>
+            <param-name>proxyPath</param-name>
+            <param-value>/pride/ws/proteomes</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProxyServletWS</servlet-name>
+        <url-pattern>/pride/ws/proteomes/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Dynamically generated initial page configuration -->
+    <servlet>
+        <servlet-name>AppWebServlet</servlet-name>
+        <servlet-class>uk.ac.ebi.pride.proteomes.web.servlets.AppWebServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AppWebServlet</servlet-name>
+        <url-pattern>/index.html</url-pattern>
+    </servlet-mapping>
 
 </web-app>

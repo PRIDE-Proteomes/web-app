@@ -15,6 +15,8 @@ public abstract class ModelFactory {
     interface BeanFactory extends AutoBeanFactory {
         AutoBean<Group> group();
         AutoBean<Protein> protein();
+        AutoBean<Peptide> peptide();
+        AutoBean<ModifiedLocation> modifiedLocation();
     }
 
     public static<T> T getModelObject(Class<T> tClass, String json) throws

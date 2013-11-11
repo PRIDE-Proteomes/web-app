@@ -5,6 +5,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
+import uk.ac.ebi.pride.proteomes.web.client.exceptions.InvalidJSONException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.Transaction;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.TransactionHandler;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
@@ -51,6 +52,10 @@ public class GroupRetriever implements TransactionHandler.DataRetriever {
     public void onResponseReceived(Request request, Response response) {
         Transaction trans;
 
+        if(request == null) {
+            onError(request, new Exception("Error: Could not contact the " +
+                    "server."));
+        }
         try {
             trans = new Transaction(response.getText(), Group.class);
 
@@ -62,7 +67,9 @@ public class GroupRetriever implements TransactionHandler.DataRetriever {
                 handler.onDataRetrieval(trans);
             }
 
-        } catch (Exception e) {
+        } catch(InvalidJSONException e) {
+            onError(request, e);
+        } catch(Exception e) {
             onError(request, e);
         }
 

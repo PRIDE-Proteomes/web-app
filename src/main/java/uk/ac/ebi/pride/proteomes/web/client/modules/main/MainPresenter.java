@@ -2,39 +2,65 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.main;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.InvalidStateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.ErrorOnUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+
+import java.util.List;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  *         Date: 17/10/13
  *         Time: 10:56
  */
-public class MainPresenter implements Presenter {
+public class MainPresenter implements Presenter,
+                                      EmptyViewEvent.EmptyViewHandler,
+                                      InvalidStateEvent.InvalidStateHandler,
+                                      ErrorOnUpdateEvent.ErrorOnUpdateHandler {
+
     public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View {
-        public void hidePopup();
-        public void showPopup();
-        public void showPopup(String message);
-        public AcceptsOneWidget getNorthPlaceHolder();
-        public AcceptsOneWidget getSouthPlaceHolder();
+        public void hide();
+        public void showLoadingMessage();
+        public void showInfoMessage(String message);
+        public AcceptsOneWidget getPlaceHolder(int i);
     }
 
     private final EventBus eventBus;
     private final View view;
-    private final Presenter northPresenter;
-    private final Presenter southPresenter;
+    private final List<Presenter> presenterList;
 
     public MainPresenter(EventBus eventBus, View view,
-                         Presenter northPresenter, Presenter southPresenter) {
+                         List<Presenter> presenters) {
         this.eventBus = eventBus;
         this.view = view;
-        this.northPresenter = northPresenter;
-        this.southPresenter = southPresenter;
+        this.presenterList = presenters;
+
+        eventBus.addHandler(EmptyViewEvent.getType(), this);
+        eventBus.addHandler(ErrorOnUpdateEvent.getType(), this);
+        eventBus.addHandler(InvalidStateEvent.getType(), this);
     }
 
     @Override
     public void bindToContainer(AcceptsOneWidget container) {
         view.bindToContainer(container);
-        northPresenter.bindToContainer(view.getNorthPlaceHolder());
-        southPresenter.bindToContainer(view.getSouthPlaceHolder());
+        for(int i = 0; i < presenterList.size(); i++) {
+            presenterList.get(i).bindToContainer(view.getPlaceHolder(i));
+        }
+    }
+
+    @Override
+    public void onEmptyViewEvent(EmptyViewEvent event) {
+        view.showInfoMessage(event.getMessage());
+    }
+
+    @Override
+    public void onInvalidStateEvent(InvalidStateEvent event) {
+        view.showInfoMessage(event.getMessage());
+    }
+
+    @Override
+    public void onUpdateErrorEvent(ErrorOnUpdateEvent event) {
+        view.showInfoMessage(event.getMessage());
     }
 }

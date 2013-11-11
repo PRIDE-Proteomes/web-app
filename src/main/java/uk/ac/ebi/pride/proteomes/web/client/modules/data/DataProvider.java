@@ -35,17 +35,17 @@ public class DataProvider implements DataServer, TransactionHandler {
     private List<Map<String, Boolean>> peptideRequests;
     private final PeptideRetriever peptideRetriever;
 
-    public DataProvider(String webRoot) {
+    public DataProvider(String webServiceRoot) {
         groupRequests = new ArrayList<Map<String, Boolean>>();
-        groupRetriever = new GroupRetriever(webRoot);
+        groupRetriever = new GroupRetriever(webServiceRoot);
         groupRetriever.addHandler(this);
 
         proteinRequests = new ArrayList<Map<String, Boolean>>();
-        proteinRetriever = new ProteinRetriever(webRoot);
+        proteinRetriever = new ProteinRetriever(webServiceRoot);
         proteinRetriever.addHandler(this);
 
         peptideRequests = new ArrayList<Map<String, Boolean>>();
-        peptideRetriever = new PeptideRetriever(webRoot);
+        peptideRetriever = new PeptideRetriever(webServiceRoot);
         peptideRetriever.addHandler(this);
     }
 
@@ -144,7 +144,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
         for(String accession : accessions) {
             request.put(accession, isProteinCached(accession));
-            if(isProteinCached(accession)) {
+            if(!isProteinCached(accession)) {
                 proteinRetriever.retrieveData(accession);
                 // we could also check whether there's a pending request or not
             }
@@ -159,7 +159,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
         for(String sequence : sequences) {
             request.put(sequence, isPeptideCached(sequence));
-            if(isPeptideCached(sequence)) {
+            if(!isPeptideCached(sequence)) {
                 peptideRetriever.retrieveData(sequence);
                 // we could also check whether there's a pending request or not
             }

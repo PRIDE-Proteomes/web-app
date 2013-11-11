@@ -17,9 +17,12 @@ public interface Group {
     public String getDescription();
     public void setDescription(String description);
 
+    public List<String> getTissues();
+    public void setTissues(List<String> tissues);
+
     public List<String> getMemberProteins();
     public void setMemberProteins(List<String> memberProteins);
 
-    public Alignment getAlignment();
-    public void setAlignment(Alignment alignment);
+    public Alignment getUniquePeptides();
+    public void setUniquePeptides(List<String> uniquePeptides);
 }
