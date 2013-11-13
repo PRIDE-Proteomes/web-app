@@ -4,7 +4,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.GroupRetriever;
-import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.PeptideRetriever;
+import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.PeptideVarianceRetriever;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.ProteinRetriever;
 
 import java.util.*;
@@ -32,8 +32,8 @@ public class DataProvider implements DataServer, TransactionHandler {
     private final ProteinRetriever proteinRetriever;
 
     private Map<String, Peptide> peptideCache = new HashMap<String, Peptide>();
-    private List<Map<String, Boolean>> peptideRequests;
-    private final PeptideRetriever peptideRetriever;
+    private List<Map<String, Boolean>> peptideVarianceRequests;
+    private final PeptideVarianceRetriever peptideVarianceRetriever;
 
     public DataProvider(String webServiceRoot) {
         groupRequests = new ArrayList<Map<String, Boolean>>();
@@ -44,9 +44,9 @@ public class DataProvider implements DataServer, TransactionHandler {
         proteinRetriever = new ProteinRetriever(webServiceRoot);
         proteinRetriever.addHandler(this);
 
-        peptideRequests = new ArrayList<Map<String, Boolean>>();
-        peptideRetriever = new PeptideRetriever(webServiceRoot);
-        peptideRetriever.addHandler(this);
+        peptideVarianceRequests = new ArrayList<Map<String, Boolean>>();
+        peptideVarianceRetriever = new PeptideVarianceRetriever(webServiceRoot);
+        peptideVarianceRetriever.addHandler(this);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class DataProvider implements DataServer, TransactionHandler {
             Peptide peptide = (Peptide) transaction.getResponse();
             peptideCache.put(peptide.getSequence(), peptide);
 
-            for(Map<String, Boolean> batchRequest : peptideRequests) {
+            for(Map<String, Boolean> batchRequest : peptideVarianceRequests) {
                 if(batchRequest.containsKey((peptide.getSequence()))) {
                     batchRequest.put(peptide.getSequence(), true);
                 }
@@ -152,15 +152,15 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public void requestPeptides(String[] sequences) {
+    public void requestPeptideVariances(String[] sequences) {
         Map<String, Boolean> request = new HashMap<String, Boolean>();
 
-        peptideRequests.add(request);
+        peptideVarianceRequests.add(request);
 
         for(String sequence : sequences) {
             request.put(sequence, isPeptideCached(sequence));
             if(!isPeptideCached(sequence)) {
-                peptideRetriever.retrieveData(sequence);
+                peptideVarianceRetriever.retrieveData(sequence);
                 // we could also check whether there's a pending request or not
             }
         }
@@ -237,9 +237,9 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     private void dispatchPeptides() {
-        for(Map<String, Boolean> batchRequest : peptideRequests) {
+        for(Map<String, Boolean> batchRequest : peptideVarianceRequests) {
             if(!batchRequest.containsValue(false)) {
-                peptideRequests.remove(batchRequest);
+                peptideVarianceRequests.remove(batchRequest);
 
                 List<Peptide> peptides = new ArrayList<Peptide>();
                 for(Map.Entry<String, Boolean> entry : batchRequest.entrySet()) {

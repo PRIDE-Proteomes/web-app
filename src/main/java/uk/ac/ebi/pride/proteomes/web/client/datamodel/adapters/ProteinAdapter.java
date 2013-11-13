@@ -1,7 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.widgets.client.common.handler.PeptideHandler;
 import uk.ac.ebi.pride.widgets.client.common.handler.ProteinHandler;
@@ -25,8 +25,8 @@ public class ProteinAdapter implements ProteinHandler {
 
         peptideHandlers = new ArrayList<PeptideHandler>();
 
-        for(Peptide p : protein.getPeptides()) {
-            peptideHandlers.add(new PeptideAdapter(p, protein));
+        for(PeptideMatch p : protein.getPeptides()) {
+            peptideHandlers.add(new PeptideAdapter(p));
         }
 
         modificationHandlers = new ArrayList<ProteinModificationHandler>();

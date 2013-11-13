@@ -99,7 +99,7 @@ public class CoveragePresenter implements Presenter,
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
         if(event.getPeptides().size() > 0) {
             view.updatePeptideSelection(new PeptideAdapter(event.getPeptides
-                    ().get(0), currentProtein));
+                    ().get(0)));
         }
         else {
             view.resetPeptideSelection();

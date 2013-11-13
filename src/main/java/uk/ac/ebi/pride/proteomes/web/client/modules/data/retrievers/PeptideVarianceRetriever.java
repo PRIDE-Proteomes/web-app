@@ -11,18 +11,19 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.data.TransactionHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 /**
+ * This class retrieves the variances of a specified peptide sequence
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  *         Date: 29/10/13
  *         Time: 16:17
  */
 
-public class PeptideRetriever implements TransactionHandler.DataRetriever {
+public class PeptideVarianceRetriever implements TransactionHandler.DataRetriever {
     private final String root;
 
     private Collection<TransactionHandler> handlers = new
             ArrayList<TransactionHandler>();
 
-    public PeptideRetriever(String webServiceRoot) {
+    public PeptideVarianceRetriever(String webServiceRoot) {
         this.root = webServiceRoot;
     }
 

@@ -2,6 +2,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 
 import java.util.Collection;
@@ -34,7 +35,7 @@ public interface DataServer {
 
     public void requestGroups(String[] ids);
     public void requestProteins(String[] accessions);
-    public void requestPeptides(String[] sequences);
+    public void requestPeptideVariances(String[] sequences);
 
     public List<Group> getGroups(String[] ids);
     public List<Protein> getProteins(String[] accessions);

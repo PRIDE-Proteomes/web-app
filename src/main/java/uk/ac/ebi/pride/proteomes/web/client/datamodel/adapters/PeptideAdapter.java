@@ -1,7 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters;
 
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.widgets.client.common.handler.PeptideHandler;
 
 /**
@@ -10,12 +9,10 @@ import uk.ac.ebi.pride.widgets.client.common.handler.PeptideHandler;
  *         Time: 13:50
  */
 public class PeptideAdapter implements PeptideHandler {
-    private final Peptide peptide;
-    private final Protein protein;
+    private final PeptideMatch peptide;
 
-    public PeptideAdapter(Peptide peptide, Protein protein) {
+    public PeptideAdapter(PeptideMatch peptide) {
         this.peptide = peptide;
-        this.protein = protein;
     }
 
     @Override
@@ -25,10 +22,7 @@ public class PeptideAdapter implements PeptideHandler {
 
     @Override
     public Integer getSite() {
-        return 0; // todo
-        // we don't have a way to know the exact site the peptide
-        // starts, we cannot calculate it, it-s sequence may repeat in the
-        // protein :/
+        return peptide.getSite();
     }
 
     @Override

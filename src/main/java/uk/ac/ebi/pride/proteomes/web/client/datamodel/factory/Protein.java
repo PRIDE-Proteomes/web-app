@@ -29,6 +29,6 @@ public interface Protein {
     public List<List<Integer>> getRegions();
     public void setRegions(List<List<Integer>> regions);
 
-    public List<Peptide> getPeptides();
-    public void setPeptides(List<Peptide> peptides);
+    public List<PeptideMatch> getPeptides();
+    public void setPeptides(List<PeptideMatch> peptides);
 }
