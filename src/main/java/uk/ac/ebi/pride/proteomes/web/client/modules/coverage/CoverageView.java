@@ -9,6 +9,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -37,7 +38,7 @@ public class CoverageView implements CoveragePresenter.View {
     }
 
     @Override
-    public void updatePeptideSelection(PeptideAdapter peptide) {
+    public void updatePeptideSelection(List<PeptideAdapter> peptideSelection) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

@@ -6,10 +6,14 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -31,7 +35,7 @@ public class CoveragePresenter implements Presenter,
         public void updateProtein(ProteinAdapter protein);
         public void updateRegionSelection(int start, int end);
         public void resetRegionSelection();
-        public void updatePeptideSelection(PeptideAdapter peptide);
+        public void updatePeptideSelection(List<PeptideAdapter> peptideSelection);
         public void resetPeptideSelection();
         public void updateModificationHighlight(ModificationAdapter mod);
         public void resetModificationHighlight();
@@ -95,11 +99,23 @@ public class CoveragePresenter implements Presenter,
         }
     }
 
+    /**
+     * This function selects all the peptide matches in the coverage view that
+     * have the same sequence as the first peptide of the list that it's
+     * received.
+     * @param event the event containing a list of peptides that got updated,
+     *              we want to select them in the coverage view
+     */
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
         if(event.getPeptides().size() > 0) {
-            view.updatePeptideSelection(new PeptideAdapter(event.getPeptides
-                    ().get(0)));
+            List<PeptideAdapter> selection = new ArrayList<PeptideAdapter>();
+            for(PeptideMatch match : currentProtein.getPeptides()) {
+                if(match.getSequence().equals(event.getPeptides().get(0).getSequence())) {
+                    selection.add(new PeptideAdapter(match));
+                }
+            }
+            view.updatePeptideSelection(selection);
         }
         else {
             view.resetPeptideSelection();

@@ -4,9 +4,7 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
