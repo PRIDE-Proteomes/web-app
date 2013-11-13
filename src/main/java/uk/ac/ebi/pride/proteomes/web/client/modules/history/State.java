@@ -1,7 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.history;
 
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
-import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 
 import java.util.Collection;
 
@@ -27,33 +27,33 @@ final class State {
 
     /**
      *
-     * @param groupIds String representing several groups, comma-separated.
-     * @param proteinIds String representing several proteins, comma-separated.
-     * @param regionIds String representing several regions, comma-separated.
-     * @param peptideIds String representing several peptides, comma-separated.
+     * @param groupIds String representing several groups,
+     *                 separated with sepValues.
+     * @param proteinIds String representing several proteins,
+     *                 separated with sepValues.
+     * @param regionIds String representing several regions,
+     *                 separated with sepValues.
+     * @param peptideIds String representing several peptides,
+     *                 separated with sepValues.
      * @param varianceIds String representing several peptide variances,
-     *                    comma-separated.
+     *                 separated with sepValues.
      * @param modificationIds String representing several modifications,
-     *                        comma-separated.
-     * @param tissueIds String representing several tissues, comma-separated.
+     *                 separated with sepValues.
+     * @param tissueIds String representing several tissues,
+     *                 separated with sepValues.
      * @throws InconsistentStateException if the state that's being created
      * doesn't follow the data model hierarchy this exception is thrown
      * instead of creating the new state. Note that there isn't enough
      * information to check whether the state is semantically correct,
      * so another check using all the data pointed in here must be made.
      */
-    public State(String groupIds,
-                 String proteinIds,
-                 String peptideIds,
-                 String varianceIds,
-                 String regionIds,
-                 String modificationIds,
-                 String tissueIds)
-                    throws InconsistentStateException {
+    State(String groupIds, String proteinIds, String peptideIds,
+          String varianceIds, String regionIds, String modificationIds,
+          String tissueIds)
+             throws InconsistentStateException {
 
-        if(!isValid(groupIds, proteinIds, peptideIds,
-                varianceIds, regionIds,
-                modificationIds, tissueIds)) {
+        if(!isValid(groupIds, proteinIds, peptideIds, varianceIds, regionIds,
+                    modificationIds, tissueIds)) {
             throw new InconsistentStateException();
         }
 
@@ -214,15 +214,25 @@ final class State {
                     String regions,
                     String modifications,
                     String tissues) {
+        boolean isValid = true;
+
         if(proteins.isEmpty() &&
            (!peptides.isEmpty() || !variances.isEmpty() || !regions.isEmpty())) {
-               return false;
+               isValid = false;
         }
         else if(peptides.isEmpty() && !variances.isEmpty()) {
-            return false;
+            isValid = false;
         }
-        else {
-            return true;
+
+        for(String regionId : regions.split(sepValues)) {
+            try {
+                Region.tokenize(regionId);
+            }
+            catch(Exception e) {
+                isValid = false;
+            }
         }
+
+        return isValid;
     }
 }

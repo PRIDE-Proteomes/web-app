@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.history;
 
+import org.apache.commons.lang.StringUtils;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
 import uk.ac.ebi.pride.proteomes.web.client.utils.DefaultHashMap;
 
@@ -47,17 +48,28 @@ public class StateChanger {
             changedState = oldState;
         }
         else {
-            DefaultHashMap<String, String> tempState = new DefaultHashMap<String, String>();
+            DefaultHashMap<String, String> changesToApply = new DefaultHashMap<String, String>();
             for(Change change : orderedChanges) {
-                tempState.put(change.getKey(), change.getValue());
+                changesToApply.put(change.getKey(), change.getValue());
             }
-            changedState = new State(tempState.get("group", ""),
-                                     tempState.get("protein", ""),
-                                     tempState.get("peptide", ""),
-                                     tempState.get("variance", ""),
-                                     tempState.get("region", ""),
-                                     tempState.get("modification", ""),
-                                     tempState.get("tissue", ""));
+
+            // We create the strings from the old state and use them as
+            // fallback values when there is no change for them.
+            String oldGroups = State.getToken(oldState.getSelectedGroups());
+            String oldProteins = State.getToken(oldState.getSelectedProteins());
+            String oldPeptides = State.getToken(oldState.getSelectedPeptides());
+            String oldVariances = State.getToken(oldState.getSelectedVariances());
+            String oldRegions = State.getToken(oldState.getSelectedRegions());
+            String oldModifications = State.getToken(oldState.getSelectedRegions());
+            String oldTissues = State.getToken(oldState.getSelectedRegions());
+
+            changedState = new State(changesToApply.get("group", oldGroups),
+                                     changesToApply.get("protein", oldProteins),
+                                     changesToApply.get("peptide", oldPeptides),
+                                     changesToApply.get("variance", oldVariances),
+                                     changesToApply.get("region", oldRegions),
+                                     changesToApply.get("modification", oldModifications),
+                                     changesToApply.get("tissue", oldTissues));
         }
         return changedState;
     }

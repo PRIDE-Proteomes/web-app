@@ -9,6 +9,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.GroupRequestEvent;
@@ -47,7 +48,7 @@ public class AppController implements
 
         stateQueue = new LinkedList<State>();
         try {
-            appState = new State("", "", "", "", "", "", "");
+            appState = State.tokenize("");
         } catch (InconsistentStateException e) {/**/}
 
         eventBus.addHandler(StateChangingActionEvent.getType(), this);
@@ -64,6 +65,12 @@ public class AppController implements
         catch(InconsistentStateException e) {
             // we tried to create an inconsistent state, that's bad,
             // we should act upon it. (show a popup with an error?)
+            InvalidStateEvent.fire(this, "The address cannot be " +
+                    "displayed. Please check that is is correct and " +
+                    "change it, or go back. If you didn't type the " +
+                    "address contact the PRIDE team about the error and " +
+                    "explained them what you were doing before this " +
+                    "message");
             return;
         }
 
@@ -71,13 +78,17 @@ public class AppController implements
         requestData(freshState);
     }
 
+    /**
+     * This function gets called whenever the browser's url gets changed
+     * @param event the event that carries the new URL
+     */
     @Override
     public void onValueChange(ValueChangeEvent<String> event) {
         if(event.getValue().isEmpty()) {
             // We're in the empty landing page!
             try {
                 appState = State.tokenize(event.getValue());
-            } catch (Exception e){
+            } catch (InconsistentStateException e){
                 InvalidStateEvent.fire(this, "Application Error, " +
                                              "please contact the PRIDE team.");
                 return;
@@ -197,7 +208,7 @@ public class AppController implements
                 server.requestProteins(state.getSelectedProteins());
             }
             if(!arePeptidesCached) {
-                server.requestPeptides(state.getSelectedPeptides());
+                server.requestPeptideVariances(state.getSelectedPeptides());
             }
         }
     }
@@ -215,7 +226,7 @@ public class AppController implements
             return;
         }
 
-        if(!isStateValid(stateQueue.peek())) {
+        if(!isStateDataValid(stateQueue.peek())) {
             InvalidStateEvent.fire(this, "The address cannot be " +
                     "displayed. Please check that is is correct and " +
                     "change it, or go back. If you didn't type the " +
@@ -233,6 +244,13 @@ public class AppController implements
         processStateQueue();
     }
 
+    /**
+     * This function checks whether the data in a state is cached in the
+     * server or not yet
+     * @param state The state which data needs to be checked.
+     * @return Whether the data in the state is all cached already in the
+     * provider
+     */
     private boolean isDataReady(State state) {
         if(state == null) {
             return false;
@@ -255,7 +273,13 @@ public class AppController implements
         return true;
     }
 
-    private boolean isStateValid(State state) {
+    /**
+     * This function checks whether an application state contains consistent
+     * data, i.e. the state can be displayed without inconsistencies.
+     * @param state the state that needs to be checked.
+     * @return Whether the data in the state is consistent or not.
+     */
+    private boolean isStateDataValid(State state) {
         if(state == null) {
             return false;
         }
@@ -275,9 +299,19 @@ public class AppController implements
                 break;
             }
 
+            //check if all the peptides in the state are actually in all the
+            // proteins that are selected, as well as inside the region
+            // selected.
             for(String sequence : state.getSelectedPeptides()) {
-                if(!server.getProtein(accession).getPeptides().contains
-                        (server.getPeptide(sequence))) {
+                boolean isContained = false;
+                for(PeptideMatch match : server.getProtein(accession).getPeptides()) {
+                    if(sequence.equals(match.getSequence())) {
+                        // todo check if the peptide is inside the region
+                        isContained = true;
+                        break;
+                    }
+                }
+                if(!isContained) {
                     isCorrect = false;
                     break;
                 }
@@ -330,7 +364,13 @@ public class AppController implements
         }
         if(!Arrays.equals(newState.getSelectedPeptides(),
                           appState.getSelectedPeptides())) {
-            PeptideUpdateEvent.fire(this, server.getPeptides(newState.getSelectedPeptides()));
+            // This should group the peptides if there are several proteins
+            // selected. Since the group view doesn't allow for this at the
+            // moment there's no need to implement it at the moment.
+
+            PeptideUpdateEvent.fire(this, server.getProtein(newState
+                    .getSelectedProteins()[0]).getPeptides(),
+                    server.getPeptides(newState.getSelectedPeptides()));
         }
         if(!Arrays.equals(newState.getSelectedVariances(),
                           appState.getSelectedVariances())) {
