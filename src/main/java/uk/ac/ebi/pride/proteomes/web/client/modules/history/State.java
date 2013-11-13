@@ -225,11 +225,13 @@ final class State {
         }
 
         for(String regionId : regions.split(sepValues)) {
-            try {
-                Region.tokenize(regionId);
-            }
-            catch(Exception e) {
-                isValid = false;
+            if(!regionId.isEmpty()) {
+                try {
+                    Region.tokenize(regionId);
+                }
+                catch(Exception e) {
+                    isValid = false;
+                }
             }
         }
 
