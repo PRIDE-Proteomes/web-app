@@ -306,9 +306,23 @@ public class AppController implements
                 boolean isContained = false;
                 for(PeptideMatch match : server.getProtein(accession).getPeptides()) {
                     if(sequence.equals(match.getSequence())) {
-                        // todo check if the peptide is inside the region
-                        isContained = true;
-                        break;
+                        // Check if the peptide match is inside any region
+                        for(String regionId : state.getSelectedRegions()) {
+                            try {
+                                Region region = Region.tokenize(regionId);
+                                if(region.getStart() <= match.getSite() &&
+                                   region.getEnd() >= match.getSite() + match
+                                           .getSequence().length()) {
+                                    isContained = true;
+                                    break;
+                                }
+                            } catch (IllegalRegionValueException e) {
+                                isCorrect = false;
+                            }
+                        }
+                        if(isContained) {
+                            break;
+                        }
                     }
                 }
                 if(!isContained) {
@@ -322,18 +336,6 @@ public class AppController implements
             }
         }
 
-        for(String regionId : state.getSelectedRegions()) {
-            try {
-                Region.tokenize(regionId);
-            }
-            catch(Exception e) {
-                isCorrect = false;
-            }
-
-            if(!isCorrect) {
-                break;
-            }
-        }
         return isCorrect;
     }
 

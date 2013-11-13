@@ -65,7 +65,6 @@ public class PeptideVarianceRetriever implements TransactionHandler.DataRetrieve
         } catch (Exception e) {
             onError(request, e);
         }
-
     }
 
     @Override
