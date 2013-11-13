@@ -24,43 +24,23 @@ public class PeptideUpdateEvent extends
     private static final GwtEvent.Type<PeptideUpdateHandler> TYPE = new GwtEvent.Type<PeptideUpdateHandler>();
 
     private List<Peptide> peptideList;
-    private List<PeptideMatch> matchList;
 
-    public PeptideUpdateEvent(List<PeptideMatch> matches,
-                              List<Peptide> peptides,
-                              HasHandlers source) {
+    public PeptideUpdateEvent(List<Peptide> peptides, HasHandlers source) {
         super();
-        matchList = matches;
         peptideList = peptides;
         setSource(source);
     }
 
-    public static void fire(HasHandlers source, List<PeptideMatch> matches) {
-        PeptideUpdateEvent eventInstance = new PeptideUpdateEvent
-                (matches, new ArrayList<Peptide>(), source);
+    public static void fire(HasHandlers source, List<Peptide> peptides) {
+        PeptideUpdateEvent eventInstance = new PeptideUpdateEvent(peptides, source);
         source.fireEvent(eventInstance);
-    }
-
-    public static void fire(HasHandlers source, List<PeptideMatch> matches,
-                            List<Peptide> peptides) {
-        PeptideUpdateEvent eventInstance = new PeptideUpdateEvent
-                (matches, peptides, source);
-        source.fireEvent(eventInstance);
-    }
-
-    /**
-     *
-     * @return the peptide matches in the protein(s) that just got updated
-     */
-    public List<PeptideMatch> getPeptides() {
-        return matchList;
     }
 
     /**
      *
      * @return the variances of the peptides that got selected
      */
-    public List<Peptide> getVariances() {
+    public List<Peptide> getPeptides() {
         return peptideList;
     }
 

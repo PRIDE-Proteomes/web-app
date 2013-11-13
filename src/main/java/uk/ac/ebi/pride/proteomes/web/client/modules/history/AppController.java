@@ -370,9 +370,7 @@ public class AppController implements
             // selected. Since the group view doesn't allow for this at the
             // moment there's no need to implement it at the moment.
 
-            PeptideUpdateEvent.fire(this, server.getProtein(newState
-                    .getSelectedProteins()[0]).getPeptides(),
-                    server.getPeptides(newState.getSelectedPeptides()));
+            PeptideUpdateEvent.fire(this, server.getPeptides(newState.getSelectedPeptides()));
         }
         if(!Arrays.equals(newState.getSelectedVariances(),
                           appState.getSelectedVariances())) {
