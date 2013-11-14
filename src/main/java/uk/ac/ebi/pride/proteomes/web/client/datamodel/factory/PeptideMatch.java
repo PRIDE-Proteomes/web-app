@@ -7,5 +7,4 @@ package uk.ac.ebi.pride.proteomes.web.client.datamodel.factory;
  */
 public interface PeptideMatch extends Peptide {
     public Integer getSite();
-    public void setSite(Integer site);
 }

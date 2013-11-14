@@ -12,17 +12,22 @@ import uk.ac.ebi.pride.proteomes.web.client.exceptions.InvalidJSONException;
  *         Time: 15:44
  */
 public abstract class ModelFactory {
-    interface BeanFactory extends AutoBeanFactory {
+    interface MyFactory extends AutoBeanFactory {
         AutoBean<Group> group();
         AutoBean<Protein> protein();
         AutoBean<Peptide> peptide();
+        AutoBean<PeptideMatch> peptideMatch();
         AutoBean<ModifiedLocation> modifiedLocation();
+
+        AutoBean<Alignment> alignment();
+        AutoBean<AlignedProtein> alignedProtein();
+        AutoBean<Mismatch> mismatch();
     }
 
     public static<T> T getModelObject(Class<T> tClass, String json) throws
             InvalidJSONException {
+        MyFactory factory = GWT.create(MyFactory.class);
         try {
-            BeanFactory factory = GWT.create(BeanFactory.class);
             AutoBean<T> bean = AutoBeanCodex.decode(factory, tClass, json);
             return bean.as();
         }

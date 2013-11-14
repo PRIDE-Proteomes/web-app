@@ -29,7 +29,7 @@ public class ProteinModificationAdapter implements ProteinModificationHandler {
 
     @Override
     public Integer getSite() {
-        return modifiedLocation.getSite();
+        return modifiedLocation.getLocation();
     }
 
     @Override

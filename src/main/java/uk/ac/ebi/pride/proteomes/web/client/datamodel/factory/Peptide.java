@@ -9,14 +9,7 @@ import java.util.List;
  */
 public interface Peptide {
     public String getSequence();
-    public void setSequence(String sequence);
-
     public int getTaxonId();
-    public void setTaxonId(int taxonID);
-
     public List<ModifiedLocation> getModifiedLocations();
-    public void setModifiedLocations(List<ModifiedLocation> modifiedLocations);
-
     public List<String> getTissues();
-    public void setTissues(List<String> tissues);
 }
