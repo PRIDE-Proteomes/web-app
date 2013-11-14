@@ -9,8 +9,10 @@
   <welcome-file-list>
     <welcome-file>webapp.html</welcome-file>
   </welcome-file-list>
+
     <!-- RESTful WS PROXY Configuration -->
-    <servlet> <!-- adapters for PRIDE web service calls /pride/ws -->
+    <!-- adapters for PRIDE web service calls /pride/ws -->
+    <servlet>
         <servlet-name>ProxyServletWS</servlet-name>
         <servlet-class>uk.ac.ebi.pride.web.util.servlet.proxy.ProxyServlet</servlet-class>
         <init-param>
