@@ -17,6 +17,7 @@ import uk.ac.ebi.pride.proteomes.web.client.events.requests.PeptideRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.InvalidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
@@ -343,6 +344,8 @@ public class AppController implements
         // we assume the code here when it gets interrupted it cannot be
         // executed again, otherwise we might run into data inconsistencies
         // (the caller should guarantee this, like processStateQueue() does)
+
+        ValidStateEvent.fire(this);
 
         History.newItem(newState.getHistoryToken(), false);
 

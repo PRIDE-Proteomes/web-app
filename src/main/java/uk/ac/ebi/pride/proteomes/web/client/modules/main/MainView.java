@@ -61,7 +61,7 @@ public class MainView implements MainPresenter.View {
     }
 
     @Override
-    public void hide() {
+    public void hideMessage() {
         popup.hide();
     }
 

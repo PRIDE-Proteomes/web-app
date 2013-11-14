@@ -29,8 +29,6 @@ public class CoveragePresenter implements Presenter,
                                           ModificationUpdateEvent.ModificationUpdateHandler,
                                           CoverageUiHandler
 {
-    private Protein currentProtein;
-
     public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View {
         public void updateProtein(ProteinAdapter protein);
         public void updateRegionSelection(int start, int end);
@@ -44,7 +42,11 @@ public class CoveragePresenter implements Presenter,
 
     private final EventBus eventBus;
     private final View view;
+
     private boolean groups = true;
+    private Protein currentProtein;
+    private Region currentRegion;
+    private List<PeptideMatch> currentPeptides;
 
     public CoveragePresenter(EventBus eventBus, View view) {
         this.eventBus = eventBus;
@@ -108,14 +110,24 @@ public class CoveragePresenter implements Presenter,
      */
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
+        List<PeptideAdapter> selectionAdapters;
+        List<PeptideMatch> selection;
+
         if(event.getPeptides().size() > 0) {
-            List<PeptideAdapter> selection = new ArrayList<PeptideAdapter>();
+            selectionAdapters = new ArrayList<PeptideAdapter>();
+            selection = new ArrayList<PeptideMatch>();
+
             for(PeptideMatch match : currentProtein.getPeptides()) {
                 if(match.getSequence().equals(event.getPeptides().get(0).getSequence())) {
-                    selection.add(new PeptideAdapter(match));
+                    selectionAdapters.add(new PeptideAdapter(match));
+                    selection.add(match);
                 }
             }
-            view.updatePeptideSelection(selection);
+
+            if(!selection.equals(currentPeptides)) {
+                currentPeptides = selection;
+                view.updatePeptideSelection(selectionAdapters);
+            }
         }
         else {
             view.resetPeptideSelection();
@@ -124,8 +136,10 @@ public class CoveragePresenter implements Presenter,
 
     @Override
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
+        Region region;
+
         if(event.getRegions().size() > 0) {
-            Region region = event.getRegions().get(0);
+            region = event.getRegions().get(0);
             view.updateRegionSelection(region.getStart(), region.getEnd());
         }
         else {

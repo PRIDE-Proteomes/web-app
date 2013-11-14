@@ -4,6 +4,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.InvalidStateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ErrorOnUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 
@@ -16,11 +17,12 @@ import java.util.List;
  */
 public class MainPresenter implements Presenter,
                                       EmptyViewEvent.EmptyViewHandler,
+                                      ValidStateEvent.ValidStateHandler,
                                       InvalidStateEvent.InvalidStateHandler,
                                       ErrorOnUpdateEvent.ErrorOnUpdateHandler {
 
     public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View {
-        public void hide();
+        public void hideMessage();
         public void showLoadingMessage();
         public void showInfoMessage(String message);
         public AcceptsOneWidget getPlaceHolder(int i);
@@ -38,6 +40,7 @@ public class MainPresenter implements Presenter,
 
         eventBus.addHandler(EmptyViewEvent.getType(), this);
         eventBus.addHandler(ErrorOnUpdateEvent.getType(), this);
+        eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(InvalidStateEvent.getType(), this);
     }
 
@@ -52,6 +55,11 @@ public class MainPresenter implements Presenter,
     @Override
     public void onEmptyViewEvent(EmptyViewEvent event) {
         view.showInfoMessage(event.getMessage());
+    }
+
+    @Override
+    public void onValidStateEvent(ValidStateEvent event) {
+        view.hideMessage();
     }
 
     @Override
