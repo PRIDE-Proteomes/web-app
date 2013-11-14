@@ -40,9 +40,9 @@ public class HeaderView implements View {
     public HeaderView() {
         root = ourUiBinder.createAndBindUi(this);
 
-        this.title.setText("lalala");
-        this.description.setText("lalala");
-        this.attributes.setText("lalala");
+        this.title.setText("");
+        this.description.setText("");
+        this.attributes.setText("");
 
     }
     @Override
