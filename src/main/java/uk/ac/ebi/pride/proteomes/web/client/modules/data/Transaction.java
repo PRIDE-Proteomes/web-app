@@ -11,8 +11,8 @@ import uk.ac.ebi.pride.proteomes.web.client.exceptions.InvalidJSONException;
 public class Transaction {
     private final Object response;
 
-    public Transaction(String response, Class type) throws InvalidJSONException {
-        this.response = ModelFactory.getModelObject(type, response);
+    public Transaction(String json, Class type) throws InvalidJSONException {
+        this.response = ModelFactory.getModelObject(type, json);
     }
     public Object getResponse() {
         return response;

@@ -2,7 +2,6 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 
 import java.util.Collection;

@@ -5,6 +5,8 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.exceptions.InvalidJSONException;
+import uk.ac.ebi.pride.proteomes.web.client.exceptions.UnacceptableResponseException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.Transaction;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.TransactionHandler;
 
@@ -51,18 +53,25 @@ public class PeptideVarianceRetriever implements TransactionHandler.DataRetrieve
     public void onResponseReceived(Request request, Response response) {
         Transaction trans;
 
+        if(response == null) {
+            onError(request, new Exception("Error: Could not contact the " +
+                    "server."));
+            return;
+        }
         try {
-            trans = new Transaction(response.getText(), Peptide.class);
-
             if(!response.getStatusText().equals("OK")) {
-                throw new Exception(response.getStatusText());
+                throw new UnacceptableResponseException();
             }
+
+            trans = new Transaction(response.getText(), Peptide.class);
 
             for(TransactionHandler handler : handlers) {
                 handler.onDataRetrieval(trans);
             }
 
-        } catch (Exception e) {
+        } catch(InvalidJSONException e) {
+            onError(request, e);
+        } catch(UnacceptableResponseException e) {
             onError(request, e);
         }
     }
