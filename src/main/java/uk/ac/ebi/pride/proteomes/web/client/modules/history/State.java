@@ -221,19 +221,24 @@ final class State {
 
         if(proteins.isEmpty() &&
            (!peptides.isEmpty() || !variances.isEmpty() || !regions.isEmpty())) {
-               isValid = false;
+            isValid = false;
+        }
+        else if((groups.isEmpty() || proteins.isEmpty()) &&
+                (modifications.isEmpty() || tissues.isEmpty())) {
+            isValid = false;
         }
         else if(peptides.isEmpty() && !variances.isEmpty()) {
             isValid = false;
         }
-
-        for(String regionId : regions.split(sepValues)) {
-            if(!regionId.isEmpty()) {
-                try {
-                    Region.tokenize(regionId);
-                }
-                catch(Exception e) {
-                    isValid = false;
+        else {
+            for(String regionId : regions.split(sepValues)) {
+                if(!regionId.isEmpty()) {
+                    try {
+                        Region.tokenize(regionId);
+                    }
+                    catch(Exception e) {
+                        isValid = false;
+                    }
                 }
             }
         }
