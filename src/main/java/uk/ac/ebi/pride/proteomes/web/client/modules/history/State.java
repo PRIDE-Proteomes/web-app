@@ -85,13 +85,16 @@ final class State {
         // split Ids)
         historyToken = sBuild.toString();
 
-        this.selectedGroupIds = groupIds.split(sepValues);
-        this.selectedProteinIds = proteinIds.split(sepValues);
-        this.selectedRegionIds = regionIds.split(sepValues);
-        this.selectedPeptideIds = peptideIds.split(sepValues);
-        this.selectedVarianceIds = varianceIds.split(sepValues);
-        this.selectedModificationIds = modificationIds.split(sepValues);
-        this.selectedTissueIds = tissueIds.split(sepValues);
+        // We split the strings into arrays or use an empty array if they're
+        // empty.
+
+        selectedGroupIds = groupIds.isEmpty() ? new String[0] : groupIds.split(sepValues);
+        selectedProteinIds = proteinIds.isEmpty() ? new String[0] : proteinIds.split(sepValues);
+        selectedRegionIds = regionIds.isEmpty() ? new String[0] : regionIds.split(sepValues);
+        selectedPeptideIds = peptideIds.isEmpty() ? new String[0] : peptideIds.split(sepValues);
+        selectedVarianceIds = varianceIds.isEmpty() ? new String[0] : varianceIds.split(sepValues);
+        selectedModificationIds = modificationIds.isEmpty() ? new String[0] : modificationIds.split(sepValues);
+        selectedTissueIds = tissueIds.isEmpty() ? new String[0] : tissueIds.split(sepValues);
     }
 
     /**
