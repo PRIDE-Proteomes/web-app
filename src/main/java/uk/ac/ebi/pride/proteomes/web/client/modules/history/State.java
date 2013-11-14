@@ -62,28 +62,28 @@ final class State {
         if(!groupIds.isEmpty()) {
             sBuild.append("group" + sepMaps).append(groupIds).append(sepTypes);
         }
-        if(!groupIds.isEmpty()) {
+        if(!proteinIds.isEmpty()) {
             sBuild.append("protein" + sepMaps).append(proteinIds).append(sepTypes);
         }
-        if(!groupIds.isEmpty()) {
+        if(!regionIds.isEmpty()) {
             sBuild.append("region" + sepMaps).append(regionIds).append(sepTypes);
         }
-        if(!groupIds.isEmpty()) {
+        if(!peptideIds.isEmpty()) {
             sBuild.append("peptide" + sepMaps).append(peptideIds).append(sepTypes);
         }
-        if(!groupIds.isEmpty()) {
+        if(!varianceIds.isEmpty()) {
             sBuild.append("variance" + sepMaps).append(varianceIds).append(sepTypes);
         }
-        if(!groupIds.isEmpty()) {
+        if(!modificationIds.isEmpty()) {
             sBuild.append("modification" + sepMaps).append(modificationIds).append(sepTypes);
         }
-        if(!groupIds.isEmpty()) {
+        if(!tissueIds.isEmpty()) {
             sBuild.append("tissue" + sepMaps).append(tissueIds).append(sepTypes);
         }
 
         // Should we clean the history token before saving it? (using the
         // split Ids)
-        historyToken = sBuild.toString();
+        historyToken = sBuild.substring(0, sBuild.length() - 1);
 
         // We split the strings into arrays or use an empty array if they're
         // empty.
@@ -193,7 +193,7 @@ final class State {
             builder.append(id);
             builder.append(sepValues);
         }
-        return builder.substring(0, builder.length());
+        return builder.substring(0, builder.length() - 1);
     }
 
     /**
