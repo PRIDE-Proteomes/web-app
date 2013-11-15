@@ -40,7 +40,7 @@ public class PeptideColumnProvider {
         TextColumn<PeptideMatch> siteColumn = new TextColumn<PeptideMatch>() {
             @Override
             public String getValue(PeptideMatch object) {
-                return object.getSite().toString();
+                return object.getPosition().toString();
             }
         };
 
@@ -48,7 +48,7 @@ public class PeptideColumnProvider {
         sorter.setComparator(siteColumn, new Comparator<PeptideMatch>() {
             @Override
             public int compare(PeptideMatch o1, PeptideMatch o2) {
-                return o1.getSite().compareTo(o2.getSite());
+                return o1.getPosition().compareTo(o2.getPosition());
             }
         });
 

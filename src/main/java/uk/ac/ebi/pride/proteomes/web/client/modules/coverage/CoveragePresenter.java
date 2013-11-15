@@ -68,11 +68,11 @@ public class CoveragePresenter implements Presenter,
     public void onValidStateEvent(ValidStateEvent event) {
         if(event.getViewType() == ValidStateEvent.ViewType.Protein) {
             hiding = false;
-            //view.asWidget().setVisible(false);
+            view.asWidget().setVisible(false);
         }
         else {
             hiding = true;
-            //view.asWidget().setVisible(true);
+            view.asWidget().setVisible(true);
         }
     }
 

@@ -22,7 +22,7 @@ public class PeptideAdapter implements PeptideHandler {
 
     @Override
     public Integer getSite() {
-        return peptide.getSite();
+        return peptide.getPosition();
     }
 
     @Override
@@ -32,8 +32,6 @@ public class PeptideAdapter implements PeptideHandler {
 
     @Override
     public Integer getUniqueness() {
-        return 0; // todo
-        //we don't know if a peptide is unique with the
-        // current model!
+        return peptide.getUniqueness();
     }
 }

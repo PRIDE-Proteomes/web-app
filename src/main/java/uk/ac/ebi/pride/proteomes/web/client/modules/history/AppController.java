@@ -311,8 +311,8 @@ public class AppController implements
                         for(String regionId : state.getSelectedRegions()) {
                             try {
                                 Region region = Region.tokenize(regionId);
-                                if(region.getStart() <= match.getSite() &&
-                                   region.getEnd() >= match.getSite() + match
+                                if(region.getStart() <= match.getPosition() &&
+                                   region.getEnd() >= match.getPosition() + match
                                            .getSequence().length()) {
                                     isContained = true;
                                     break;
