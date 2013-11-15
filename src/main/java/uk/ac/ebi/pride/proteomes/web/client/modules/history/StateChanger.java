@@ -1,27 +1,32 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.history;
 
-import org.apache.commons.lang.StringUtils;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
 import uk.ac.ebi.pride.proteomes.web.client.utils.DefaultHashMap;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
+ * This class tries to decouple the modules using the event bus from the
+ * whole state of the application. Using the state changer they can only use
+ * the methods of the data in which they are interested whenever they want to
+ * change the state of the application.
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  *         Date: 18/10/13
  *         Time: 12:14
  */
 public class StateChanger {
     private final class Change {
-        private String key;
+        private Type key;
         private String value;
 
-        public Change(String key, String value) {
+        public Change(Type key, String value) {
             this.key = key;
             this.value = value;
         }
 
-        public String getKey() {
+        public Type getKey() {
             return key;
         }
 
@@ -30,10 +35,40 @@ public class StateChanger {
         }
     }
 
+    private enum Type {
+        Group, Protein, Region, Peptide, Variance, Modification, Tissue
+    }
+
     Queue<Change> orderedChanges = new LinkedList<Change>();
 
-    public void addGroupChange(Collection<String> selectedGroup) {
-        orderedChanges.add(new Change("group", State.getToken(selectedGroup)));
+    public void addGroupChange(Collection<String> groupSelection) {
+        orderedChanges.add(new Change(Type.Group,
+                                      State.getToken(groupSelection)));
+    }
+
+    public void addProteinChange(Collection<String> proteinSelection) {
+        orderedChanges.add(new Change(Type.Protein,
+                                      State.getToken(proteinSelection)));
+    }
+
+    public void addRegionChange(Collection<String> regionSelection) {
+        orderedChanges.add(new Change(Type.Region,
+                                      State.getToken(regionSelection)));
+    }
+
+    public void addPeptideChange(Collection<String> peptideSelection) {
+        orderedChanges.add(new Change(Type.Peptide,
+                                      State.getToken(peptideSelection)));
+    }
+
+    public void addVarianceChange(Collection<String> varianceSelection) {
+        orderedChanges.add(new Change(Type.Variance,
+                                      State.getToken(varianceSelection)));
+    }
+
+    public void addModificationChange(Collection<String> modificationSelection) {
+        orderedChanges.add(new Change(Type.Modification,
+                                      State.getToken(modificationSelection)));
     }
 
     /**
@@ -48,7 +83,7 @@ public class StateChanger {
             changedState = oldState;
         }
         else {
-            DefaultHashMap<String, String> changesToApply = new DefaultHashMap<String, String>();
+            DefaultHashMap<Type, String> changesToApply = new DefaultHashMap<Type, String>();
             for(Change change : orderedChanges) {
                 changesToApply.put(change.getKey(), change.getValue());
             }
@@ -63,13 +98,13 @@ public class StateChanger {
             String oldModifications = State.getToken(oldState.getSelectedRegions());
             String oldTissues = State.getToken(oldState.getSelectedRegions());
 
-            changedState = new State(changesToApply.get("group", oldGroups),
-                                     changesToApply.get("protein", oldProteins),
-                                     changesToApply.get("peptide", oldPeptides),
-                                     changesToApply.get("variance", oldVariances),
-                                     changesToApply.get("region", oldRegions),
-                                     changesToApply.get("modification", oldModifications),
-                                     changesToApply.get("tissue", oldTissues));
+            changedState = new State(changesToApply.get(Type.Group, oldGroups),
+                                     changesToApply.get(Type.Protein, oldProteins),
+                                     changesToApply.get(Type.Region, oldRegions),
+                                     changesToApply.get(Type.Peptide, oldPeptides),
+                                     changesToApply.get(Type.Variance, oldVariances),
+                                     changesToApply.get(Type.Modification, oldModifications),
+                                     changesToApply.get(Type.Tissue, oldTissues));
         }
         return changedState;
     }
