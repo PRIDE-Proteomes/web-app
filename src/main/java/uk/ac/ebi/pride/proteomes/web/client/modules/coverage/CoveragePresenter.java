@@ -9,6 +9,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 
@@ -21,7 +22,7 @@ import java.util.List;
  *         Time: 14:43
  */
 public class CoveragePresenter implements Presenter,
-                                          GroupUpdateEvent.GroupUpdateHandler,
+                                          ValidStateEvent.ValidStateHandler,
                                           ProteinUpdateEvent.ProteinUpdateHandler,
                                           ProteinRequestEvent.ProteinRequestHandler,
                                           RegionUpdateEvent.RegionUpdateHandler,
@@ -43,16 +44,17 @@ public class CoveragePresenter implements Presenter,
     private final EventBus eventBus;
     private final View view;
 
-    private boolean groups = true;
+    private boolean hiding = true;
     private Protein currentProtein;
     private Region currentRegion;
     private List<PeptideMatch> currentPeptides;
+    private String currentModification;
 
     public CoveragePresenter(EventBus eventBus, View view) {
         this.eventBus = eventBus;
         this.view = view;
 
-        eventBus.addHandler(GroupUpdateEvent.getType(), this);
+        eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
     }
@@ -63,42 +65,29 @@ public class CoveragePresenter implements Presenter,
     }
 
     @Override
-    public void onGroupUpdateEvent(GroupUpdateEvent event) {
-        if(event.getGroups().size() > 0) {
-            groups = true;
-            view.asWidget().setVisible(false);
+    public void onValidStateEvent(ValidStateEvent event) {
+        if(event.getViewType() == ValidStateEvent.ViewType.Protein) {
+            hiding = false;
+            //view.asWidget().setVisible(false);
         }
         else {
-            groups = false;
+            hiding = true;
+            //view.asWidget().setVisible(true);
         }
     }
 
     @Override
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
-        if(!groups && event.getProteins().size() > 0) {
+        if(!hiding && event.getProteins().size() > 0) {
             currentProtein = event.getProteins().get(0);
             view.updateProtein(new ProteinAdapter(currentProtein));
             view.setVisible(true);
-        }
-        else if(!groups) {
-            // what should we do here? put a blank view?
         }
     }
 
     @Override
     public void onProteinRequestEvent(ProteinRequestEvent event) {
         view.displayLoadingMessage();
-    }
-
-    @Override
-    public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-        if(event.getModifications().length > 0) {
-            view.updateModificationHighlight(
-                    new ModificationAdapter(event.getModifications()[0]));
-        }
-        else {
-            view.resetModificationHighlight();
-        }
     }
 
     /**
@@ -123,11 +112,9 @@ public class CoveragePresenter implements Presenter,
                     selection.add(match);
                 }
             }
+            currentPeptides = selection;
+            view.updatePeptideSelection(selectionAdapters);
 
-            if(!selection.equals(currentPeptides)) {
-                currentPeptides = selection;
-                view.updatePeptideSelection(selectionAdapters);
-            }
         }
         else {
             view.resetPeptideSelection();
@@ -140,10 +127,23 @@ public class CoveragePresenter implements Presenter,
 
         if(event.getRegions().size() > 0) {
             region = event.getRegions().get(0);
+            currentRegion = region;
             view.updateRegionSelection(region.getStart(), region.getEnd());
         }
         else {
             view.resetRegionSelection();
+        }
+    }
+
+    @Override
+    public void onModificationUpdateEvent(ModificationUpdateEvent event) {
+        if(event.getModifications().length > 0) {
+            currentModification = event.getModifications()[0];
+            view.updateModificationHighlight(
+                new ModificationAdapter(event.getModifications()[0]));
+        }
+        else {
+            view.resetModificationHighlight();
         }
     }
 }

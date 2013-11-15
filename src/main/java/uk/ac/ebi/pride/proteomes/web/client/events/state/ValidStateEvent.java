@@ -10,19 +10,26 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Time: 15:30
  */
 public class ValidStateEvent extends GwtEvent<ValidStateEvent.ValidStateHandler> {
+
     public interface ValidStateHandler extends EventHandler {
         public void onValidStateEvent(ValidStateEvent event);
     }
 
-    private static final GwtEvent.Type<ValidStateHandler> TYPE = new GwtEvent.Type<ValidStateHandler>();
-
-    public ValidStateEvent(HasHandlers source) {
-        super();
-        setSource(source);
+    public static enum ViewType {
+        Group, Protein
     }
 
-    public static void fire(HasHandlers source) {
-        ValidStateEvent eventInstance = new ValidStateEvent(source);
+    private static final GwtEvent.Type<ValidStateHandler> TYPE = new GwtEvent.Type<ValidStateHandler>();
+    private final ViewType viewType;
+
+    public ValidStateEvent(HasHandlers source, ViewType viewType) {
+        super();
+        setSource(source);
+        this.viewType = viewType;
+    }
+
+    public static void fire(HasHandlers source, ViewType viewType) {
+        ValidStateEvent eventInstance = new ValidStateEvent(source, viewType);
         source.fireEvent(eventInstance);
     }
 
@@ -30,6 +37,9 @@ public class ValidStateEvent extends GwtEvent<ValidStateEvent.ValidStateHandler>
         return TYPE;
     }
 
+    public ViewType getViewType() {
+        return viewType;
+    }
     @Override
     public Type<ValidStateHandler> getAssociatedType() {
         return TYPE;

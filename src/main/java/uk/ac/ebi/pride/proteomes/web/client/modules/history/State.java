@@ -83,7 +83,12 @@ final class State {
 
         // Should we clean the history token before saving it? (using the
         // split Ids)
-        historyToken = sBuild.substring(0, sBuild.length() - 1);
+        if(sBuild.length() > 0) {
+            historyToken = sBuild.substring(0, sBuild.length() - 1);
+        }
+        else {
+            historyToken = sBuild.toString();
+        }
 
         // We split the strings into arrays or use an empty array if they're
         // empty.
@@ -193,7 +198,8 @@ final class State {
             builder.append(id);
             builder.append(sepValues);
         }
-        return builder.substring(0, builder.length() - 1);
+        return builder.substring(0, builder.length() == 0 ? builder.length():
+                                                            builder.length() - 1);
     }
 
     /**
@@ -224,7 +230,7 @@ final class State {
             isValid = false;
         }
         else if((groups.isEmpty() || proteins.isEmpty()) &&
-                (modifications.isEmpty() || tissues.isEmpty())) {
+                (!modifications.isEmpty() || !tissues.isEmpty())) {
             isValid = false;
         }
         else if(peptides.isEmpty() && !variances.isEmpty()) {

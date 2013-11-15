@@ -4,6 +4,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.GroupUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
@@ -16,6 +17,7 @@ import java.util.List;
  *         Time: 10:46
  */
 public class HeaderPresenter implements Presenter,
+                                        ValidStateEvent.ValidStateHandler,
                                         GroupUpdateEvent.GroupUpdateHandler,
                                         ProteinUpdateEvent.ProteinUpdateHandler {
 
@@ -26,6 +28,7 @@ public class HeaderPresenter implements Presenter,
     }
     private final EventBus eventBus;
     private final View view;
+    private boolean groupView;
 
     private List<Group> groups;
 
@@ -33,6 +36,7 @@ public class HeaderPresenter implements Presenter,
         this.eventBus = eventBus;
         this.view = view;
 
+        eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(GroupUpdateEvent.getType(), this);
     }
 
@@ -42,10 +46,15 @@ public class HeaderPresenter implements Presenter,
     }
 
     @Override
+    public void onValidStateEvent(ValidStateEvent event) {
+        groupView = event.getViewType() == ValidStateEvent.ViewType.Group;
+    }
+
+    @Override
     public void onGroupUpdateEvent(GroupUpdateEvent event) {
         groups = event.getGroups();
 
-        if(groups.size() > 0) {
+        if(groupView && groups.size() > 0) {
             view.updateTitle("Protein group: " + groups.get(0).getId());
             view.updateDescription(groups.get(0).getDescription());
             StringBuilder proteins = new StringBuilder("");
@@ -63,7 +72,7 @@ public class HeaderPresenter implements Presenter,
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
         List<Protein> proteins = event.getProteins();
 
-        if(groups.size() == 0) {
+        if(!groupView) {
             view.updateTitle("Protein: " + proteins.get(0).getAccession());
             view.updateDescription(proteins.get(0).getDescription());
             view.updateProperties("");

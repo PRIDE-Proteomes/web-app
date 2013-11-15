@@ -345,7 +345,12 @@ public class AppController implements
         // executed again, otherwise we might run into data inconsistencies
         // (the caller should guarantee this, like processStateQueue() does)
 
-        ValidStateEvent.fire(this);
+        if(newState.getSelectedGroups().length > 0) {
+            ValidStateEvent.fire(this, ValidStateEvent.ViewType.Group);
+        }
+        else {
+            ValidStateEvent.fire(this, ValidStateEvent.ViewType.Protein);
+        }
 
         History.newItem(newState.getHistoryToken(), false);
 
