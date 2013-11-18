@@ -38,6 +38,7 @@ public class HeaderPresenter implements Presenter,
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(GroupUpdateEvent.getType(), this);
+        eventBus.addHandler(ProteinUpdateEvent.getType(), this);
     }
 
     @Override
