@@ -40,4 +40,8 @@ public class Region {
     public int getLength() {
         return end - start;
     }
+
+    public String toString() {
+        return Integer.toString(start) + "-" + Integer.toString(end);
+    }
 }
