@@ -47,12 +47,12 @@ final class State {
      * information to check whether the state is semantically correct,
      * so another check using all the data pointed in here must be made.
      */
-    State(String groupIds, String proteinIds, String peptideIds,
-          String varianceIds, String regionIds, String modificationIds,
+    State(String groupIds, String proteinIds, String regionIds,
+          String peptideIds, String varianceIds, String modificationIds,
           String tissueIds)
              throws InconsistentStateException {
 
-        if(!isValid(groupIds, proteinIds, peptideIds, varianceIds, regionIds,
+        if(!isValid(groupIds, proteinIds, regionIds, peptideIds, varianceIds,
                     modificationIds, tissueIds)) {
             throw new InconsistentStateException();
         }
@@ -151,8 +151,8 @@ final class State {
             }
         }
 
-        return new State(groupIds, proteinIds, peptideIds, varianceIds,
-                regionIds, modificationIds, tissueIds);
+        return new State(groupIds, proteinIds, regionIds, peptideIds,
+                varianceIds, modificationIds, tissueIds);
     }
 
     public String[] getSelectedGroups() {
@@ -213,14 +213,15 @@ final class State {
             builder.append(id);
             builder.append(sepValues);
         }
-        return builder.substring(0, builder.length());
+        return builder.substring(0, builder.length() == 0 ? builder.length():
+                                                            builder.length() - 1);
     }
 
     boolean isValid(String groups,
                     String proteins,
+                    String regions,
                     String peptides,
                     String variances,
-                    String regions,
                     String modifications,
                     String tissues) {
         boolean isValid = true;
