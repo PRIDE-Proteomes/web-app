@@ -223,7 +223,7 @@ public class AppController implements
             queueBeingProcessed = true;
         }
         // Check if the other data to represent the state arrived already
-        if(!isDataReady(stateQueue.peek())) {
+        if(stateQueue.size() < 0 || !isDataReady(stateQueue.element())) {
             return;
         }
 
