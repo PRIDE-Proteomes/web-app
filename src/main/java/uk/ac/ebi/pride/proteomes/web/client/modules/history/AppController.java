@@ -215,31 +215,40 @@ public class AppController implements
     }
 
     private void processStateQueue() {
-        // Do a poor man's atomic region.
+        // Do a poor man's atomic region, we have to ensure that we reset the
+        // variable queueBeingProcessed to false whenever we exit the function
         if(queueBeingProcessed) {
             return;
         }
         else {
             queueBeingProcessed = true;
         }
-        // Check if the other data to represent the state arrived already
-        if(stateQueue.size() < 0 || !isDataReady(stateQueue.element())) {
+
+        // Check if the queue should be processed
+        if(stateQueue.isEmpty() || !isDataReady(stateQueue.element())) {
+            queueBeingProcessed = false;
             return;
         }
-
-        if(!isStateDataValid(stateQueue.peek())) {
+        try {
+            if(!isStateDataValid(stateQueue.peek())) {
+                throw new InconsistentStateException();
+            }
+            goTo(stateQueue.remove());
+        }
+        catch(InconsistentStateException e) {
             InvalidStateEvent.fire(this, "The address cannot be " +
                     "displayed. Please check that is is correct and " +
                     "change it, or go back. If you didn't type the " +
                     "address contact the PRIDE team about the error and " +
                     "explained them what you were doing before this " +
                     "message");
-            return;
         }
-
-        goTo(stateQueue.remove());
-
-        queueBeingProcessed = false;
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            queueBeingProcessed = false;
+        }
 
         //the first state in the queue right now might be ready, who knows?
         processStateQueue();
