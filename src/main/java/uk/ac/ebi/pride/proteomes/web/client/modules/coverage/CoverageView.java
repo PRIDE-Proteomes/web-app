@@ -31,6 +31,8 @@ public class CoverageView implements CoveragePresenter.View,
     private ProteinViewer coverage;
     private Map<ProteinAdapter, ProteinViewer> viewersCache;
 
+    private List<CoverageUiHandler> uiHandlers = new ArrayList<CoverageUiHandler>();
+
     public CoverageView() {
         viewersCache = new HashMap<ProteinAdapter, ProteinViewer>();
 
@@ -69,22 +71,27 @@ public class CoverageView implements CoveragePresenter.View,
 
     @Override
     public void updatePeptideSelection(List<PeptideAdapter> peptideSelection) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        coverage.setSelectedPeptide(peptideSelection.get(0));
     }
 
     @Override
     public void resetPeptideSelection() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        coverage.resetPeptideSelection();
     }
 
     @Override
     public void updateModificationHighlight(ModificationAdapter mod) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        coverage.setHighlightedModifications(mod);
+    }
+
+    @Override
+    public void updateModificationHighlight(int start, int end) {
+        coverage.selectModificationsBetween(start, end);
     }
 
     @Override
     public void resetModificationHighlight() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        coverage.resetModificationHighlight();
     }
 
     @Override
@@ -98,13 +105,13 @@ public class CoverageView implements CoveragePresenter.View,
     }
 
     @Override
-    public void addUiHandler(Object o) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void addUiHandler(CoverageUiHandler handler) {
+        getUiHandlers().add(handler);
     }
 
     @Override
-    public Collection getUiHandlers() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public Collection<CoverageUiHandler> getUiHandlers() {
+        return uiHandlers;
     }
 
     @Override
@@ -117,36 +124,51 @@ public class CoverageView implements CoveragePresenter.View,
         return outerBox;
     }
 
-
-
+    /**
+     * This function gets called whenever the user is doing a
+     * selection by dragging the mouse over the coverage.
+     * @param e event containing the region that got selected.
+     */
     @Override
     public void onProteinAreaSelected(ProteinAreaSelectedEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        for(CoverageUiHandler handler : uiHandlers) {
+            handler.onRegionDragSelected(e);
+        }
     }
 
     @Override
     public void onProteinAreaHighlighted(ProteinAreaHighlightEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        for(CoverageUiHandler handler : uiHandlers) {
+            handler.onRegionDragHighlighted(e);
+        }
     }
 
     @Override
     public void onProteinRegionHighlighted(ProteinRegionHighlightEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        for(CoverageUiHandler handler : uiHandlers) {
+            handler.onRegionClickHighlighted(e);
+        }
     }
 
     @Override
     public void onPeptideSelected(PeptideSelectedEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        for(CoverageUiHandler handler : uiHandlers) {
+            handler.onPeptideSelected(e);
+        }
     }
 
     @Override
     public void onModificationSelected(ModificationSelectedEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        for(CoverageUiHandler handler : uiHandlers) {
+            handler.onModificationSelected(e);
+        }
     }
 
     @Override
     public void onModificationHighlighted(ModificationHighlightedEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        for(CoverageUiHandler handler : uiHandlers) {
+            handler.onModificationHighlighted(e);
+        }
     }
 
     private void bindViewer(ProteinViewer viewer) {

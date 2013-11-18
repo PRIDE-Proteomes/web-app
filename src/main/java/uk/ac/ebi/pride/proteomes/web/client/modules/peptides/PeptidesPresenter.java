@@ -1,6 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.peptides;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -70,6 +71,11 @@ public class PeptidesPresenter implements Presenter,
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
+    }
+
+    @Override
+    public void fireEvent(GwtEvent<?> event) {
+        eventBus.fireEventFromSource(event, this);
     }
 
     @Override

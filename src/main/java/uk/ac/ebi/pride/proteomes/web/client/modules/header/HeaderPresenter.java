@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.header;
 
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
@@ -39,6 +40,11 @@ public class HeaderPresenter implements Presenter,
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(GroupUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
+    }
+
+    @Override
+    public void fireEvent(GwtEvent<?> event) {
+        eventBus.fireEventFromSource(event, this);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.main;
 
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
@@ -42,6 +43,11 @@ public class MainPresenter implements Presenter,
         eventBus.addHandler(ErrorOnUpdateEvent.getType(), this);
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(InvalidStateEvent.getType(), this);
+    }
+
+    @Override
+    public void fireEvent(GwtEvent<?> event) {
+        eventBus.fireEventFromSource(event, this);
     }
 
     @Override

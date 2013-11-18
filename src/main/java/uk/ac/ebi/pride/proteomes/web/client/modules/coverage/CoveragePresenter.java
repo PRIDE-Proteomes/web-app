@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.coverage;
 
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
@@ -9,11 +10,16 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
+import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
+import uk.ac.ebi.pride.widgets.client.protein.events.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,13 +36,14 @@ public class CoveragePresenter implements Presenter,
                                           ModificationUpdateEvent.ModificationUpdateHandler,
                                           CoverageUiHandler
 {
-    public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View {
+    public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View<CoverageUiHandler> {
         public void updateProtein(ProteinAdapter protein);
         public void updateRegionSelection(int start, int end);
         public void resetRegionSelection();
         public void updatePeptideSelection(List<PeptideAdapter> peptideSelection);
         public void resetPeptideSelection();
         public void updateModificationHighlight(ModificationAdapter mod);
+        public void updateModificationHighlight(int start, int end);
         public void resetModificationHighlight();
         public void displayLoadingMessage();
     }
@@ -54,12 +61,19 @@ public class CoveragePresenter implements Presenter,
         this.eventBus = eventBus;
         this.view = view;
 
+        view.addUiHandler(this);
+
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(ModificationUpdateEvent.getType(), this);
+    }
+
+    @Override
+    public void fireEvent(GwtEvent<?> event) {
+        eventBus.fireEventFromSource(event, this);
     }
 
     @Override
@@ -121,6 +135,7 @@ public class CoveragePresenter implements Presenter,
         }
         else {
             view.resetPeptideSelection();
+            currentPeptides = Collections.emptyList();
         }
     }
 
@@ -135,8 +150,11 @@ public class CoveragePresenter implements Presenter,
             currentRegion = region;
             view.updateRegionSelection(region.getStart(), region.getEnd());
             if(region.getLength() == 1) {
-
+                view.updateModificationHighlight(region.getStart(), region.getEnd());
             }
+        }
+        else {
+            currentRegion = null;
         }
     }
 
@@ -149,6 +167,67 @@ public class CoveragePresenter implements Presenter,
         }
         else {
             view.resetModificationHighlight();
+            currentModification = null;
         }
+    }
+    @Override
+    public void onRegionClickSelected(ProteinRegionSelectionEvent event) {
+        StateChanger changer = new StateChanger();
+        List<String> region = new ArrayList<String>();
+
+        try {
+            region.add(new Region(event.getStart(), event.getStart() + event
+                    .getLength()).toString());
+            changer.addGroupChange(region);
+        } catch (IllegalRegionValueException e) {
+            // what to do here?
+        }
+
+        StateChangingActionEvent.fire(this, changer);
+    }
+
+    @Override
+    public void onRegionDragSelected(ProteinAreaSelectedEvent event) {
+        StateChanger changer = new StateChanger();
+        List<String> region = new ArrayList<String>();
+        // if the selection is done right to left then start > end
+        int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
+        int end = event.getStart() + event.getEnd() - start;
+
+        try {
+            region.add(new Region(start, end).toString());
+            changer.addRegionChange(region);
+
+            StateChangingActionEvent.fire(this, changer);
+        } catch (IllegalRegionValueException e) {
+            // Empty selection, we don't send any event
+        }
+
+
+    }
+
+    @Override
+    public void onRegionClickHighlighted(ProteinRegionHighlightEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onRegionDragHighlighted(ProteinAreaHighlightEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onModificationSelected(ModificationSelectedEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onModificationHighlighted(ModificationHighlightedEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onPeptideSelected(PeptideSelectedEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

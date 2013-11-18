@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules;
 
+import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
 /**
@@ -11,6 +12,6 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
  *         Date: 17/10/13
  *         Time: 10:28
  */
-public interface Presenter {
+public interface Presenter extends HasHandlers {
     public void bindToContainer(final AcceptsOneWidget container);
 }
