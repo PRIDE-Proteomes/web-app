@@ -19,7 +19,13 @@ import java.util.*;
  *         Date: 11/11/13
  *         Time: 12:10
  */
-public class CoverageView implements CoveragePresenter.View, ProteinAreaSelectedHandler, ProteinAreaHighlightedHandler, ProteinRegionHighlightedHandler, PeptideSelectedHandler, ModificationSelectedHandler, ModificationHighlightedHandler {
+public class CoverageView implements CoveragePresenter.View,
+                                     ProteinAreaSelectedHandler,
+                                     ProteinAreaHighlightedHandler,
+                                     ProteinRegionHighlightedHandler,
+                                     PeptideSelectedHandler,
+                                     ModificationSelectedHandler,
+                                     ModificationHighlightedHandler {
     private HTMLPanel panel;
     private ModuleContainer outerBox;
     private ProteinViewer coverage;
@@ -51,12 +57,14 @@ public class CoverageView implements CoveragePresenter.View, ProteinAreaSelected
 
     @Override
     public void updateRegionSelection(int start, int end) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        coverage.setSelectedArea(start, end);
     }
 
     @Override
     public void resetRegionSelection() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        coverage.resetRegionSelection();
+        coverage.resetSelectedArea();
+        coverage.resetModificationSelection();
     }
 
     @Override
@@ -81,12 +89,12 @@ public class CoverageView implements CoveragePresenter.View, ProteinAreaSelected
 
     @Override
     public void displayLoadingMessage() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        outerBox.setContent(ModuleContainer.getLoadingPanel());
     }
 
     @Override
     public void bindToContainer(AcceptsOneWidget container) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        container.setWidget(outerBox);
     }
 
     @Override

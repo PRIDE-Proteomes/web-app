@@ -57,6 +57,9 @@ public class CoveragePresenter implements Presenter,
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
+        eventBus.addHandler(RegionUpdateEvent.getType(), this);
+        eventBus.addHandler(PeptideUpdateEvent.getType(), this);
+        eventBus.addHandler(ModificationUpdateEvent.getType(), this);
     }
 
     @Override
@@ -68,11 +71,11 @@ public class CoveragePresenter implements Presenter,
     public void onValidStateEvent(ValidStateEvent event) {
         if(event.getViewType() == ValidStateEvent.ViewType.Protein) {
             hiding = false;
-            view.asWidget().setVisible(false);
+            view.asWidget().setVisible(true);
         }
         else {
             hiding = true;
-            view.asWidget().setVisible(true);
+            view.asWidget().setVisible(false);
         }
     }
 
@@ -125,13 +128,15 @@ public class CoveragePresenter implements Presenter,
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
         Region region;
 
+        view.resetRegionSelection();
+
         if(event.getRegions().size() > 0) {
             region = event.getRegions().get(0);
             currentRegion = region;
             view.updateRegionSelection(region.getStart(), region.getEnd());
-        }
-        else {
-            view.resetRegionSelection();
+            if(region.getLength() == 1) {
+
+            }
         }
     }
 
