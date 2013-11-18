@@ -56,21 +56,18 @@ public class GroupRetriever implements TransactionHandler.DataRetriever {
             onError(request, new Exception("Error: Could not contact the " +
                     "server."));
             return;
+        } else if(!response.getStatusText().equals("OK")) {
+            onError(request, new UnacceptableResponseException());
+            return;
         }
-        try {
-            if(!response.getStatusText().equals("OK")) {
-                throw new UnacceptableResponseException();
-            }
 
+        try {
             trans = new Transaction(response.getText(), Group.class);
 
             for(TransactionHandler handler : handlers) {
                 handler.onDataRetrieval(trans);
             }
-
         } catch(InvalidJSONException e) {
-            onError(request, e);
-        } catch(UnacceptableResponseException e) {
             onError(request, e);
         }
     }

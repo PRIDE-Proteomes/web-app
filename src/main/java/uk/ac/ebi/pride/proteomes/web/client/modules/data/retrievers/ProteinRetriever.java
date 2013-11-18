@@ -52,20 +52,22 @@ public class ProteinRetriever implements TransactionHandler.DataRetriever {
     public void onResponseReceived(Request request, Response response) {
         Transaction trans;
 
-        try {
-            if(!response.getStatusText().equals("OK")) {
-                throw new UnacceptableResponseException();
-            }
+        if(response == null) {
+            onError(request, new Exception("Error: Could not contact the " +
+                    "server."));
+            return;
+        } else if(!response.getStatusText().equals("OK")) {
+            onError(request, new UnacceptableResponseException());
+            return;
+        }
 
+        try {
             trans = new Transaction(response.getText(), Protein.class);
 
             for(TransactionHandler handler : handlers) {
                 handler.onDataRetrieval(trans);
             }
-
         } catch(InvalidJSONException e) {
-            onError(request, e);
-        } catch(UnacceptableResponseException e) {
             onError(request, e);
         }
     }
