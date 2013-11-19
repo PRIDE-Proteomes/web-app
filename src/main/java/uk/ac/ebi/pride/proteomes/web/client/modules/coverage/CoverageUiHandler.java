@@ -16,5 +16,4 @@ public interface CoverageUiHandler {
     void onPeptideSelected(PeptideSelectedEvent event);
 
     void onModificationSelected(ModificationSelectedEvent event);
-    void onModificationHighlighted(ModificationHighlightedEvent event);
 }

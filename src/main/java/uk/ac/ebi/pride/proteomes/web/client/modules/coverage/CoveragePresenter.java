@@ -81,6 +81,8 @@ public class CoveragePresenter implements Presenter,
         view.bindToContainer(container);
     }
 
+    // Callbacks that handle event bus events
+
     @Override
     public void onValidStateEvent(ValidStateEvent event) {
         if(event.getViewType() == ValidStateEvent.ViewType.Protein) {
@@ -171,6 +173,8 @@ public class CoveragePresenter implements Presenter,
         }
     }
 
+    // Callbacks that handle user events from the view.
+
     @Override
     public void onRegionClickSelected(ProteinRegionSelectionEvent event) {
         StateChanger changer = new StateChanger();
@@ -179,25 +183,26 @@ public class CoveragePresenter implements Presenter,
         try {
             region.add(new Region(event.getStart(), event.getStart() + event
                     .getLength() - 1).toString());
-            changer.addGroupChange(region);
+            changer.addRegionChange(region);
 
             StateChangingActionEvent.fire(this, changer);
         } catch (IllegalRegionValueException e) {
-            // what to do here?
+            // This is probably because of an empty selection,
+            // we don't send any event
         }
     }
 
     @Override
     public void onRegionDragSelected(ProteinAreaSelectedEvent event) {
         StateChanger changer = new StateChanger();
-        List<String> region = new ArrayList<String>();
+        List<String> regions = new ArrayList<String>();
         // if the selection is done right to left then start > end
         int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
         int end = event.getStart() + event.getEnd() - start;
 
         try {
-            region.add(new Region(start, end).toString());
-            changer.addRegionChange(region);
+            regions.add(new Region(start, end).toString());
+            changer.addRegionChange(regions);
 
             StateChangingActionEvent.fire(this, changer);
         } catch (IllegalRegionValueException e) {
@@ -207,26 +212,62 @@ public class CoveragePresenter implements Presenter,
 
     @Override
     public void onRegionClickHighlighted(ProteinRegionHighlightEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // todo We don't do anything right now, we should work on getting the
+        // application to a functional state first
     }
 
     @Override
     public void onRegionDragHighlighted(ProteinAreaHighlightEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // todo We don't do anything right now, we should work on getting the
+        // application to a functional state first
     }
 
     @Override
     public void onPeptideSelected(PeptideSelectedEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        StateChanger changer = new StateChanger();
+        List<String> regions = new ArrayList<String>();
+        List<String> peptides = new ArrayList<String>();
+
+        PeptideAdapter peptide = (PeptideAdapter) event.getPeptide();
+
+        // If the peptide doesn't fit the region that's selected we ought to
+        // change the region too.
+        if(peptide.getSite() < currentRegion.getStart() ||
+           peptide.getEnd() > currentRegion.getEnd()) {
+            try {
+                regions.add(new Region(peptide.getSite(), peptide.getEnd()).toString());
+                changer.addRegionChange(regions);
+            } catch (IllegalRegionValueException e) {
+                // this shouldn't happen
+            }
+        }
+        peptides.add(peptide.getSequence());
+        changer.addPeptideChange(peptides);
+
+        StateChangingActionEvent.fire(this, changer);
     }
 
     @Override
     public void onModificationSelected(ModificationSelectedEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+        StateChanger changer = new StateChanger();
+        List<String> regions = new ArrayList<String>();
+        List<String> modifications = new ArrayList<String>();
 
-    @Override
-    public void onModificationHighlighted(ModificationHighlightedEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // Terminal modifications are ignored for now
+        if(event.getSite() > 0 && event.getSite() < currentProtein
+                .getSequence().length() + 1) {
+        try {
+
+            regions.add(new Region(event.getSite(), event.getSite() + 1).toString());
+            changer.addRegionChange(regions);
+        } catch (IllegalRegionValueException e) {
+            // this shouldn't happen
+        }
+
+        modifications.add(event.getSite().toString());
+        changer.addModificationChange(modifications);
+        StateChangingActionEvent.fire(this, changer);
+
+        }
     }
 }

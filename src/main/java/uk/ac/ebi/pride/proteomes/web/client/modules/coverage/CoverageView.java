@@ -25,8 +25,7 @@ public class CoverageView implements CoveragePresenter.View,
                                      ProteinRegionSelectedHandler,
                                      ProteinRegionHighlightedHandler,
                                      PeptideSelectedHandler,
-                                     ModificationSelectedHandler,
-                                     ModificationHighlightedHandler {
+                                     ModificationSelectedHandler {
     private HTMLPanel panel;
     private ModuleContainer outerBox;
     private ProteinViewer coverage;
@@ -172,21 +171,15 @@ public class CoverageView implements CoveragePresenter.View,
         }
     }
 
-    @Override
-    public void onModificationHighlighted(ModificationHighlightedEvent e) {
-        for(CoverageUiHandler handler : uiHandlers) {
-            handler.onModificationHighlighted(e);
-        }
-    }
-
     private void bindViewer(ProteinViewer viewer) {
         viewer.addProteinAreaSelectedHandler(this);
         viewer.addProteinAreaHighlightedHandler(this);
+
+        viewer.addProteinRegionSelectedHandler(this);
         viewer.addProteinRegionHighlightedHandler(this);
 
         viewer.addPeptideSelectedHandler(this);
 
         viewer.addModificationSelectedHandler(this);
-        viewer.addModificationHighlightedHandler(this);
     }
 }
