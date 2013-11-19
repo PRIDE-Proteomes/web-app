@@ -13,8 +13,8 @@ public interface CoverageUiHandler {
     void onRegionClickHighlighted(ProteinRegionHighlightEvent event);
     void onRegionDragHighlighted(ProteinAreaHighlightEvent event);
 
+    void onPeptideSelected(PeptideSelectedEvent event);
+
     void onModificationSelected(ModificationSelectedEvent event);
     void onModificationHighlighted(ModificationHighlightedEvent event);
-
-    void onPeptideSelected(PeptideSelectedEvent event);
 }

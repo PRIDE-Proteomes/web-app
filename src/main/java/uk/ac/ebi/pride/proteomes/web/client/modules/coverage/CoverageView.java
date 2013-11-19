@@ -22,6 +22,7 @@ import java.util.*;
 public class CoverageView implements CoveragePresenter.View,
                                      ProteinAreaSelectedHandler,
                                      ProteinAreaHighlightedHandler,
+                                     ProteinRegionSelectedHandler,
                                      ProteinRegionHighlightedHandler,
                                      PeptideSelectedHandler,
                                      ModificationSelectedHandler,
@@ -133,6 +134,13 @@ public class CoverageView implements CoveragePresenter.View,
     public void onProteinAreaSelected(ProteinAreaSelectedEvent e) {
         for(CoverageUiHandler handler : uiHandlers) {
             handler.onRegionDragSelected(e);
+        }
+    }
+
+    @Override
+    public void onProteinRegionSelectionChanged(ProteinRegionSelectionEvent e) {
+        for(CoverageUiHandler handler : uiHandlers) {
+            handler.onRegionClickSelected(e);
         }
     }
 

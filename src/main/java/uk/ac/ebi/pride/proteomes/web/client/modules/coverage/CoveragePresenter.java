@@ -163,13 +163,14 @@ public class CoveragePresenter implements Presenter,
         if(event.getModifications().length > 0) {
             currentModification = event.getModifications()[0];
             view.updateModificationHighlight(
-                new ModificationAdapter(event.getModifications()[0]));
+                    new ModificationAdapter(event.getModifications()[0]));
         }
         else {
             view.resetModificationHighlight();
             currentModification = null;
         }
     }
+
     @Override
     public void onRegionClickSelected(ProteinRegionSelectionEvent event) {
         StateChanger changer = new StateChanger();
@@ -177,13 +178,13 @@ public class CoveragePresenter implements Presenter,
 
         try {
             region.add(new Region(event.getStart(), event.getStart() + event
-                    .getLength()).toString());
+                    .getLength() - 1).toString());
             changer.addGroupChange(region);
+
+            StateChangingActionEvent.fire(this, changer);
         } catch (IllegalRegionValueException e) {
             // what to do here?
         }
-
-        StateChangingActionEvent.fire(this, changer);
     }
 
     @Override
@@ -202,8 +203,6 @@ public class CoveragePresenter implements Presenter,
         } catch (IllegalRegionValueException e) {
             // Empty selection, we don't send any event
         }
-
-
     }
 
     @Override
@@ -217,17 +216,17 @@ public class CoveragePresenter implements Presenter,
     }
 
     @Override
+    public void onPeptideSelected(PeptideSelectedEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public void onModificationSelected(ModificationSelectedEvent event) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void onModificationHighlighted(ModificationHighlightedEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void onPeptideSelected(PeptideSelectedEvent event) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 }
