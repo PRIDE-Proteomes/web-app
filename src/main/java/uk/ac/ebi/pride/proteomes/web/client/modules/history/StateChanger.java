@@ -95,8 +95,8 @@ public class StateChanger {
             String oldPeptides = State.getToken(oldState.getSelectedPeptides());
             String oldVariances = State.getToken(oldState.getSelectedVariances());
             String oldRegions = State.getToken(oldState.getSelectedRegions());
-            String oldModifications = State.getToken(oldState.getSelectedRegions());
-            String oldTissues = State.getToken(oldState.getSelectedRegions());
+            String oldModifications = State.getToken(oldState.getSelectedModifications());
+            String oldTissues = State.getToken(oldState.getSelectedTissues());
 
             changedState = new State(changesToApply.get(Type.Group, oldGroups),
                                      changesToApply.get(Type.Protein, oldProteins),
