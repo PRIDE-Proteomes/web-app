@@ -6,17 +6,23 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.GroupUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.RegionUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
+import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -28,47 +34,34 @@ public class PeptidesPresenter implements Presenter,
                                           ProteinUpdateEvent.ProteinUpdateHandler,
                                           ProteinRequestEvent.ProteinRequestHandler,
                                           RegionUpdateEvent.RegionUpdateHandler,
-                                          PeptideUpdateEvent.PeptideUpdateHandler
+                                          PeptideUpdateEvent.PeptideUpdateHandler,
+                                          ListUiHandler<PeptideMatch>
 {
-    public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View {
-        void selectItemOn(int row);
-        void deselectItemOn(int row);
-
-        // Used to scroll to a row in the list
-        void focusItemOn(int row);
-
-        void showLoadingMessage();
-        void showList();
-
-        // Used to inject the list displayed in the view,
-        // this frees the view from the list manipulation, e.g. sorting.
-        void bindDataProvider(ListDataProvider<PeptideMatch> dataProvider);
-        void addColumns(List<Column<PeptideMatch, ?>> columns);
-        void addColumnSortHandler(ColumnSortEvent.ListHandler<PeptideMatch> sorter);
-    }
     private final EventBus eventBus;
-    private final View view;
+    private final ListView<PeptideMatch> view;
     private Protein currentProtein;
 
-    private final ListDataProvider<PeptideMatch> dataProvider;
-    private final ColumnSortEvent.ListHandler<PeptideMatch> dataSorter;
+    private final ListDataProvider<PeptideMatch> dataProvider = new
+                                            ListDataProvider<PeptideMatch>();
+    private final ColumnSortEvent.ListHandler<PeptideMatch> dataSorter = new
+                                            ColumnSortEvent.ListHandler<PeptideMatch>(new ArrayList<PeptideMatch>());
     private boolean groups = true;
+    private Collection<Peptide> selectedPeptides;
+    private Protein loadedProtein;
 
-    public PeptidesPresenter(EventBus eventBus, View view) {
+    public PeptidesPresenter(EventBus eventBus, ListView<PeptideMatch> view) {
         this.eventBus = eventBus;
         this.view = view;
-        dataProvider = new ListDataProvider<PeptideMatch>();
-        dataSorter = new ColumnSortEvent.ListHandler<PeptideMatch>(new
-                ArrayList<PeptideMatch>());
         List<Column<PeptideMatch, ?>> columns = PeptideColumnProvider
                                             .getSortingColumns(dataSorter);
 
-        view.bindDataProvider(dataProvider);
+        view.addDataProvider(dataProvider);
         view.addColumns(columns);
         view.addColumnSortHandler(dataSorter);
 
         eventBus.addHandler(GroupUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
+        eventBus.addHandler(ProteinRequestEvent.getType(), this);
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
     }
@@ -102,7 +95,7 @@ public class PeptidesPresenter implements Presenter,
             if(event.getProteins().get(0) != currentProtein) {
                 currentProtein = event.getProteins().get(0);
                 // we should reset filters and ordering here
-                updateList(currentProtein.getPeptides());
+                setList(currentProtein.getPeptides());
                 view.showList();
             }
         }
@@ -118,33 +111,95 @@ public class PeptidesPresenter implements Presenter,
 
     @Override
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
-        // We need to filter the proteins contained in the region
+        // todo We need to filter the peptides contained in the region
+
+        if(event.getRegions().size() == 0) {
+            updateList(loadedProtein.getPeptides());
+        }
+        else {
+            Region region = event.getRegions().get(0);
+
+            updateList(PeptideUtils.filterPeptidesNotIn(loadedProtein.getPeptides(),
+                    region.getStart(), region.getEnd()));
+        }
     }
 
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
-        // We should select a peptide
+        // todo We should (de)select peptides
+
+        for(Peptide peptide : selectedPeptides) {
+            deselectPeptide(peptide);
+        }
+
+        if(event.getPeptides().size() > 0) {
+            selectedPeptides = event.getPeptides();
+        }
+        else {
+            selectedPeptides = Collections.emptyList();
+        }
+    }
+
+    @Override
+    public void onSelectionChanged(Collection<PeptideMatch> items) {
+        StateChanger changer;
+
+        if(items.equals(selectedPeptides)) {
+            return;
+        }
+
+        changer = new StateChanger();
+
+        Set<String> peptideIds = new HashSet<String>();
+
+        for(PeptideMatch peptide : items) {
+            peptideIds.add(peptide.getSequence());
+        }
+
+        changer.addPeptideChange(peptideIds);
+        StateChangingActionEvent.fire(this, changer);
+    }
+
+    private void updateList(List<PeptideMatch> peptideList) {
+        for(Peptide peptide : selectedPeptides) {
+            deselectPeptide(peptide);
+        }
+
+        setList(peptideList);
+
+        for(Peptide peptide : selectedPeptides) {
+            selectPeptide(peptide);
+        }
+    }
+
+    private void selectPeptide(Peptide peptide) {
+        // todo
+        int peptidePosition = dataProvider.getList().indexOf(peptide);
+
+        if(peptidePosition > -1) {
+            view.selectItemOn(peptidePosition);
+        }
+    }
+
+    private void deselectPeptide(Peptide peptide) {
+        // todo
+        int peptidePosition = dataProvider.getList().indexOf(peptide);
+
+        if(peptidePosition > -1) {
+            view.deselectItemOn(peptidePosition);
+        }
     }
 
     /**
-     * This method is used whenever a new list is set as the model of the view,
-     * this is because the class that reacts to sorting events is bound to
-     * the list, not the data provider, this means that we have to empty the
-     * list and then fill it again in order to be able to order any loaded list.
+     * This method is used whenever a new list is set as the model of the view.
+     * We have to update the list reference in the provider and the sorter,
+     * otherwise the sorting would not work anymore.
      *
-     * If the presenter had a reference to the sortEventHandler, setList
-     * could be used in the dataProvider and the sortEventHandler
-     * but then the presenter-view interface gets bigger and the order of
-     * creation of the presenter and the view has to be designed very
-     * carefully. Just kidding, we have now the reference to the sorter,
-     * motherfuckers :D
-     *
-     * We also have to make sure the peptide list cannot be modified,
-     * as this may change the list contained inside Proteins
+     * Alternatively we could also empty the list and repopulate it with the
+     * new data, but that would make it slower.
      */
-
-    private void updateList(final List<PeptideMatch> peptideList) {
-        dataProvider.getList().clear();
-        dataProvider.getList().addAll(peptideList);
+    private void setList(final List<PeptideMatch> peptideList) {
+        dataProvider.setList(peptideList);
+        dataSorter.setList(peptideList);
     }
 }

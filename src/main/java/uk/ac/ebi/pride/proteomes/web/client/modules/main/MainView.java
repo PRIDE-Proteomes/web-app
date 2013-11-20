@@ -4,6 +4,7 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
+import uk.ac.ebi.pride.proteomes.web.client.modules.UiHandler;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,12 +47,12 @@ public class MainView implements MainPresenter.View {
     }
 
     @Override
-    public void addUiHandler(Object o) {
+    public void addUiHandler(UiHandler handler) {
         // TODO
     }
 
     @Override
-    public Collection getUiHandlers() {
+    public Collection<UiHandler> getUiHandlers() {
         return null;  // TODO
     }
 
