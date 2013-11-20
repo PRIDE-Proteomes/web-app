@@ -5,8 +5,10 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.*;
+import uk.ac.ebi.pride.proteomes.web.client.modules.UiHandler;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import static uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderPresenter.View;
 
@@ -66,13 +68,13 @@ public class HeaderView implements View {
     }
 
     @Override
-    public void addUiHandler(Object o) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void addUiHandler(UiHandler handler) {
+        // We don't emit any Ui events, so we don't have to add any handlers
     }
 
     @Override
-    public Collection getUiHandlers() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public Collection<UiHandler> getUiHandlers() {
+        return Collections.emptyList();
     }
 
     @Override

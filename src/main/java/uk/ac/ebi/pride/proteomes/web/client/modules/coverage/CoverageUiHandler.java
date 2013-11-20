@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.coverage;
 
+import uk.ac.ebi.pride.proteomes.web.client.modules.UiHandler;
 import uk.ac.ebi.pride.widgets.client.protein.events.*;
 
 /**
@@ -7,7 +8,7 @@ import uk.ac.ebi.pride.widgets.client.protein.events.*;
  *         Date: 11/11/13
  *         Time: 12:18
  */
-public interface CoverageUiHandler {
+public interface CoverageUiHandler extends UiHandler {
     void onRegionClickSelected(ProteinRegionSelectionEvent event);
     void onRegionDragSelected(ProteinAreaSelectedEvent event);
     void onRegionClickHighlighted(ProteinRegionHighlightEvent event);

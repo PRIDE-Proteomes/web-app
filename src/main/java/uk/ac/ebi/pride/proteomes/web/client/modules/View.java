@@ -10,9 +10,9 @@ import java.util.Collection;
  *         Date: 17/10/13
  *         Time: 13:59
  */
-public interface View<UiHandler> extends IsWidget {
+public interface View<H extends UiHandler> extends IsWidget {
     public void bindToContainer(AcceptsOneWidget container);
-    public void addUiHandler(UiHandler handler);
-    Collection<UiHandler> getUiHandlers();
+    public void addUiHandler(H handler);
+    Collection<H> getUiHandlers();
     public void setVisible(boolean visible);
 }
