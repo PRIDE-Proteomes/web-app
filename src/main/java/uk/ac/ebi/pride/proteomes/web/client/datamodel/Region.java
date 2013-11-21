@@ -8,8 +8,38 @@ import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueExcepti
  *         Time: 15:07
  */
 public class Region {
-    private final int end;
-    private final int start;
+    private static class EmptyRegion extends Region {
+        EmptyRegion() {}
+
+        EmptyRegion(int start, int end) throws IllegalRegionValueException {
+            super(0, 1);
+        }
+
+        @Override
+        public int getEnd() {
+            return 0;
+        }
+
+        @Override
+        public int getLength() {
+            return 0;
+        }
+
+        @Override
+        public String toString() {
+            return "";
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+    }
+    private static volatile EmptyRegion emptyRegion = new EmptyRegion();
+    private int end;
+    private int start;
+
+    private Region(){}
 
     public Region(int start, int end) throws IllegalRegionValueException {
         if(end - start < 1) {
@@ -29,6 +59,10 @@ public class Region {
                           Integer.parseInt(startEnd[1]));
     }
 
+    public static EmptyRegion emptyRegion() {
+        return emptyRegion;
+    }
+
     public int getStart() {
         return start;
     }
@@ -43,5 +77,9 @@ public class Region {
 
     public String toString() {
         return Integer.toString(start) + "-" + Integer.toString(end);
+    }
+
+    public boolean isEmpty() {
+        return false;
     }
 }
