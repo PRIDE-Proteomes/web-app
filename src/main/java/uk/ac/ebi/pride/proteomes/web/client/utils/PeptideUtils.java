@@ -22,12 +22,29 @@ public class PeptideUtils {
         List<PeptideMatch> filteredList = new ArrayList<PeptideMatch>();
 
         for(PeptideMatch peptide : peptides) {
-            if(!(peptide.getPosition() < start &&
-                 peptide.getSequence().length() + peptide.getPosition() - 1 > end)) {
+            if(inRange(peptide, start, end)) {
                 filteredList.add(peptide);
             }
         }
 
         return filteredList;
+    }
+
+    static public int firstIndexOf(List<PeptideMatch> peptides, String sequence) {
+        int index = -1;
+
+        for(int i = 0; i < peptides.size(); i++) {
+            if(peptides.get(i).getSequence().equals(sequence)) {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
+
+    public static boolean inRange(PeptideMatch peptide, int start, int end) {
+        return !(peptide.getPosition() < start ||
+                peptide.getSequence().length() + peptide.getPosition() - 1 > end);
     }
 }
