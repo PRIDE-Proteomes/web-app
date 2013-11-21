@@ -6,6 +6,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -73,6 +74,18 @@ public class PeptideColumnProvider {
         columns.add(sequenceColumn);
         columns.add(siteColumn);
         return columns;
+    }
+
+    public static List<String> getColumnTitles() {
+        List<String> titles = new ArrayList<String>();
+        Collections.addAll(titles, "Sequence", "Site");
+        return titles;
+    }
+
+    public static List<String> getColumnWidths() {
+        List<String> widths = new ArrayList<String>();
+        Collections.addAll(widths, "50%", "50%");
+        return widths;
     }
 
 }

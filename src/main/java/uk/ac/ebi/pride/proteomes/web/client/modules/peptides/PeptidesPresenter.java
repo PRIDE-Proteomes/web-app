@@ -56,9 +56,11 @@ public class PeptidesPresenter implements Presenter,
         this.view = view;
         List<Column<PeptideMatch, ?>> columns = PeptideColumnProvider
                                             .getSortingColumns(dataSorter);
+        List<String> columnTitles = PeptideColumnProvider.getColumnTitles();
+        List<String> columnWidths = PeptideColumnProvider.getColumnWidths();
 
         view.addDataProvider(dataProvider);
-        view.addColumns(columns);
+        view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
 
         eventBus.addHandler(ValidStateEvent.getType(), this);

@@ -97,9 +97,10 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
     }
 
     @Override
-    public void addColumns(List<Column<T, ?>> columns) {
-        for(Column<T, ?> column : columns) {
-            grid.addColumn(column);
+    public void addColumns(List<Column<T, ?>> columns, List<String> titles, List<String> widths) {
+        for(int i = 0; i < columns.size(); i ++) {
+            grid.addColumn(columns.get(i), titles.get(i));
+            grid.setColumnWidth(columns.get(i), widths.get(i));
         }
     }
 
