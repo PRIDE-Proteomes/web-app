@@ -349,6 +349,11 @@ public class AppController implements
         return isCorrect;
     }
 
+    /**
+     * This method signals the rest of the application the data that has been
+     * updated to reflect the new state
+     * @param newState the state that the application has to show.
+     */
     private void goTo(State newState) {
         // we assume the code here when it gets interrupted it cannot be
         // executed again, otherwise we might run into data inconsistencies

@@ -7,17 +7,23 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.View;
 import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoveragePresenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoverageUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoverageView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
 import uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.AppController;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.GridView;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainView;
+import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptidesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower.WhistleBlower;
 
 import java.util.ArrayList;
@@ -69,12 +75,18 @@ public class AppStarter implements RunAsyncCallback {
         Presenter headerPresenter = new HeaderPresenter(eventBus,
                                             (HeaderPresenter.View) headerView);
 
-        View coverageView = new CoverageView();
+        View<CoverageUiHandler> coverageView = new CoverageView();
         Presenter coveragePresenter = new CoveragePresenter(eventBus,
                                           (CoveragePresenter.View) coverageView);
 
+        ListView<PeptideMatch> peptideView =
+                new GridView<ListUiHandler<PeptideMatch>, PeptideMatch>("Peptides", "peptide");
+        Presenter peptidePresenter = new PeptidesPresenter(eventBus,
+                peptideView);
+
         presenterList.add(headerPresenter);
         presenterList.add(coveragePresenter);
+        presenterList.add(peptidePresenter);
 
         for(Presenter p : presenterList) {
             placeHolderList.add(new SimplePanel());

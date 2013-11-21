@@ -19,9 +19,8 @@ import java.util.*;
  *         Date: 19/11/13
  *         Time: 14:27
  */
-public class GridView<H extends ListUiHandler<T>, T>
-                        implements ListView<T>,
-                        RowCountChangeEvent.Handler
+public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
+                                                     RowCountChangeEvent.Handler
 {
     private List<ListUiHandler<T>> handlers = new ArrayList<ListUiHandler<T>>();
     private DataGrid<T> grid;
@@ -39,8 +38,8 @@ public class GridView<H extends ListUiHandler<T>, T>
         grid.setSelectionModel(getSelectionModel());
         grid.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.ENABLED);
 
-        grid.setEmptyTableWidget(new Label("Select a sequence to load" +
-                baseType + "s list."));
+        grid.setEmptyTableWidget(new Label("No " +
+                baseType + "s match the selection."));
 
         grid.setWidth("99%");
         grid.setHeight("150px");

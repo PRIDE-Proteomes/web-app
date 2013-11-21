@@ -1,21 +1,23 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.peptides;
 
-import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.GroupUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.RegionUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
@@ -30,7 +32,7 @@ import java.util.*;
  *         Time: 09:40
  */
 public class PeptidesPresenter implements Presenter,
-                                          GroupUpdateEvent.GroupUpdateHandler,
+                                          ValidStateEvent.ValidStateHandler,
                                           ProteinUpdateEvent.ProteinUpdateHandler,
                                           ProteinRequestEvent.ProteinRequestHandler,
                                           RegionUpdateEvent.RegionUpdateHandler,
@@ -39,15 +41,15 @@ public class PeptidesPresenter implements Presenter,
 {
     private final EventBus eventBus;
     private final ListView<PeptideMatch> view;
-    private Protein currentProtein;
-
     private final ListDataProvider<PeptideMatch> dataProvider = new
                                             ListDataProvider<PeptideMatch>();
     private final ColumnSortEvent.ListHandler<PeptideMatch> dataSorter = new
                                             ColumnSortEvent.ListHandler<PeptideMatch>(new ArrayList<PeptideMatch>());
+
     private boolean groups = true;
-    private Collection<Peptide> selectedPeptides;
-    private Protein loadedProtein;
+    private Protein currentProtein;
+    private Region currentRegion = Region.emptyRegion();
+    private Collection<Peptide> selectedPeptides = Collections.emptyList();
 
     public PeptidesPresenter(EventBus eventBus, ListView<PeptideMatch> view) {
         this.eventBus = eventBus;
@@ -59,7 +61,7 @@ public class PeptidesPresenter implements Presenter,
         view.addColumns(columns);
         view.addColumnSortHandler(dataSorter);
 
-        eventBus.addHandler(GroupUpdateEvent.getType(), this);
+        eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
@@ -77,9 +79,9 @@ public class PeptidesPresenter implements Presenter,
     }
 
     @Override
-    public void onGroupUpdateEvent(GroupUpdateEvent event) {
+    public void onValidStateEvent(ValidStateEvent event) {
         // We should check if we have to stay hidden or not
-        if(event.getGroups().size() > 0) {
+        if(event.getViewType() == ValidStateEvent.ViewType.Group) {
             groups = true;
             view.asWidget().setVisible(false);
         }
@@ -94,8 +96,13 @@ public class PeptidesPresenter implements Presenter,
         if(!groups && event.getProteins().size() > 0) {
             if(event.getProteins().get(0) != currentProtein) {
                 currentProtein = event.getProteins().get(0);
+                try {
+                    currentRegion = new Region(1, currentProtein.getSequence()
+                            .length());
+                } catch (IllegalRegionValueException e) {
+                }
                 // we should reset filters and ordering here
-                setList(currentProtein.getPeptides());
+                updateList(currentProtein.getPeptides());
                 view.showList();
             }
         }
@@ -111,32 +118,40 @@ public class PeptidesPresenter implements Presenter,
 
     @Override
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
-        // todo We need to filter the peptides contained in the region
-
-        if(event.getRegions().size() == 0) {
-            updateList(loadedProtein.getPeptides());
-        }
-        else {
-            Region region = event.getRegions().get(0);
-
-            updateList(PeptideUtils.filterPeptidesNotIn(loadedProtein.getPeptides(),
-                    region.getStart(), region.getEnd()));
-        }
-    }
-
-    @Override
-    public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
-        // todo We should (de)select peptides
-
+        // we deselect all the peptides, we can select them again.
         for(Peptide peptide : selectedPeptides) {
             deselectPeptide(peptide);
         }
 
-        if(event.getPeptides().size() > 0) {
-            selectedPeptides = event.getPeptides();
+        // we change the peptide list
+        if(event.getRegions().size() == 0) {
+            try {
+                currentRegion = new Region(1, currentProtein.getSequence().length());
+            } catch (IllegalRegionValueException e) {
+            }
+            updateList(currentProtein.getPeptides());
         }
         else {
-            selectedPeptides = Collections.emptyList();
+            currentRegion = event.getRegions().get(0);
+            updateList(PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
+                    currentRegion.getStart(), currentRegion.getEnd()));
+        }
+
+        // we reselect the peptides, this is because the selected peptides
+        // might not change when reselecting the region.
+        selectPeptides();
+    }
+
+    @Override
+    public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
+        for(Peptide peptide : selectedPeptides) {
+            deselectPeptide(peptide);
+        }
+
+        selectedPeptides = event.getPeptides();
+        if(event.getPeptides().size() > 0) {
+            // we reselect the peptides only if there are any
+            selectPeptides();
         }
     }
 
@@ -173,8 +188,10 @@ public class PeptidesPresenter implements Presenter,
     }
 
     private void selectPeptide(Peptide peptide) {
-        // todo
-        int peptidePosition = dataProvider.getList().indexOf(peptide);
+        // search the first occurrence of the peptide, we can only select
+        // one because of the selection model
+        int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList
+                (), peptide.getSequence());
 
         if(peptidePosition > -1) {
             view.selectItemOn(peptidePosition);
@@ -182,11 +199,28 @@ public class PeptidesPresenter implements Presenter,
     }
 
     private void deselectPeptide(Peptide peptide) {
-        // todo
-        int peptidePosition = dataProvider.getList().indexOf(peptide);
+        // search the first occurrence of the peptide, we can only select
+        // one because of the selection model
+        int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList
+                (), peptide.getSequence());
 
         if(peptidePosition > -1) {
             view.deselectItemOn(peptidePosition);
+        }
+    }
+
+    private void selectPeptides() {
+        //we reselect the peptides inside the range, to do this,
+        // we must search first the first peptide match that has the same
+        // sequence as the peptide we want to select.
+        for(Peptide peptide : selectedPeptides) {
+            int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList(),
+                    peptide.getSequence());
+            if(PeptideUtils.inRange(dataProvider.getList().get(peptidePosition),
+                    currentRegion.getStart(),
+                    currentRegion.getEnd())) {
+                selectPeptide(peptide);
+            }
         }
     }
 
