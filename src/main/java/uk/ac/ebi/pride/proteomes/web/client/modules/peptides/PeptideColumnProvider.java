@@ -87,5 +87,4 @@ public class PeptideColumnProvider {
         Collections.addAll(widths, "50%", "50%");
         return widths;
     }
-
 }

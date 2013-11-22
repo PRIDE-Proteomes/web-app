@@ -13,7 +13,6 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.updates.GroupUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.RegionUpdateEvent;
@@ -97,17 +96,15 @@ public class PeptidesPresenter implements Presenter,
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
         // We need to extract a peptide list from the ones in the proteins
         if(!groups && event.getProteins().size() > 0) {
-            if(event.getProteins().get(0) != currentProtein) {
-                currentProtein = event.getProteins().get(0);
-                try {
-                    currentRegion = new Region(1, currentProtein.getSequence()
-                            .length());
-                } catch (IllegalRegionValueException e) {
-                }
-                // we should reset filters and ordering here
-                updateList(currentProtein.getPeptides());
-                view.showList();
+            currentProtein = event.getProteins().get(0);
+            try {
+                currentRegion = new Region(1, currentProtein.getSequence()
+                        .length());
+            } catch (IllegalRegionValueException e) {
             }
+            // we should reset filters and ordering here
+            updateList(currentProtein.getPeptides());
+            view.showList();
         }
     }
 
@@ -123,7 +120,7 @@ public class PeptidesPresenter implements Presenter,
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
         // we deselect all the peptides, we can select them again.
         for(Peptide peptide : selectedPeptides) {
-            deselectPeptide(peptide);
+            deselectItem(peptide);
         }
 
         // we change the peptide list
@@ -148,7 +145,7 @@ public class PeptidesPresenter implements Presenter,
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
         for(Peptide peptide : selectedPeptides) {
-            deselectPeptide(peptide);
+            deselectItem(peptide);
         }
 
         // we don't care about all the modifications, so we get rid of them
@@ -182,17 +179,17 @@ public class PeptidesPresenter implements Presenter,
 
     private void updateList(List<PeptideMatch> peptideList) {
         for(Peptide peptide : selectedPeptides) {
-            deselectPeptide(peptide);
+            deselectItem(peptide);
         }
 
         setList(peptideList);
 
         for(Peptide peptide : selectedPeptides) {
-            selectPeptide(peptide);
+            selectItem(peptide);
         }
     }
 
-    private void selectPeptide(Peptide peptide) {
+    private void selectItem(Peptide peptide) {
         // search the first occurrence of the peptide, we can only select
         // one because of the selection model
         int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList
@@ -203,7 +200,7 @@ public class PeptidesPresenter implements Presenter,
         }
     }
 
-    private void deselectPeptide(Peptide peptide) {
+    private void deselectItem(Peptide peptide) {
         // search the first occurrence of the peptide, we can only select
         // one because of the selection model
         int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList
@@ -224,7 +221,7 @@ public class PeptidesPresenter implements Presenter,
             if(PeptideUtils.inRange(dataProvider.getList().get(peptidePosition),
                     currentRegion.getStart(),
                     currentRegion.getEnd())) {
-                selectPeptide(peptide);
+                selectItem(peptide);
             }
         }
     }

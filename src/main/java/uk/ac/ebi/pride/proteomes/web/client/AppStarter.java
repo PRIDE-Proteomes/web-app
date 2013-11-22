@@ -24,6 +24,7 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptidesPresenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissuesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower.WhistleBlower;
 
 import java.util.ArrayList;
@@ -75,6 +76,9 @@ public class AppStarter implements RunAsyncCallback {
         Presenter headerPresenter = new HeaderPresenter(eventBus,
                                             (HeaderPresenter.View) headerView);
 
+        ListView<String> tissueView = new GridView<ListUiHandler<String>, String>("Tissues", "tissue");
+        Presenter tissuePresenter = new TissuesPresenter(eventBus, tissueView);
+
         View<CoverageUiHandler> coverageView = new CoverageView();
         Presenter coveragePresenter = new CoveragePresenter(eventBus,
                                           (CoveragePresenter.View) coverageView);
@@ -85,6 +89,7 @@ public class AppStarter implements RunAsyncCallback {
                 peptideView);
 
         presenterList.add(headerPresenter);
+        presenterList.add(tissuePresenter);
         presenterList.add(coveragePresenter);
         presenterList.add(peptidePresenter);
 
