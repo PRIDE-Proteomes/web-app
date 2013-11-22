@@ -74,8 +74,6 @@ public class AppController implements
                     "message");
             return;
         }
-
-        stateQueue.add(freshState);
         requestData(freshState);
     }
 
