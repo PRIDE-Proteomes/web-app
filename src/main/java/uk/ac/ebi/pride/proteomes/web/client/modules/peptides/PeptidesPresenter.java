@@ -89,6 +89,7 @@ public class PeptidesPresenter implements Presenter,
         }
         else {
             groups = false;
+            view.asWidget().setVisible(true);
         }
     }
 
