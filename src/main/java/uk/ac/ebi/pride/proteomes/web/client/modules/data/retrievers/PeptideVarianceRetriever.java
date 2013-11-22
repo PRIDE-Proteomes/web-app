@@ -5,6 +5,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InvalidJSONException;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.UnacceptableResponseException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.Transaction;
@@ -63,7 +64,7 @@ public class PeptideVarianceRetriever implements TransactionHandler.DataRetrieve
         }
 
         try {
-            trans = new Transaction(response.getText(), Peptide.class);
+            trans = new Transaction(response.getText(), PeptideList.class);
 
             for(TransactionHandler handler : handlers) {
                 handler.onDataRetrieval(trans);

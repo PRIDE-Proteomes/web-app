@@ -1,7 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.GroupRetriever;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.PeptideVarianceRetriever;
@@ -31,7 +31,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     private List<Map<String, Boolean>> proteinRequests;
     private final ProteinRetriever proteinRetriever;
 
-    private Map<String, Peptide> peptideCache = new HashMap<String, Peptide>();
+    private Map<String, PeptideList> peptideVarianceCache = new HashMap<String, PeptideList>();
     private List<Map<String, Boolean>> peptideVarianceRequests;
     private final PeptideVarianceRetriever peptideVarianceRetriever;
 
@@ -82,17 +82,20 @@ public class DataProvider implements DataServer, TransactionHandler {
 
             dispatchProteins();
         }
-        else if(transaction.getResponse() instanceof Peptide) {
-            Peptide peptide = (Peptide) transaction.getResponse();
-            peptideCache.put(peptide.getSequence(), peptide);
+        else if(transaction.getResponse() instanceof PeptideList) {
+            PeptideList variances = (PeptideList) transaction.getResponse();
+            if(variances.getVariances().size() > 0) {
+                String sequence = variances.getVariances().get(0).getSequence();
+                peptideVarianceCache.put(sequence, variances);
 
-            for(Map<String, Boolean> batchRequest : peptideVarianceRequests) {
-                if(batchRequest.containsKey((peptide.getSequence()))) {
-                    batchRequest.put(peptide.getSequence(), true);
+                for(Map<String, Boolean> batchRequest : peptideVarianceRequests) {
+                    if(batchRequest.containsKey(sequence)) {
+                        batchRequest.put(sequence, true);
+                    }
                 }
-            }
 
-            dispatchPeptides();
+                dispatchPeptideVariances();
+            }
         }
         else {
             onDataRetrievalError(new Exception("Internal Error, " +
@@ -117,7 +120,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public boolean isPeptideCached(String sequence) {
-        return peptideCache.containsKey(sequence);
+        return peptideVarianceCache.containsKey(sequence);
     }
 
     @Override
@@ -185,12 +188,12 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public List<Peptide> getPeptides(String[] sequences) {
-        List<Peptide> peptides = new ArrayList<Peptide>();
+    public List<PeptideList> getPeptideVarianceLists(String[] sequences) {
+        List<PeptideList> peptideVarianceLists = new ArrayList<PeptideList>();
         for(String sequence : sequences) {
-            peptides.add(peptideCache.get(sequence));
+            peptideVarianceLists.add(peptideVarianceCache.get(sequence));
         }
-        return peptides;
+        return peptideVarianceLists;
     }
 
     @Override
@@ -204,8 +207,8 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public Peptide getPeptide(String sequence) {
-        return peptideCache.get(sequence);
+    public PeptideList getPeptideVarianceList(String sequence) {
+        return peptideVarianceCache.get(sequence);
     }
 
     private void dispatchGroups() {
@@ -236,16 +239,16 @@ public class DataProvider implements DataServer, TransactionHandler {
         }
     }
 
-    private void dispatchPeptides() {
+    private void dispatchPeptideVariances() {
         for(Map<String, Boolean> batchRequest : peptideVarianceRequests) {
             if(!batchRequest.containsValue(false)) {
                 peptideVarianceRequests.remove(batchRequest);
 
-                List<Peptide> peptides = new ArrayList<Peptide>();
+                List<PeptideList> peptideVarianceLists = new ArrayList<PeptideList>();
                 for(Map.Entry<String, Boolean> entry : batchRequest.entrySet()) {
-                    peptides.add(peptideCache.get(entry.getKey()));
+                    peptideVarianceLists.add(peptideVarianceCache.get(entry.getKey()));
                 }
-                client.onPeptidesRetrieved(peptides);
+                client.onPeptideVarianceListsRetrieved(peptideVarianceLists);
             }
         }
     }

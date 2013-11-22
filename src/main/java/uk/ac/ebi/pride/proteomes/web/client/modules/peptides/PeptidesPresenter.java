@@ -151,7 +151,9 @@ public class PeptidesPresenter implements Presenter,
             deselectPeptide(peptide);
         }
 
-        selectedPeptides = event.getPeptides();
+        // we don't care about all the modifications, so we get rid of them
+        // and pick a single variance per list of peptides.
+        selectedPeptides = PeptideUtils.getFirstOfEach(event.getPeptides());
         if(event.getPeptides().size() > 0) {
             // we reselect the peptides only if there are any
             selectPeptides();

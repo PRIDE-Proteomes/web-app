@@ -3,7 +3,7 @@ package uk.ac.ebi.pride.proteomes.web.client.events.updates;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 
 import java.util.List;
 
@@ -21,16 +21,16 @@ public class PeptideUpdateEvent extends
 
     private static final GwtEvent.Type<PeptideUpdateHandler> TYPE = new GwtEvent.Type<PeptideUpdateHandler>();
 
-    private List<Peptide> peptideList;
+    private List<PeptideList> peptideVariances;
 
-    public PeptideUpdateEvent(List<Peptide> peptides, HasHandlers source) {
+    public PeptideUpdateEvent(List<PeptideList> peptides, HasHandlers source) {
         super();
-        peptideList = peptides;
+        peptideVariances = peptides;
         setSource(source);
     }
 
-    public static void fire(HasHandlers source, List<Peptide> peptides) {
-        PeptideUpdateEvent eventInstance = new PeptideUpdateEvent(peptides, source);
+    public static void fire(HasHandlers source, List<PeptideList> variances) {
+        PeptideUpdateEvent eventInstance = new PeptideUpdateEvent(variances, source);
         source.fireEvent(eventInstance);
     }
 
@@ -38,8 +38,8 @@ public class PeptideUpdateEvent extends
      *
      * @return the variances of the peptides that got selected
      */
-    public List<Peptide> getPeptides() {
-        return peptideList;
+    public List<PeptideList> getPeptides() {
+        return peptideVariances;
     }
 
     public static GwtEvent.Type<PeptideUpdateHandler> getType() {

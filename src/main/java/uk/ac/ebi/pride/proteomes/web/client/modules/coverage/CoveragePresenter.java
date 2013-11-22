@@ -16,6 +16,7 @@ import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
+import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 import uk.ac.ebi.pride.widgets.client.protein.events.*;
 
 import java.util.ArrayList;
@@ -53,9 +54,9 @@ public class CoveragePresenter implements Presenter,
 
     private boolean hiding = true;
     private Protein currentProtein;
-    private Region currentRegion;
-    private List<PeptideMatch> currentPeptides;
-    private String currentModification;
+    private Region currentRegion = Region.emptyRegion();
+    private List<PeptideMatch> currentPeptides = Collections.emptyList();
+    private String currentModification = "";
 
     public CoveragePresenter(EventBus eventBus, View view) {
         this.eventBus = eventBus;
@@ -121,12 +122,13 @@ public class CoveragePresenter implements Presenter,
         List<PeptideAdapter> selectionAdapters;
         List<PeptideMatch> selection;
 
-        if(event.getPeptides().size() > 0) {
+        if(event.getPeptides().size() > 0 && event.getPeptides().size() > 0) {
             selectionAdapters = new ArrayList<PeptideAdapter>();
             selection = new ArrayList<PeptideMatch>();
 
             for(PeptideMatch match : currentProtein.getPeptides()) {
-                if(match.getSequence().equals(event.getPeptides().get(0).getSequence())) {
+                if(match.getSequence().equals(event.getPeptides().get(0)
+                        .getVariances().get(0).getSequence())) {
                     selectionAdapters.add(new PeptideAdapter(match));
                     selection.add(match);
                 }
@@ -145,8 +147,6 @@ public class CoveragePresenter implements Presenter,
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
         Region region;
 
-        view.resetRegionSelection();
-
         if(event.getRegions().size() > 0) {
             region = event.getRegions().get(0);
             currentRegion = region;
@@ -156,7 +156,8 @@ public class CoveragePresenter implements Presenter,
             }
         }
         else {
-            currentRegion = null;
+            currentRegion = Region.emptyRegion();
+            view.resetRegionSelection();
         }
     }
 
@@ -232,8 +233,8 @@ public class CoveragePresenter implements Presenter,
 
         // If the peptide doesn't fit the region that's selected we ought to
         // change the region too.
-        if(peptide.getSite() < currentRegion.getStart() ||
-           peptide.getEnd() > currentRegion.getEnd()) {
+        if(!PeptideUtils.inRange(peptide, currentRegion.getStart(),
+                currentRegion.getEnd())) {
             try {
                 regions.add(new Region(peptide.getSite(), peptide.getEnd()).toString());
                 changer.addRegionChange(regions);

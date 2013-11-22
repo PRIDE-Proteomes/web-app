@@ -1,14 +1,17 @@
 package uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters;
 
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.widgets.client.common.handler.PeptideHandler;
+
+import java.util.List;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  *         Date: 11/11/13
  *         Time: 13:50
  */
-public class PeptideAdapter implements PeptideHandler {
+public class PeptideAdapter implements PeptideHandler, PeptideMatch {
     private final PeptideMatch peptide;
 
     public PeptideAdapter(PeptideMatch peptide) {
@@ -21,13 +24,33 @@ public class PeptideAdapter implements PeptideHandler {
     }
 
     @Override
+    public int getTaxonID() {
+        return peptide.getTaxonID();
+    }
+
+    @Override
+    public List<ModifiedLocation> getModifiedLocations() {
+        return peptide.getModifiedLocations();
+    }
+
+    @Override
+    public List<String> getTissues() {
+        return peptide.getTissues();
+    }
+
+    @Override
     public Integer getSite() {
-        return peptide.getPosition();
+        return getPosition();
     }
 
     @Override
     public Integer getEnd() {
-        return getSite() + peptide.getSequence().length();
+        return getPosition() + peptide.getSequence().length();
+    }
+
+    @Override
+    public Integer getPosition() {
+        return peptide.getPosition();
     }
 
     @Override

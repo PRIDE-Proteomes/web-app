@@ -1,8 +1,11 @@
 package uk.ac.ebi.pride.proteomes.web.client.utils;
 
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,7 +47,19 @@ public class PeptideUtils {
     }
 
     public static boolean inRange(PeptideMatch peptide, int start, int end) {
-        return !(peptide.getPosition() < start ||
-                peptide.getSequence().length() + peptide.getPosition() - 1 > end);
+        return peptide.getPosition() > start &&
+               peptide.getSequence().length() + peptide.getPosition() - 1 < end;
+    }
+
+    public static Collection<Peptide> getFirstOfEach(List<PeptideList> peptidesLists) {
+        List<Peptide> peptides = new ArrayList<Peptide>();
+
+        for(PeptideList list : peptidesLists) {
+            if(!list.getVariances().isEmpty()) {
+                peptides.add(list.getVariances().get(0));
+            }
+        }
+
+        return peptides;
     }
 }

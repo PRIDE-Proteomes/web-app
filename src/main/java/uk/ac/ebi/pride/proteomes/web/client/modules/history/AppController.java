@@ -7,10 +7,7 @@ import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.History;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.*;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.GroupRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.PeptideRequestEvent;
@@ -132,7 +129,7 @@ public class AppController implements
     }
 
     @Override
-    public void onPeptidesRetrieved(Collection<Peptide> peptides) {
+    public void onPeptideVarianceListsRetrieved(Collection<PeptideList>  peptides) {
         processStateQueue();
     }
 
@@ -390,7 +387,7 @@ public class AppController implements
             // selected. Since the group view doesn't allow for this at the
             // moment there's no need to implement it at the moment.
 
-            PeptideUpdateEvent.fire(this, server.getPeptides(newState.getSelectedPeptides()));
+            PeptideUpdateEvent.fire(this, server.getPeptideVarianceLists(newState.getSelectedPeptides()));
         }
         if(!Arrays.equals(newState.getSelectedVariances(),
                           appState.getSelectedVariances())) {
