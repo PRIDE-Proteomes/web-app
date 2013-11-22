@@ -50,10 +50,12 @@ public class TissuesPresenter implements Presenter,
         view.addDataProvider(dataProvider);
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
+        view.addUiHandler(this);
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
+
     }
     @Override
     public void bindToContainer(AcceptsOneWidget container) {
@@ -106,7 +108,7 @@ public class TissuesPresenter implements Presenter,
 
         changer = new StateChanger();
 
-        changer.addPeptideChange(items);
+        changer.addTissueChange(items);
         StateChangingActionEvent.fire(this, changer);
     }
 

@@ -230,7 +230,7 @@ final class State {
            (!peptides.isEmpty() || !variances.isEmpty() || !regions.isEmpty())) {
             isValid = false;
         }
-        else if((groups.isEmpty() || proteins.isEmpty()) &&
+        else if((groups.isEmpty() && proteins.isEmpty()) &&
                 (!modifications.isEmpty() || !tissues.isEmpty())) {
             isValid = false;
         }

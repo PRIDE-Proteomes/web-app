@@ -61,6 +61,7 @@ public class PeptidesPresenter implements Presenter,
         view.addDataProvider(dataProvider);
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
+        view.addUiHandler(this);
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);

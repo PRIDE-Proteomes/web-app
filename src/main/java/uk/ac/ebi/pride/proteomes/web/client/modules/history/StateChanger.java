@@ -68,7 +68,12 @@ public class StateChanger {
 
     public void addModificationChange(Collection<String> modificationSelection) {
         orderedChanges.add(new Change(Type.Modification,
-                                      State.getToken(modificationSelection)));
+                State.getToken(modificationSelection)));
+    }
+
+    public void addTissueChange(Collection<String> tissueSelection) {
+        orderedChanges.add(new Change(Type.Tissue,
+                State.getToken(tissueSelection)));
     }
 
     /**
