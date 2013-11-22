@@ -16,6 +16,7 @@ import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.RegionUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.TissueUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
@@ -36,8 +37,7 @@ public class PeptidesPresenter implements Presenter,
                                           ProteinRequestEvent.ProteinRequestHandler,
                                           RegionUpdateEvent.RegionUpdateHandler,
                                           PeptideUpdateEvent.PeptideUpdateHandler,
-                                          ListUiHandler<PeptideMatch>
-{
+                                          ListUiHandler<PeptideMatch>,TissueUpdateEvent.TissueUpdateHandler {
     private final EventBus eventBus;
     private final ListView<PeptideMatch> view;
     private final ListDataProvider<PeptideMatch> dataProvider = new
@@ -49,6 +49,7 @@ public class PeptidesPresenter implements Presenter,
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
     private Collection<Peptide> selectedPeptides = Collections.emptyList();
+    private String currentTissue = "";
 
     public PeptidesPresenter(EventBus eventBus, ListView<PeptideMatch> view) {
         this.eventBus = eventBus;
@@ -68,6 +69,7 @@ public class PeptidesPresenter implements Presenter,
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
+        eventBus.addHandler(TissueUpdateEvent.getType(), this);
     }
 
     @Override
@@ -134,8 +136,10 @@ public class PeptidesPresenter implements Presenter,
         }
         else {
             currentRegion = event.getRegions().get(0);
-            updateList(PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
-                    currentRegion.getStart(), currentRegion.getEnd()));
+            updateList(PeptideUtils.filterPeptidesNotInTissue(
+                       PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
+                             currentRegion.getStart(), currentRegion.getEnd()),
+                       currentTissue));
         }
 
         // we reselect the peptides, this is because the selected peptides
@@ -155,6 +159,25 @@ public class PeptidesPresenter implements Presenter,
         if(event.getPeptides().size() > 0) {
             // we reselect the peptides only if there are any
             selectPeptides();
+        }
+    }
+
+    @Override
+    public void onTissueUpdateEvent(TissueUpdateEvent event) {
+        // we deselect all the peptides, we can select them again.
+        for(Peptide peptide : selectedPeptides) {
+            deselectItem(peptide);
+        }
+
+        if(event.getTissues().length > 0) {
+            currentTissue = event.getTissues()[0];
+            updateList(PeptideUtils.filterPeptidesNotInTissue(
+                       PeptideUtils.filterPeptidesNotIn( dataProvider.getList(),
+                               currentRegion.getStart(),currentRegion.getEnd()),
+                        currentTissue));
+        }
+        else {
+            currentTissue = "";
         }
     }
 

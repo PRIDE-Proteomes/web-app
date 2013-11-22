@@ -6,7 +6,6 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
@@ -37,7 +36,6 @@ public class TissuesPresenter implements Presenter,
             ColumnSortEvent.ListHandler<String>(new ArrayList<String>());
 
     private boolean groups;
-    private Protein currentProtein;
     private List<String> selectedTissues = new ArrayList<String>();
 
     public TissuesPresenter(EventBus eventBus, ListView<String> view) {
@@ -83,9 +81,7 @@ public class TissuesPresenter implements Presenter,
     @Override
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
         if(!groups && event.getProteins().size() > 0) {
-            currentProtein = event.getProteins().get(0);
-
-            updateList(currentProtein.getTissues());
+            updateList(event.getProteins().get(0).getTissues());
             view.showList();
         }
     }

@@ -33,6 +33,24 @@ public class PeptideUtils {
         return filteredList;
     }
 
+    public static List<PeptideMatch> filterPeptidesNotInTissue(List<PeptideMatch> peptideMatches, String tissue) {
+        List<PeptideMatch> filteredList;
+
+        if(tissue.isEmpty()) {
+            return peptideMatches;
+        }
+
+        filteredList = new ArrayList<PeptideMatch>();
+
+        for(PeptideMatch peptide : peptideMatches) {
+            if(peptide.getTissues().contains(tissue)) {
+                filteredList.add(peptide);
+            }
+        }
+
+        return filteredList;
+    }
+
     static public int firstIndexOf(List<PeptideMatch> peptides, String sequence) {
         int index = -1;
 
