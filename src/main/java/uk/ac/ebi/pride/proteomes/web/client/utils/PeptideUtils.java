@@ -65,8 +65,8 @@ public class PeptideUtils {
     }
 
     public static boolean inRange(PeptideMatch peptide, int start, int end) {
-        return peptide.getPosition() > start &&
-               peptide.getSequence().length() + peptide.getPosition() - 1 < end;
+        return peptide.getPosition() >= start &&
+               peptide.getSequence().length() + peptide.getPosition() - 1 <= end;
     }
 
     public static Collection<Peptide> getFirstOfEach(List<PeptideList> peptidesLists) {
