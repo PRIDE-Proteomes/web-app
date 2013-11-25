@@ -68,7 +68,9 @@ public class AppController implements
                     "change it, or go back. If you didn't type the " +
                     "address contact the PRIDE team about the error and " +
                     "explained them what you were doing before this " +
-                    "message");
+                    "message",
+                    appState.getHistoryToken() + " + " +
+                           event.getChanger().getChanges());
             return;
         }
         requestData(freshState);
@@ -86,7 +88,8 @@ public class AppController implements
                 appState = State.tokenize(event.getValue());
             } catch (InconsistentStateException e){
                 InvalidStateEvent.fire(this, "Application Error, " +
-                                             "please contact the PRIDE team.");
+                                             "please contact the PRIDE team.",
+                                       "Empty State");
                 return;
             }
 
@@ -106,7 +109,7 @@ public class AppController implements
                         "change it, or go back. If you didn't type the " +
                         "address contact the PRIDE team about the error and " +
                         "explained them what you were doing before this " +
-                        "message");
+                        "message", event.getValue());
                 return;
             }
             requestData(freshState);
@@ -228,21 +231,21 @@ public class AppController implements
             if(!isStateDataValid(stateQueue.peek())) {
                 throw new InconsistentStateException();
             }
-            goTo(stateQueue.remove());
+            goTo(stateQueue.peek());
         }
         catch(InconsistentStateException e) {
-            stateQueue.remove();
             InvalidStateEvent.fire(this, "The address cannot be " +
                     "displayed. Please check that is is correct and " +
                     "change it, or go back. If you didn't type the " +
                     "address contact the PRIDE team about the error and " +
                     "explained them what you were doing before this " +
-                    "message");
+                    "message", stateQueue.peek().getHistoryToken());
         }
         catch(Exception e) {
             e.printStackTrace();
         }
         finally {
+            stateQueue.remove();
             queueBeingProcessed = false;
         }
 

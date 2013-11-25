@@ -19,13 +19,16 @@ public class SnoopingEventBus extends SimpleEventBus {
         super();
     }
 
+    public String getIndentation() {
+        return new String(new char[depth]).replace("\0", "  ");
+    }
+
     @Override
     public void fireEvent(Event<?> event) {
         if(Console.VERBOSE){
             String evName = getSimpleName(event.getClass().toString());
-            String indent = new String(new char[depth]).replace("\0", "  ");
 
-            Console.info("(EventBus): " + indent + evName);
+            Console.info("(EventBus): " + getIndentation() + evName);
         }
 
         depth++;
@@ -38,9 +41,8 @@ public class SnoopingEventBus extends SimpleEventBus {
         if(Console.VERBOSE) {
             String clName = getSimpleName(event.getSource().getClass().toString());
             String evName = getSimpleName(event.getClass().toString());
-            String indent = new String(new char[depth]).replace("\0", "  ");
 
-            Console.info("(EventBus): " + indent + evName + " <- " + clName);
+            Console.info("(EventBus): " + getIndentation() + evName + " <- " + clName);
         }
 
         depth++;

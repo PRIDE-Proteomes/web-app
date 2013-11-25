@@ -16,15 +16,18 @@ public class InvalidStateEvent extends GwtEvent<InvalidStateEvent.InvalidStateHa
 
     private static final Type<InvalidStateHandler> TYPE = new Type<InvalidStateHandler>();
     private final String message;
+    private final String state;
 
-    public InvalidStateEvent(HasHandlers source, String message) {
+    public InvalidStateEvent(HasHandlers source, String message,
+                             String state) {
         super();
         setSource(source);
         this.message = message;
+        this.state = state;
     }
 
-    public static void fire(HasHandlers source, String message) {
-        InvalidStateEvent eventInstance = new InvalidStateEvent(source, message);
+    public static void fire(HasHandlers source, String message, String state) {
+        InvalidStateEvent eventInstance = new InvalidStateEvent(source, message, state);
         source.fireEvent(eventInstance);
     }
 
@@ -34,6 +37,10 @@ public class InvalidStateEvent extends GwtEvent<InvalidStateEvent.InvalidStateHa
 
     public String getMessage() {
         return message;
+    }
+
+    public String getState() {
+        return state;
     }
 
     @Override

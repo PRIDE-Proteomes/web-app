@@ -113,4 +113,21 @@ public class StateChanger {
         }
         return changedState;
     }
+
+    public String getChanges() {
+        StringBuilder sb = new StringBuilder();
+
+        DefaultHashMap<Type, String> changesToApply = new DefaultHashMap<Type, String>();
+        for(Change change : orderedChanges) {
+            changesToApply.put(change.getKey(), change.getValue());
+        }
+        sb.append(changesToApply.get(Type.Group, ""));
+        sb.append(changesToApply.get(Type.Protein, ""));
+        sb.append(changesToApply.get(Type.Region, ""));
+        sb.append(changesToApply.get(Type.Peptide, ""));
+        sb.append(changesToApply.get(Type.Variance, ""));
+        sb.append(changesToApply.get(Type.Modification, ""));
+        sb.append(changesToApply.get(Type.Tissue, ""));
+        return sb.toString();
+    }
 }
