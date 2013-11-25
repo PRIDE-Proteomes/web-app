@@ -231,6 +231,7 @@ public class AppController implements
             goTo(stateQueue.remove());
         }
         catch(InconsistentStateException e) {
+            stateQueue.remove();
             InvalidStateEvent.fire(this, "The address cannot be " +
                     "displayed. Please check that is is correct and " +
                     "change it, or go back. If you didn't type the " +
@@ -291,10 +292,12 @@ public class AppController implements
 
         boolean isCorrect = true;
 
-        for(String accession : state.getSelectedPeptides()) {
+        // for each peptide in the state check if they belong in all the
+        // selected groups and proteins.
+        for(String sequence : state.getSelectedPeptides()) {
             for(String id : state.getSelectedGroups()) {
                 if(!server.getGroup(id).getMemberProteins().contains
-                        (accession)) {
+                        (sequence)) {
                     isCorrect = false;
                     break;
                 }
@@ -303,26 +306,31 @@ public class AppController implements
             if(!isCorrect) {
                 break;
             }
-
-            //check if all the peptides in the state are actually in all the
-            // proteins that are selected, as well as inside the region
-            // selected.
-            for(String sequence : state.getSelectedPeptides()) {
+            for(String accession : state.getSelectedProteins()) {
+                //check if the peptide in the state are actually in the
+                // protein, as well as inside the regions selected.
                 boolean isContained = false;
                 for(PeptideMatch match : server.getProtein(accession).getPeptides()) {
                     if(sequence.equals(match.getSequence())) {
-                        // Check if the peptide match is inside any region
-                        for(String regionId : state.getSelectedRegions()) {
-                            try {
-                                Region region = Region.tokenize(regionId);
-                                if(region.getStart() <= match.getPosition() &&
-                                   region.getEnd() >= match.getPosition() + match
-                                           .getSequence().length()) {
-                                    isContained = true;
-                                    break;
+                        // Check if the peptide match is inside any region,
+                        // the lack of region means it's contained,
+                        // because all the protein is relevant.
+                        if(state.getSelectedRegions().length == 0) {
+                            isContained = true;
+                        }
+                        else {
+                            for(String regionId : state.getSelectedRegions()) {
+                                try {
+                                    Region region = Region.tokenize(regionId);
+                                    if(region.getStart() <= match.getPosition() &&
+                                       region.getEnd() >= match.getPosition() + match
+                                               .getSequence().length()) {
+                                        isContained = true;
+                                        break;
+                                    }
+                                } catch (IllegalRegionValueException e) {
+                                    isCorrect = false;
                                 }
-                            } catch (IllegalRegionValueException e) {
-                                isCorrect = false;
                             }
                         }
                         if(isContained) {
@@ -330,12 +338,11 @@ public class AppController implements
                         }
                     }
                 }
-                if(!isContained) {
+                if(!isContained || !isCorrect) {
                     isCorrect = false;
                     break;
                 }
             }
-
             if(!isCorrect) {
                 break;
             }

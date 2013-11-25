@@ -73,8 +73,8 @@ public class PeptideUtils {
         List<Peptide> peptides = new ArrayList<Peptide>();
 
         for(PeptideList list : peptidesLists) {
-            if(!list.getVariances().isEmpty()) {
-                peptides.add(list.getVariances().get(0));
+            if(!list.getPeptideList().isEmpty()) {
+                peptides.add(list.getPeptideList().get(0));
             }
         }
 

@@ -84,8 +84,8 @@ public class DataProvider implements DataServer, TransactionHandler {
         }
         else if(transaction.getResponse() instanceof PeptideList) {
             PeptideList variances = (PeptideList) transaction.getResponse();
-            if(variances.getVariances().size() > 0) {
-                String sequence = variances.getVariances().get(0).getSequence();
+            if(variances.getPeptideList().size() > 0) {
+                String sequence = variances.getPeptideList().get(0).getSequence();
                 peptideVarianceCache.put(sequence, variances);
 
                 for(Map<String, Boolean> batchRequest : peptideVarianceRequests) {
@@ -95,6 +95,10 @@ public class DataProvider implements DataServer, TransactionHandler {
                 }
 
                 dispatchPeptideVariances();
+            }
+            else {
+                onDataRetrievalError(new Exception("Internal Error, " +
+                    "the developers need to update " + this.getClass().getName()));
             }
         }
         else {

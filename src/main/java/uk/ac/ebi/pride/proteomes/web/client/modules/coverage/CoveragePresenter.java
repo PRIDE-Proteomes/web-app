@@ -128,7 +128,7 @@ public class CoveragePresenter implements Presenter,
 
             for(PeptideMatch match : currentProtein.getPeptides()) {
                 if(match.getSequence().equals(event.getPeptides().get(0)
-                        .getVariances().get(0).getSequence())) {
+                        .getPeptideList().get(0).getSequence())) {
                     selectionAdapters.add(new PeptideAdapter(match));
                     selection.add(match);
                 }

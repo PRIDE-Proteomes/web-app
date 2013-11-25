@@ -15,8 +15,9 @@ public abstract class ModelFactory {
     interface MyFactory extends AutoBeanFactory {
         AutoBean<Group> group();
         AutoBean<Protein> protein();
-        AutoBean<Peptide> peptide();
         AutoBean<PeptideMatch> peptideMatch();
+        AutoBean<PeptideList> peptideList();
+        AutoBean<Peptide> peptide();
         AutoBean<ModifiedLocation> modifiedLocation();
 
         AutoBean<Alignment> alignment();
