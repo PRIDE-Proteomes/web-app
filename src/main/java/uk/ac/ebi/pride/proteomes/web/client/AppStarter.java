@@ -23,7 +23,9 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainView;
+import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptideColumnProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptidesPresenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissueColumnProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissuesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower.WhistleBlower;
 
@@ -76,7 +78,8 @@ public class AppStarter implements RunAsyncCallback {
         Presenter headerPresenter = new HeaderPresenter(eventBus,
                                             (HeaderPresenter.View) headerView);
 
-        ListView<String> tissueView = new GridView<ListUiHandler<String>, String>("Tissues", "tissue");
+        ListView<String> tissueView = new GridView<ListUiHandler<String>,
+                String>("Tissues", "tissue", TissueColumnProvider.KEY_PROVIDER);
         Presenter tissuePresenter = new TissuesPresenter(eventBus, tissueView);
 
         View<CoverageUiHandler> coverageView = new CoverageView();
@@ -84,7 +87,9 @@ public class AppStarter implements RunAsyncCallback {
                                           (CoveragePresenter.View) coverageView);
 
         ListView<PeptideMatch> peptideView =
-                new GridView<ListUiHandler<PeptideMatch>, PeptideMatch>("Peptides", "peptide");
+                new GridView<ListUiHandler<PeptideMatch>,
+                        PeptideMatch>("Peptides", "peptide",
+                        PeptideColumnProvider.KEY_PROVIDER);
         Presenter peptidePresenter = new PeptidesPresenter(eventBus,
                 peptideView);
 

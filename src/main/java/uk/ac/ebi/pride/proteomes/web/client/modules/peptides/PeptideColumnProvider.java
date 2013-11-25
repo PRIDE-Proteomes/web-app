@@ -3,6 +3,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.peptides;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.view.client.ProvidesKey;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 
 import java.util.ArrayList;
@@ -16,6 +17,18 @@ import java.util.List;
  *         Time: 15:44
  */
 public class PeptideColumnProvider {
+    /**
+     * The key provider that allows us to identify Contacts even if a field
+     * changes. We identify contacts by their unique ID.
+     */
+    public static final ProvidesKey<PeptideMatch> KEY_PROVIDER =
+            new ProvidesKey<PeptideMatch>() {
+                @Override
+                public Object getKey(PeptideMatch item) {
+                    return item.getPosition() + item.getSequence();
+                }
+            };
+
     public static List<Column<PeptideMatch, ?>> getSortingColumns
             (ColumnSortEvent.ListHandler<PeptideMatch> sorter) {
 
