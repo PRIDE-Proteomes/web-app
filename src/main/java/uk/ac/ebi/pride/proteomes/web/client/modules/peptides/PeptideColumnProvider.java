@@ -4,12 +4,10 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.view.client.ProvidesKey;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -66,6 +64,73 @@ public class PeptideColumnProvider {
             }
         });
 
+        // Column that shows the tissues the peptide has been seen in.
+        TextColumn<PeptideMatch> tissuesColumn = new TextColumn<PeptideMatch>() {
+            @Override
+            public String getValue(PeptideMatch object) {
+                StringBuilder sb = new StringBuilder();
+                for(String tissue : object.getTissues()) {
+                    sb.append(tissue).append(", ");
+                }
+                return sb.length() == 0 ? "None" : sb.substring(0, sb.length() - 2);
+            }
+        };
+
+        tissuesColumn.setSortable(true);
+        sorter.setComparator(tissuesColumn, new Comparator<PeptideMatch>() {
+            @Override
+            public int compare(PeptideMatch o1, PeptideMatch o2) {
+                StringBuilder sb1 = new StringBuilder();
+                StringBuilder sb2 = new StringBuilder();
+                for(String tissue : o1.getTissues()) {
+                    sb1.append(tissue);
+                }
+                for(String tissue : o2.getTissues()) {
+                    sb2.append(tissue);
+                }
+                return sb1.toString().compareTo(sb2.toString());
+            }
+        });
+
+        // Column that shows the modifications the peptide has.
+        TextColumn<PeptideMatch> modsColumn = new TextColumn<PeptideMatch>() {
+            @Override
+            public String getValue(PeptideMatch object) {
+                Set<String> modSet = new HashSet<String>();
+                for(ModifiedLocation modLoc : object.getModifiedLocations()) {
+                    modSet.add(modLoc.getModification());
+                }
+                StringBuilder sb = new StringBuilder();
+                for(String mod : modSet) {
+                    sb.append(mod).append(", ");
+                }
+                return sb.length() == 0 ? "None" : sb.substring(0, sb.length() - 2);
+            }
+        };
+
+        tissuesColumn.setSortable(true);
+        sorter.setComparator(tissuesColumn, new Comparator<PeptideMatch>() {
+            @Override
+            public int compare(PeptideMatch o1, PeptideMatch o2) {
+                if(o1.getModifiedLocations().size() !=
+                   o2.getModifiedLocations().size()) {
+                    return new Integer(o1.getModifiedLocations().size())
+                            .compareTo(o2.getModifiedLocations().size());
+                }
+                else {
+                    StringBuilder sb1 = new StringBuilder();
+                    StringBuilder sb2 = new StringBuilder();
+                    for(String tissue : o1.getTissues()) {
+                        sb1.append(tissue);
+                    }
+                    for(String tissue : o2.getTissues()) {
+                        sb2.append(tissue);
+                    }
+                    return sb1.toString().compareTo(sb2.toString());
+                }
+            }
+        });
+
         // Column that shows an star depending on a rating given by Pride.
 //        Column<PeptideMatch, String> prideQRatingColumn = new Column<PeptideMatch,
 //                String>(new MedalImageCell(5, 5)) {
@@ -86,18 +151,21 @@ public class PeptideColumnProvider {
 
         columns.add(sequenceColumn);
         columns.add(siteColumn);
+        columns.add(modsColumn);
+        columns.add(tissuesColumn);
         return columns;
     }
 
     public static List<String> getColumnTitles() {
         List<String> titles = new ArrayList<String>();
-        Collections.addAll(titles, "Sequence", "Site");
+        Collections.addAll(titles, "Sequence", "Site", "Modifications",
+                                   "Tissues");
         return titles;
     }
 
     public static List<String> getColumnWidths() {
         List<String> widths = new ArrayList<String>();
-        Collections.addAll(widths, "50%", "50%");
+        Collections.addAll(widths, "30%", "10%", "30%", "30%");
         return widths;
     }
 }
