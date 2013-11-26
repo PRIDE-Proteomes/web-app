@@ -100,6 +100,8 @@ public class TissuesPresenter implements Presenter,
 
         if(items.equals(selectedTissues)) {
             return;
+        } else if(items.contains(null)) {
+            items = Collections.emptyList();
         }
 
         changer = new StateChanger();

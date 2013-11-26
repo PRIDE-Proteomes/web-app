@@ -169,15 +169,17 @@ public class PeptidesPresenter implements Presenter,
             deselectItem(peptide);
         }
 
-        if(event.getTissues().length > 0) {
+        if(event.getTissues().length > 0 && !event.getTissues()[0].equals("")) {
             currentTissue = event.getTissues()[0];
             updateList(PeptideUtils.filterPeptidesNotInTissue(
-                       PeptideUtils.filterPeptidesNotIn( dataProvider.getList(),
+                       PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
                                currentRegion.getStart(),currentRegion.getEnd()),
                         currentTissue));
         }
         else {
             currentTissue = "";
+            updateList(PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
+                    currentRegion.getStart(),currentRegion.getEnd()));
         }
     }
 
@@ -242,10 +244,12 @@ public class PeptidesPresenter implements Presenter,
         for(Peptide peptide : selectedPeptides) {
             int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList(),
                     peptide.getSequence());
+            if(peptidePosition != -1) {
             if(PeptideUtils.inRange(dataProvider.getList().get(peptidePosition),
                     currentRegion.getStart(),
                     currentRegion.getEnd())) {
                 selectItem(peptide);
+            }
             }
         }
     }

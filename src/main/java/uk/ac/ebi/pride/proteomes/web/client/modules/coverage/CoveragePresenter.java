@@ -19,9 +19,7 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 import uk.ac.ebi.pride.widgets.client.protein.events.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -180,11 +178,21 @@ public class CoveragePresenter implements Presenter,
     public void onRegionClickSelected(ProteinRegionSelectionEvent event) {
         StateChanger changer = new StateChanger();
         List<String> region = new ArrayList<String>();
+        Set<String> peptides;
 
         try {
             region.add(new Region(event.getStart(), event.getStart() + event
                     .getLength() - 1).toString());
             changer.addRegionChange(region);
+
+            peptides = new HashSet<String>();
+            for(PeptideMatch peptide : currentPeptides) {
+                if(PeptideUtils.inRange(peptide, event.getStart(),
+                        event.getStart() + event.getLength() - 1)) {
+                    peptides.add(peptide.getSequence());
+                }
+            }
+            changer.addPeptideChange(peptides);
 
             StateChangingActionEvent.fire(this, changer);
         } catch (IllegalRegionValueException e) {
@@ -197,6 +205,8 @@ public class CoveragePresenter implements Presenter,
     public void onRegionDragSelected(ProteinAreaSelectedEvent event) {
         StateChanger changer = new StateChanger();
         List<String> regions = new ArrayList<String>();
+        Set<String> peptides;
+
         // if the selection is done right to left then start > end
         int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
         int end = event.getStart() + event.getEnd() - start;
@@ -205,7 +215,15 @@ public class CoveragePresenter implements Presenter,
             regions.add(new Region(start, end).toString());
             changer.addRegionChange(regions);
 
+            peptides = new HashSet<String>();
+            for(PeptideMatch peptide : currentPeptides) {
+                if(PeptideUtils.inRange(peptide, start, end)) {
+                    peptides.add(peptide.getSequence());
+                }
+            }
+            changer.addPeptideChange(peptides);
             StateChangingActionEvent.fire(this, changer);
+
         } catch (IllegalRegionValueException e) {
             // Empty selection, we don't send any event
         }
@@ -239,7 +257,8 @@ public class CoveragePresenter implements Presenter,
                 regions.add(new Region(peptide.getSite(), peptide.getEnd()).toString());
                 changer.addRegionChange(regions);
             } catch (IllegalRegionValueException e) {
-                // this shouldn't happen
+                // this shouldn't happen, unless the peptide is somehow empty.
+                e.printStackTrace();
             }
         }
         peptides.add(peptide.getSequence());
@@ -257,18 +276,16 @@ public class CoveragePresenter implements Presenter,
         // Terminal modifications are ignored for now
         if(event.getSite() > 0 && event.getSite() < currentProtein
                 .getSequence().length() + 1) {
-        try {
-
-            regions.add(new Region(event.getSite(), event.getSite() + 1).toString());
-            changer.addRegionChange(regions);
-        } catch (IllegalRegionValueException e) {
-            // this shouldn't happen
-        }
-
-        modifications.add(event.getSite().toString());
-        changer.addModificationChange(modifications);
-        StateChangingActionEvent.fire(this, changer);
-
+            try {
+                regions.add(new Region(event.getSite(), event.getSite() + 1).toString());
+                changer.addRegionChange(regions);
+            } catch (IllegalRegionValueException e) {
+                // this shouldn't happen, at all.
+                e.printStackTrace();
+            }
+            modifications.add(event.getSite().toString());
+            changer.addModificationChange(modifications);
+            StateChangingActionEvent.fire(this, changer);
         }
     }
 }
