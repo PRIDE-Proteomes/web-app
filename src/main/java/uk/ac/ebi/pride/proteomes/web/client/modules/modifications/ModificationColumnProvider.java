@@ -1,0 +1,82 @@
+package uk.ac.ebi.pride.proteomes.web.client.modules.modifications;
+
+import com.google.common.collect.Multiset;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.view.client.ProvidesKey;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+/**
+ * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
+ *         Date: 26/11/13
+ *         Time: 10:53
+ */
+public class ModificationColumnProvider {
+    /**
+     * The key provider that allows us to identify Contacts even if a field
+     * changes. We identify contacts by their unique ID.
+     */
+    public static final ProvidesKey<Multiset.Entry<String>> KEY_PROVIDER =
+            new ProvidesKey<Multiset.Entry<String>>() {
+                @Override
+                public Object getKey(Multiset.Entry<String>item) {
+                    return item.getElement();
+                }
+            };
+
+    public static List<Column<Multiset.Entry<String>, ?>> getSortingColumns
+            (ColumnSortEvent.ListHandler<Multiset.Entry<String>> sorter) {
+        List<Column<Multiset.Entry<String>, ?>> columns = new ArrayList<Column<Multiset.Entry<String>, ?>>();
+
+        TextColumn<Multiset.Entry<String>> nameColumn = new TextColumn<Multiset.Entry<String>>() {
+            @Override
+            public String getValue(Multiset.Entry<String> object) {
+                return object.getElement();
+            }
+        };
+
+        nameColumn.setSortable(true);
+        sorter.setComparator(nameColumn, new Comparator<Multiset.Entry<String>>() {
+            @Override
+            public int compare(Multiset.Entry<String> o1, Multiset.Entry<String> o2) {
+                return o1.getElement().compareTo(o2.getElement());
+            }
+        });
+
+        TextColumn<Multiset.Entry<String>> countColumn = new TextColumn<Multiset.Entry<String>>() {
+            @Override
+            public String getValue(Multiset.Entry<String> object) {
+                return String.valueOf(object.getCount());
+            }
+        };
+
+        countColumn.setSortable(true);
+        sorter.setComparator(countColumn, new Comparator<Multiset.Entry<String>>() {
+            @Override
+            public int compare(Multiset.Entry<String> o1, Multiset.Entry<String> o2) {
+                return new Integer(o1.getCount()).compareTo(o2.getCount());
+            }
+        });
+
+        columns.add(nameColumn);
+
+        return columns;
+    }
+
+    public static List<String> getColumnTitles() {
+        List<String> titles = new ArrayList<String>();
+        Collections.addAll(titles, "Name", "Count");
+        return titles;
+    }
+
+    public static List<String> getColumnWidths() {
+        List<String> widths = new ArrayList<String>();
+        Collections.addAll(widths, "70%", "30%");
+        return widths;
+    }
+}

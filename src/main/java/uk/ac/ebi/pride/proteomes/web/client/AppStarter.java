@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client;
 
+import com.google.common.collect.Multiset;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.History;
@@ -23,6 +24,8 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainView;
+import uk.ac.ebi.pride.proteomes.web.client.modules.modifications.ModificationColumnProvider;
+import uk.ac.ebi.pride.proteomes.web.client.modules.modifications.ModificationsPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptideColumnProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptidesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissueColumnProvider;
@@ -82,6 +85,12 @@ public class AppStarter implements RunAsyncCallback {
                 String>("Tissues", "tissue", TissueColumnProvider.KEY_PROVIDER);
         Presenter tissuePresenter = new TissuesPresenter(eventBus, tissueView);
 
+        ListView<Multiset.Entry<String>> modView = new
+                GridView<ListUiHandler<Multiset.Entry<String>>,
+                Multiset.Entry<String>>("Modifications", "modification",
+                            ModificationColumnProvider.KEY_PROVIDER);
+        Presenter modPresenter = new ModificationsPresenter(eventBus, modView);
+
         View<CoverageUiHandler> coverageView = new CoverageView();
         Presenter coveragePresenter = new CoveragePresenter(eventBus,
                                           (CoveragePresenter.View) coverageView);
@@ -95,6 +104,7 @@ public class AppStarter implements RunAsyncCallback {
 
         presenterList.add(headerPresenter);
         presenterList.add(tissuePresenter);
+        presenterList.add(modPresenter);
         presenterList.add(coveragePresenter);
         presenterList.add(peptidePresenter);
 

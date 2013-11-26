@@ -189,6 +189,8 @@ public class PeptidesPresenter implements Presenter,
 
         if(items.equals(selectedPeptides)) {
             return;
+        } else if(items.contains(null)) {
+            items = Collections.emptyList();
         }
 
         changer = new StateChanger();
