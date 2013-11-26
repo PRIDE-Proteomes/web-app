@@ -26,8 +26,20 @@ public class MainView implements MainPresenter.View {
         layout = new VerticalPanel();
         layout.setWidth("100%");
 
-        for (AcceptsOneWidget panel : panelList) {
-            layout.add((Widget) panel);
+        HorizontalPanel subHeader = new HorizontalPanel();
+        subHeader.setWidth("100%");
+
+        for(int i = 0; i < panelList.size(); i++) {
+            if(i == 1) {
+                layout.add(subHeader);
+                subHeader.add((Widget) panelList.get(i));
+            }
+            else if(i == 2) {
+                subHeader.add((Widget) panelList.get(i));
+            }
+            else {
+                layout.add((Widget) panelList.get(i));
+            }
         }
         popup = new PopupMask();
         //We want to move the popup position when the window is resized
