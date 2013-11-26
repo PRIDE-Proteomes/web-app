@@ -122,7 +122,7 @@ public class AppStarter implements RunAsyncCallback {
 
         mainPresenter.bindToContainer(mainPanel);
 
-        WhistleBlower whistle = new WhistleBlower(eventBus);
+        new WhistleBlower(eventBus);
 
         DataServer provider = new DataProvider(webServiceRoot);
         AppController appController = new AppController(eventBus, provider);
