@@ -70,8 +70,6 @@ public class AppStarter implements RunAsyncCallback {
         // Stick together the whole app first by creating the listeners to
         // the event bus, then creating the structure of the graphical elements
 
-        // todo we should initialize these two lists,
-        // the placeholders usually are enough with SimplePanels
         // The two lists should have the same size
         List<Presenter> presenterList = new ArrayList<Presenter>();
         List<AcceptsOneWidget> placeHolderList = new

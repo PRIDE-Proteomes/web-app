@@ -49,6 +49,7 @@ public class TissuesPresenter implements Presenter,
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
+        view.asWidget().setVisible(false);
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
