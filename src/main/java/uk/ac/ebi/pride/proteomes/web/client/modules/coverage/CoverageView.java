@@ -36,9 +36,9 @@ public class CoverageView implements CoveragePresenter.View,
     public CoverageView() {
         viewersCache = new HashMap<ProteinAdapter, ProteinViewer>();
 
-        panel = new HTMLPanel("");
         outerBox = ModuleContainerFactory.getModuleContainer("Protein " +
                                                              "Coverage");
+        panel = new HTMLPanel("");
         outerBox.setWidth("100%");
         outerBox.setContent(panel);
         outerBox.setOpen(true);

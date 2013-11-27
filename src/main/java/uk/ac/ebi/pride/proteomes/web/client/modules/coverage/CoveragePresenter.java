@@ -100,13 +100,30 @@ public class CoveragePresenter implements Presenter,
         if(!hiding && event.getProteins().size() > 0) {
             currentProtein = event.getProteins().get(0);
             view.updateProtein(new ProteinAdapter(currentProtein));
-            view.setVisible(true);
         }
     }
 
     @Override
     public void onProteinRequestEvent(ProteinRequestEvent event) {
         view.displayLoadingMessage();
+    }
+
+    @Override
+    public void onRegionUpdateEvent(RegionUpdateEvent event) {
+        Region region;
+
+        if(event.getRegions().size() > 0) {
+            region = event.getRegions().get(0);
+            currentRegion = region;
+            view.updateRegionSelection(region.getStart(), region.getEnd());
+            if(region.getLength() == 1) {
+                view.updateModificationHighlight(region.getStart(), region.getEnd());
+            }
+        }
+        else {
+            currentRegion = Region.emptyRegion();
+            view.resetRegionSelection();
+        }
     }
 
     /**
@@ -139,24 +156,6 @@ public class CoveragePresenter implements Presenter,
         else {
             view.resetPeptideSelection();
             currentPeptides = Collections.emptyList();
-        }
-    }
-
-    @Override
-    public void onRegionUpdateEvent(RegionUpdateEvent event) {
-        Region region;
-
-        if(event.getRegions().size() > 0) {
-            region = event.getRegions().get(0);
-            currentRegion = region;
-            view.updateRegionSelection(region.getStart(), region.getEnd());
-            if(region.getLength() == 1) {
-                view.updateModificationHighlight(region.getStart(), region.getEnd());
-            }
-        }
-        else {
-            currentRegion = Region.emptyRegion();
-            view.resetRegionSelection();
         }
     }
 
@@ -226,7 +225,9 @@ public class CoveragePresenter implements Presenter,
             StateChangingActionEvent.fire(this, changer);
 
         } catch (IllegalRegionValueException e) {
-            // Empty selection, we don't send any event
+            regions.add("");
+            changer.addRegionChange(regions);
+            StateChangingActionEvent.fire(this, changer);
         }
     }
 
