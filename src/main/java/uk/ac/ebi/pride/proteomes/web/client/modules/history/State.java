@@ -188,8 +188,8 @@ final class State {
     }
 
     /**
-     * Used to produce a URL token from a collection of ids
-     * @param ids the collection that is needed to convert to a string
+     * Used to produce a URL token from a collection of identifiers.
+     * @param ids the collection that is needed to represent in a URL
      * @return section of URL that represents the collection
      */
     static String getToken(Collection<String> ids) {
@@ -203,9 +203,9 @@ final class State {
     }
 
     /**
-     * Used to produce a URL token from a collection of ids
-     * @param ids the collection that is needed to convert to a string
-     * @return section of URL that represents the collection
+     * Used to produce a URL token from an array of identifiers.
+     * @param ids the collection that is needed to represent in a URL
+     * @return section of URL that represents the array
      */
     static String getToken(String[] ids) {
         StringBuilder builder = new StringBuilder();

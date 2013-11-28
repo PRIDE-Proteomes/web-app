@@ -231,7 +231,7 @@ public class AppController implements
             if(!isStateDataValid(stateQueue.peek())) {
                 throw new InconsistentStateException();
             }
-            goTo(stateQueue.peek());
+            goTo(revisePeptideFilters(stateQueue.peek()));
         }
         catch(InconsistentStateException e) {
             InvalidStateEvent.fire(this, "The address cannot be " +
@@ -352,6 +352,70 @@ public class AppController implements
         }
 
         return isCorrect;
+    }
+
+    /**
+     *  This method checks if the selected peptides are filtered out by some
+     *  filters and removes said filters to achieve a consistent state.
+     *  This is done because not all modules use filters before displaying
+     *  the peptides and can select them. This frees these modules from
+     *  the responsibility of receiving each of the events related to the
+     *  filters and maintain those in its state.
+     * @param uncheckedState state that may not have consistent peptide filters
+     * @return a state which has the peptide filters consistent with the
+     * selected peptides.
+     */
+    private State revisePeptideFilters(State uncheckedState) {
+        if(uncheckedState.getSelectedPeptides().length == 0) {
+            return uncheckedState;
+        }
+
+        StateChanger sc = new StateChanger();
+        List<String> validTissues = new ArrayList<String>();
+        List<String> validModifications = new ArrayList<String>();
+        boolean contained;
+
+        for(String tissue : uncheckedState.getSelectedTissues()) {
+            contained = false;
+            for(PeptideList peptideVariances :
+                    server.getPeptideVarianceLists(uncheckedState.getSelectedPeptides())) {
+                if(peptideVariances.getPeptideList().get(0).getTissues().contains(tissue)) {
+                    contained = true;
+                    break;
+                }
+            }
+            if(contained) {
+                validTissues.add(tissue);
+            }
+        }
+
+        for(String mod : uncheckedState.getSelectedModifications()) {
+            contained = false;
+            for(PeptideList peptideVariances :
+                    server.getPeptideVarianceLists(uncheckedState.getSelectedPeptides())) {
+                for(ModifiedLocation mLoc :
+                        peptideVariances.getPeptideList().get(0).getModifiedLocations()) {
+                    if(mLoc.getModification().equals(mod)) {
+                        contained = true;
+                        break;
+                    }
+                }
+                if(contained) {
+                    break;
+                }
+            }
+            if(contained) {
+                validModifications.add(mod);
+            }
+        }
+        sc.addTissueChange(validTissues);
+        sc.addModificationChange(validModifications);
+        try {
+            return sc.change(uncheckedState);
+        } catch (InconsistentStateException e) {
+            e.printStackTrace();
+            return uncheckedState;
+        }
     }
 
     /**

@@ -9,7 +9,9 @@ import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.ModificationUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.TissueUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
@@ -26,6 +28,7 @@ public class TissuesPresenter implements Presenter,
                                          ValidStateEvent.ValidStateHandler,
                                          ProteinUpdateEvent.ProteinUpdateHandler,
                                          ProteinRequestEvent.ProteinRequestHandler,
+                                         TissueUpdateEvent.TissueUpdateHandler,
                                          ListUiHandler<String>
 {
     private final EventBus eventBus;
@@ -54,6 +57,7 @@ public class TissuesPresenter implements Presenter,
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
+        eventBus.addHandler(TissueUpdateEvent.getType(), this);
 
     }
     @Override
@@ -92,6 +96,19 @@ public class TissuesPresenter implements Presenter,
         // We should display that the list is being loaded
         if(!groups) {
             view.showLoadingMessage();
+        }
+    }
+
+    @Override
+    public void onTissueUpdateEvent(TissueUpdateEvent event) {
+        for(String item : selectedTissues) {
+            deselectItem(item);
+        }
+
+        selectedTissues = new ArrayList<String>();
+        for(String item : event.getTissues()) {
+            selectItem(item);
+            selectedTissues.add(item);
         }
     }
 
