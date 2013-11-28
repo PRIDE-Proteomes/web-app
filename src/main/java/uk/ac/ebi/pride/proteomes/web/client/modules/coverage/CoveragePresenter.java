@@ -112,6 +112,10 @@ public class CoveragePresenter implements Presenter,
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
         Region region;
 
+        if(event.getSource() == this) {
+            return;
+        }
+
         if(event.getRegions().size() > 0) {
             region = event.getRegions().get(0);
             currentRegion = region;
@@ -233,14 +237,24 @@ public class CoveragePresenter implements Presenter,
 
     @Override
     public void onRegionClickHighlighted(ProteinRegionHighlightEvent event) {
-        // todo We don't do anything right now, we should work on getting the
-        // application to a functional state first
+        // we don't do anything for the moment
     }
 
     @Override
     public void onRegionDragHighlighted(ProteinAreaHighlightEvent event) {
-        // todo We don't do anything right now, we should work on getting the
-        // application to a functional state first
+        List<Region> regions = new ArrayList<Region>();
+
+        // if the selection is done right to left then start > end
+        int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
+        int end = event.getStart() + event.getEnd() - start;
+
+        try {
+            regions.add(new Region(start, end));
+        } catch (IllegalRegionValueException e) {
+            regions.add(Region.emptyRegion());
+        } finally {
+            RegionUpdateEvent.fire(this, regions);
+        }
     }
 
     @Override
