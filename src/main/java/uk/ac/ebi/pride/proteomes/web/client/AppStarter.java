@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.View;
@@ -33,6 +34,8 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequenceUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequenceView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissueColumnProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissuesPresenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.variances.VarianceColumnProvider;
+import uk.ac.ebi.pride.proteomes.web.client.modules.variances.VariancesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower.WhistleBlower;
 
 import java.util.ArrayList;
@@ -107,12 +110,19 @@ public class AppStarter implements RunAsyncCallback {
         Presenter peptidePresenter = new PeptidesPresenter(eventBus,
                 peptideView);
 
+        ListView<Peptide> varianceView =
+                new GridView<ListUiHandler<Peptide>, Peptide>("Variances",
+                        "variance", VarianceColumnProvider.KEY_PROVIDER);
+        Presenter variancePresenter = new VariancesPresenter(eventBus,
+                varianceView);
+
         presenterList.add(headerPresenter);
         presenterList.add(tissuePresenter);
         presenterList.add(modPresenter);
         presenterList.add(coveragePresenter);
         presenterList.add(sequencePresenter);
         presenterList.add(peptidePresenter);
+        presenterList.add(variancePresenter);
 
         for(Presenter p : presenterList) {
             placeHolderList.add(new SimplePanel());
