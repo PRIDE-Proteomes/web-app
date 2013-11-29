@@ -15,7 +15,7 @@ import java.util.Properties;
 public class AppWebServlet extends HttpServlet {
     private static String templateUrl;
     private static String propertiesLocation =
-            "uk/ac/ebi/pride/proteomes/web/properties/proteomes.properties";
+            "uk/ac/ebi/pride/proteomes/web/properties/template.properties";
 
     static {
         Properties props = new Properties();
@@ -87,7 +87,7 @@ public class AppWebServlet extends HttpServlet {
     private String getWebConfigurationJSON() throws IOException {
         StringBuilder sb = new StringBuilder();
         ServletContext servletContext = this.getServletContext();
-        String pathContext = servletContext.getRealPath("WEB-INF/webconfig/config.json");
+        String pathContext = servletContext.getRealPath("WEB-INF/template/config.json");
         FileInputStream fstream = new FileInputStream(pathContext);
         DataInputStream in = new DataInputStream(fstream);
         BufferedReader br = new BufferedReader(new InputStreamReader(in));

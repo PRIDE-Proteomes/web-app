@@ -111,7 +111,7 @@
              documentation at codehaus.org -->
                 <configuration>
                     <compileReport>true</compileReport>
-                    <runTarget>/webapp.html</runTarget>
+                    <runTarget>/index.html</runTarget>
                     <hostedWebapp>${webappDirectory}</hostedWebapp>
                 </configuration>
             </plugin>

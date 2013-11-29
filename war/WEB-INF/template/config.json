@@ -1,0 +1,84 @@
+{
+    "globalTemplate": {
+        "title": "EMBL-EBI PRIDE Proteomes",
+        "javascriptList": [
+            {
+                "url": "WebApp/WebApp.nocache.js"
+            }
+        ],
+        "breadcrumbItems": [{
+            "title": "PRIDE",
+            "href": "../../"
+        },{
+            "title": "PRIDE Proteomes",
+            "href": "../"
+        },{
+            "title": "Viewer"
+        }],
+        "lastInBody": true,
+        "cssList": [
+            {
+                "url": "static/css/webapp.css"
+            }
+        ],
+        "placeHolder": "webapp",
+        "bodyMaxWidth": 1050
+    },
+    "localMasthead": {
+        "title": "PRIDE Proteomes",
+        "search": {
+            "btnText": "Search",
+            "action": "../search",
+            "method": "get",
+            "inputName": "q",
+            "examples": [
+                {
+                    "title": "albumin",
+                    "href": "../search?q=albumin"
+                },
+                {
+                    "title": "P02768",
+                    "href": "../search?q=P02768"
+                },
+                {
+                    "title": "kinase",
+                    "href": "../search?q=kinase"
+                }
+            ]
+        },
+        "navigationTabs": [
+            {
+                "selected": false,
+                "title": "Home",
+                "href": "../",
+                "tooltip": "Home page"
+            },
+            {
+                "selected": false,
+                "title": "Search",
+                "href": "../search",
+                "tooltip": "Search PRIDE Proteomes data"
+            },
+            {
+                "selected": false,
+                "title": "Documentation",
+                "href": "../documentation",
+                "tooltip": "PRIDE Proteomes documentation"
+            },
+            {
+                "selected": false,
+                "title": "About PRIDE Proteomes",
+                "href": "../about",
+                "tooltip": "About PRIDE Proteomes"
+            }
+        ],
+        "functionalTabs": [
+            {
+                "title": "Feedback",
+                "href": "/support",
+                "iconFontSet": "icon-static",
+                "dataIcon": "\\"
+            }
+        ]
+    }
+}

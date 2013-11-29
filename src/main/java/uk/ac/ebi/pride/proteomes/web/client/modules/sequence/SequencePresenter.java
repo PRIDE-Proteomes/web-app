@@ -64,6 +64,7 @@ public class SequencePresenter implements Presenter,
         this.view = view;
 
         view.addUiHandler(this);
+        view.asWidget().setVisible(false);
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
