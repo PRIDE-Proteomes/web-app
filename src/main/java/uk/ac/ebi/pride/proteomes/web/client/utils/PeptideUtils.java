@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.utils;
 
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
@@ -51,7 +52,38 @@ public class PeptideUtils {
         return filteredList;
     }
 
-    static public int firstIndexOf(List<PeptideMatch> peptides, String sequence) {
+    /**
+     * This will show ugly warning about "unchecked assignment",
+     * it's ok because we don't change the objects or create new ones
+     * (hopefully)
+     * @param peptideMatches
+     * @param modification
+     * @return A list of items that where already contained in the original
+     * list
+     */
+    public static List filterPeptidesWithoutModification
+            (List<? extends Peptide> peptideMatches, String modification) {
+        List<Peptide> filteredList;
+
+        if(modification.isEmpty()) {
+            return peptideMatches;
+        }
+
+        filteredList = new ArrayList<Peptide>();
+
+        for(Peptide peptide : peptideMatches) {
+            for(ModifiedLocation modLoc : peptide.getModifiedLocations()) {
+                if(modLoc.getModification().equals(modification)) {
+                    filteredList.add(peptide);
+                    break;
+                }
+            }
+        }
+
+        return filteredList;
+    }
+
+    static public int firstIndexOf(List<? extends Peptide> peptides, String sequence) {
         int index = -1;
 
         for(int i = 0; i < peptides.size(); i++) {

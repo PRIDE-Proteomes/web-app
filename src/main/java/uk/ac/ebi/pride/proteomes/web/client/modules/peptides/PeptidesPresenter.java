@@ -13,10 +13,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.updates.RegionUpdateEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.updates.TissueUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
@@ -37,7 +34,9 @@ public class PeptidesPresenter implements Presenter,
                                           ProteinRequestEvent.ProteinRequestHandler,
                                           RegionUpdateEvent.RegionUpdateHandler,
                                           PeptideUpdateEvent.PeptideUpdateHandler,
-                                          ListUiHandler<PeptideMatch>,TissueUpdateEvent.TissueUpdateHandler {
+                                          TissueUpdateEvent.TissueUpdateHandler,
+                                          ModificationUpdateEvent.ModificationUpdateHandler,
+                                          ListUiHandler<PeptideMatch> {
     private final EventBus eventBus;
     private final ListView<PeptideMatch> view;
     private final ListDataProvider<PeptideMatch> dataProvider = new
@@ -50,6 +49,7 @@ public class PeptidesPresenter implements Presenter,
     private Region currentRegion = Region.emptyRegion();
     private Collection<PeptideMatch> selectedPeptidesMatches = Collections.emptyList();
     private String currentTissue = "";
+    private String currentModification = "";
 
     public PeptidesPresenter(EventBus eventBus, ListView<PeptideMatch> view) {
         this.eventBus = eventBus;
@@ -182,10 +182,37 @@ public class PeptidesPresenter implements Presenter,
 
         if(event.getTissues().length > 0 && !event.getTissues()[0].equals("")) {
             currentTissue = event.getTissues()[0];
-            updateList(PeptideUtils.filterPeptidesNotInTissue(
+            updateList(PeptideUtils.filterPeptidesWithoutModification(
+                       PeptideUtils.filterPeptidesNotInTissue(
                        PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
-                               currentRegion.getStart(),currentRegion.getEnd()),
-                        currentTissue));
+                               currentRegion.getStart(), currentRegion.getEnd()),
+                        currentTissue),
+                        currentModification));
+        }
+        else {
+            currentTissue = "";
+            updateList(PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
+                    currentRegion.getStart(),currentRegion.getEnd()));
+        }
+    }
+
+
+
+    @Override
+    public void onModificationUpdateEvent(ModificationUpdateEvent event) {
+        // we deselect all the peptides, we can select them again.
+        for(Peptide peptide : selectedPeptidesMatches) {
+            deselectItem(peptide);
+        }
+
+        if(event.getModifications().length > 0 && !event.getModifications()[0].equals("")) {
+            currentTissue = event.getModifications()[0];
+            updateList(PeptideUtils.filterPeptidesWithoutModification(
+                       PeptideUtils.filterPeptidesNotInTissue(
+                       PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
+                               currentRegion.getStart(), currentRegion.getEnd()),
+                        currentTissue),
+                        currentModification));
         }
         else {
             currentTissue = "";
