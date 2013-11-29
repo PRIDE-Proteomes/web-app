@@ -9,9 +9,12 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.ModificationUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
@@ -32,6 +35,8 @@ public class ModificationsPresenter implements Presenter,
                                           ValidStateEvent.ValidStateHandler,
                                           ProteinUpdateEvent.ProteinUpdateHandler,
                                           ProteinRequestEvent.ProteinRequestHandler,
+                                          PeptideUpdateEvent.PeptideUpdateHandler,
+                                          ModificationUpdateEvent.ModificationUpdateHandler,
                                           ListUiHandler<Multiset.Entry<String>>
 {
     private final EventBus eventBus;
@@ -43,6 +48,7 @@ public class ModificationsPresenter implements Presenter,
 
     private boolean groups;
     private List<Multiset.Entry<String>> selectedModifications = new ArrayList<Multiset.Entry<String>>();
+    private List<Peptide> selectedPeptides = Collections.emptyList();
 
     public ModificationsPresenter(EventBus eventBus, ListView<Multiset.Entry<String>> view) {
         this.eventBus = eventBus;
@@ -60,6 +66,8 @@ public class ModificationsPresenter implements Presenter,
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
+        eventBus.addHandler(PeptideUpdateEvent.getType(), this);
+        eventBus.addHandler(ModificationUpdateEvent.getType(), this);
     }
 
     @Override
@@ -73,32 +81,15 @@ public class ModificationsPresenter implements Presenter,
     }
 
     @Override
-    public void onSelectionChanged(Collection<Multiset.Entry<String>> items) {
-
-        StateChanger changer;
-
-        if(items.equals(selectedModifications)) {
-            return;
-        } else if(items.contains(null)) {
-            items = Collections.emptyList();
+    public void onValidStateEvent(ValidStateEvent event) {
+        // We should check if we have to stay hidden or not
+        if(event.getViewType() == ValidStateEvent.ViewType.Group) {
+            groups = true;
+            view.asWidget().setVisible(false);
         }
-
-        changer = new StateChanger();
-
-        List<String> selection = new ArrayList<String>();
-        for(Multiset.Entry<String> item : items) {
-            selection.add(item.getElement());
-        }
-
-        changer.addModificationChange(selection);
-        StateChangingActionEvent.fire(this, changer);
-    }
-
-    @Override
-    public void onProteinRequestEvent(ProteinRequestEvent event) {
-        // We should display that the list is being loaded
-        if(!groups) {
-            view.showLoadingMessage();
+        else {
+            groups = false;
+            view.asWidget().setVisible(true);
         }
     }
 
@@ -116,15 +107,72 @@ public class ModificationsPresenter implements Presenter,
     }
 
     @Override
-    public void onValidStateEvent(ValidStateEvent event) {
-        // We should check if we have to stay hidden or not
-        if(event.getViewType() == ValidStateEvent.ViewType.Group) {
-            groups = true;
-            view.asWidget().setVisible(false);
+    public void onProteinRequestEvent(ProteinRequestEvent event) {
+        // We should display that the list is being loaded
+        if(!groups) {
+            view.showLoadingMessage();
+        }
+    }
+
+    @Override
+    public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
+        if(event.getPeptides().isEmpty()) {
+            selectedPeptides = Collections.emptyList();
         }
         else {
-            groups = false;
-            view.asWidget().setVisible(true);
+            selectedPeptides = event.getPeptides().get(0).getPeptideList();
+        }
+    }
+
+    @Override
+    public void onSelectionChanged(Collection<Multiset.Entry<String>> items) {
+        StateChanger changer;
+        List<String> filteredPeptides;
+
+        if((items.containsAll(selectedModifications) &&
+            selectedModifications.containsAll(items)) ||
+                (items.contains(null) && selectedModifications.isEmpty())) {
+            return;
+        } else if(items.contains(null)) {
+            items = Collections.emptyList();
+        }
+
+        List<String> selection = new ArrayList<String>();
+        for(Multiset.Entry<String> item : items) {
+            selection.add(item.getElement());
+        }
+
+        filteredPeptides = new ArrayList<String>();
+        for(Peptide pep : selectedPeptides) {
+            // If the collections are disjoint means the peptide doesn't have
+            // any tissue in items. If this happens, we filter it out.
+            if(!Collections.disjoint(pep.getTissues(), items)) {
+                filteredPeptides.add(pep.getSequence());
+            }
+        }
+
+        changer = new StateChanger();
+        changer.addModificationChange(selection);
+        changer.addPeptideChange(filteredPeptides);
+        StateChangingActionEvent.fire(this, changer);
+    }
+
+    @Override
+    public void onModificationUpdateEvent(ModificationUpdateEvent event) {
+        for(Multiset.Entry<String> item : selectedModifications) {
+            deselectItem(item);
+        }
+
+        selectedModifications = new ArrayList<Multiset.Entry<String>>();
+        for(String item : event.getModifications()) {
+            for(Multiset.Entry<String> entry : dataProvider.getList()) {
+                if(entry.getElement().equals(item)) {
+                    selectItem(entry);
+                    selectedModifications.add(entry);
+                    break;
+                }
+            }
+
         }
     }
 

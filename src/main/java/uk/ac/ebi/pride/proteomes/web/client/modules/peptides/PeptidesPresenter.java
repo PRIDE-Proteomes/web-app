@@ -48,7 +48,7 @@ public class PeptidesPresenter implements Presenter,
     private boolean groups = true;
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
-    private Collection<Peptide> selectedPeptides = Collections.emptyList();
+    private Collection<PeptideMatch> selectedPeptidesMatches = Collections.emptyList();
     private String currentTissue = "";
 
     public PeptidesPresenter(EventBus eventBus, ListView<PeptideMatch> view) {
@@ -123,7 +123,7 @@ public class PeptidesPresenter implements Presenter,
     @Override
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
         // we deselect all the peptides, we can select them again.
-        for(Peptide peptide : selectedPeptides) {
+        for(Peptide peptide : selectedPeptidesMatches) {
             deselectItem(peptide);
         }
 
@@ -150,13 +150,23 @@ public class PeptidesPresenter implements Presenter,
 
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
-        for(Peptide peptide : selectedPeptides) {
+        for(Peptide peptide : selectedPeptidesMatches) {
             deselectItem(peptide);
         }
 
         // we don't care about all the modifications, so we get rid of them
         // and pick a single variance per list of peptides.
-        selectedPeptides = PeptideUtils.getFirstOfEach(event.getPeptides());
+        Collection<Peptide> selectedPepVars = PeptideUtils.getFirstOfEach(event.getPeptides());
+        selectedPeptidesMatches = new ArrayList<PeptideMatch>();
+        for(Peptide pepVariance : selectedPepVars) {
+            for(PeptideMatch pepMatch : currentProtein.getPeptides()) {
+                if(pepVariance.getSequence().equals(pepMatch.getSequence())) {
+                    selectedPeptidesMatches.add(pepMatch);
+                    break;
+                }
+            }
+        }
+
         if(event.getPeptides().size() > 0) {
             // we reselect the peptides only if there are any
             selectPeptides();
@@ -166,7 +176,7 @@ public class PeptidesPresenter implements Presenter,
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
         // we deselect all the peptides, we can select them again.
-        for(Peptide peptide : selectedPeptides) {
+        for(Peptide peptide : selectedPeptidesMatches) {
             deselectItem(peptide);
         }
 
@@ -188,13 +198,16 @@ public class PeptidesPresenter implements Presenter,
     public void onSelectionChanged(Collection<PeptideMatch> items) {
         StateChanger changer;
 
-        if(items.equals(selectedPeptides)) {
+        // an empty selection is represented by a list with a null items,
+        // we represent that with an empty list, so we have to add an
+        // additional check for that.
+        if((items.containsAll(selectedPeptidesMatches) &&
+            selectedPeptidesMatches.containsAll(items)) ||
+                (items.contains(null) && selectedPeptidesMatches.isEmpty())) {
             return;
         } else if(items.contains(null)) {
             items = Collections.emptyList();
         }
-
-        changer = new StateChanger();
 
         Set<String> peptideIds = new HashSet<String>();
 
@@ -202,18 +215,19 @@ public class PeptidesPresenter implements Presenter,
             peptideIds.add(peptide.getSequence());
         }
 
+        changer = new StateChanger();
         changer.addPeptideChange(peptideIds);
         StateChangingActionEvent.fire(this, changer);
     }
 
     private void updateList(List<PeptideMatch> peptideList) {
-        for(Peptide peptide : selectedPeptides) {
+        for(Peptide peptide : selectedPeptidesMatches) {
             deselectItem(peptide);
         }
 
         setList(peptideList);
 
-        for(Peptide peptide : selectedPeptides) {
+        for(Peptide peptide : selectedPeptidesMatches) {
             selectItem(peptide);
         }
     }
@@ -244,7 +258,7 @@ public class PeptidesPresenter implements Presenter,
         //we reselect the peptides inside the range, to do this,
         // we must search first the first peptide match that has the same
         // sequence as the peptide we want to select.
-        for(Peptide peptide : selectedPeptides) {
+        for(Peptide peptide : selectedPeptidesMatches) {
             int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList(),
                     peptide.getSequence());
             if(peptidePosition != -1) {

@@ -6,10 +6,12 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ModificationUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.TissueUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
@@ -28,6 +30,7 @@ public class TissuesPresenter implements Presenter,
                                          ValidStateEvent.ValidStateHandler,
                                          ProteinUpdateEvent.ProteinUpdateHandler,
                                          ProteinRequestEvent.ProteinRequestHandler,
+                                         PeptideUpdateEvent.PeptideUpdateHandler,
                                          TissueUpdateEvent.TissueUpdateHandler,
                                          ListUiHandler<String>
 {
@@ -38,8 +41,9 @@ public class TissuesPresenter implements Presenter,
     private final ColumnSortEvent.ListHandler<String> dataSorter = new
             ColumnSortEvent.ListHandler<String>(new ArrayList<String>());
 
-    private boolean groups;
-    private List<String> selectedTissues = new ArrayList<String>();
+    private boolean groups = true;
+    private List<String> selectedTissues = Collections.emptyList();
+    private List<Peptide> selectedPeptides = Collections.emptyList();
 
     public TissuesPresenter(EventBus eventBus, ListView<String> view) {
         this.eventBus = eventBus;
@@ -100,6 +104,16 @@ public class TissuesPresenter implements Presenter,
     }
 
     @Override
+    public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
+        if(event.getPeptides().isEmpty()) {
+            selectedPeptides = Collections.emptyList();
+        }
+        else {
+            selectedPeptides = event.getPeptides().get(0).getPeptideList();
+        }
+    }
+
+    @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
         for(String item : selectedTissues) {
             deselectItem(item);
@@ -115,16 +129,30 @@ public class TissuesPresenter implements Presenter,
     @Override
     public void onSelectionChanged(Collection<String> items) {
         StateChanger changer;
+        List<String> filteredPeptides;
 
-        if(items.equals(selectedTissues)) {
+        // an empty selection is represented by a list with a null items,
+        // we represent that with an empty list, so we have to add an
+        // additional check for that.
+        if((items.containsAll(selectedTissues) && selectedTissues.containsAll(items)) ||
+                (items.contains(null) && selectedTissues.isEmpty())) {
             return;
         } else if(items.contains(null)) {
             items = Collections.emptyList();
         }
 
-        changer = new StateChanger();
+        filteredPeptides = new ArrayList<String>();
+        for(Peptide pep : selectedPeptides) {
+            // If the collections are disjoint means the peptide doesn't have
+            // any tissue in items. If this happens, we filter it out.
+            if(!Collections.disjoint(pep.getTissues(), items)) {
+                filteredPeptides.add(pep.getSequence());
+            }
+        }
 
+        changer = new StateChanger();
         changer.addTissueChange(items);
+        changer.addPeptideChange(filteredPeptides);
         StateChangingActionEvent.fire(this, changer);
     }
 
