@@ -8,7 +8,8 @@ ehthumbs.db
 Thumbs.db
 
 # IDEA generated files
-.idea/
+.idea
+*.iml
 
 ## Maven generated resources
-target/
+target
