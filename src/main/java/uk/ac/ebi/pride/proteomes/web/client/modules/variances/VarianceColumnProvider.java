@@ -15,18 +15,6 @@ import java.util.*;
  *         Time: 14:46
  */
 public class VarianceColumnProvider {
-    /**
-     * The key provider that allows us to identify Contacts even if a field
-     * changes. We identify contacts by their unique ID.
-     */
-    public static final ProvidesKey<Peptide> KEY_PROVIDER =
-            new ProvidesKey<Peptide>() {
-                @Override
-                public Object getKey(Peptide item) {
-                    return item.getSequence();
-                }
-            };
-
     public static List<Column<Peptide, ?>> getSortingColumns(ColumnSortEvent.ListHandler<Peptide> sorter) {
 
         List<Column<Peptide, ?>> columns = new ArrayList<Column<Peptide, ?>>();

@@ -28,9 +28,9 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
 
     private String baseType;
 
-    public GridView(String title, String typeName, ProvidesKey<T> providesKey) {
+    public GridView(String title, String typeName) {
         frame = ModuleContainerFactory.getModuleContainer(title);
-        grid = new DataGrid<T>(providesKey);
+        grid = new DataGrid<T>();
         baseType = typeName;
 
         grid.addRowCountChangeHandler(this);

@@ -16,18 +16,6 @@ import java.util.List;
  *         Time: 15:33
  */
 public class TissueColumnProvider {
-    /**
-     * The key provider that allows us to identify Contacts even if a field
-     * changes. We identify contacts by their unique ID.
-     */
-    public static final ProvidesKey<String> KEY_PROVIDER =
-            new ProvidesKey<String>() {
-                @Override
-                public Object getKey(String item) {
-                    return item;
-                }
-            };
-
     public static List<Column<String, ?>> getSortingColumns
             (ColumnSortEvent.ListHandler<String> sorter) {
         List<Column<String, ?>> columns = new ArrayList<Column<String, ?>>();

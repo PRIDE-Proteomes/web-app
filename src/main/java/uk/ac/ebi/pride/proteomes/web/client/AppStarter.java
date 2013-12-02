@@ -25,16 +25,12 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainView;
-import uk.ac.ebi.pride.proteomes.web.client.modules.modifications.ModificationColumnProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.modifications.ModificationsPresenter;
-import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptideColumnProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptidesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequencePresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequenceUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequenceView;
-import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissueColumnProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissuesPresenter;
-import uk.ac.ebi.pride.proteomes.web.client.modules.variances.VarianceColumnProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.variances.VariancesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower.WhistleBlower;
 
@@ -86,13 +82,12 @@ public class AppStarter implements RunAsyncCallback {
                                             (HeaderPresenter.View) headerView);
 
         ListView<String> tissueView = new GridView<ListUiHandler<String>,
-                String>("Tissues", "tissue", TissueColumnProvider.KEY_PROVIDER);
+                String>("Tissues", "tissue");
         Presenter tissuePresenter = new TissuesPresenter(eventBus, tissueView);
 
         ListView<Multiset.Entry<String>> modView = new
                 GridView<ListUiHandler<Multiset.Entry<String>>,
-                Multiset.Entry<String>>("Modifications", "modification",
-                            ModificationColumnProvider.KEY_PROVIDER);
+                Multiset.Entry<String>>("Modifications", "modification");
         Presenter modPresenter = new ModificationsPresenter(eventBus, modView);
 
         View<CoverageUiHandler> coverageView = new CoverageView();
@@ -105,14 +100,13 @@ public class AppStarter implements RunAsyncCallback {
 
         ListView<PeptideMatch> peptideView =
                 new GridView<ListUiHandler<PeptideMatch>,
-                        PeptideMatch>("Peptides", "peptide",
-                        PeptideColumnProvider.KEY_PROVIDER);
+                        PeptideMatch>("Peptides", "peptide");
         Presenter peptidePresenter = new PeptidesPresenter(eventBus,
                 peptideView);
 
         ListView<Peptide> varianceView =
                 new GridView<ListUiHandler<Peptide>, Peptide>("Variances",
-                        "variance", VarianceColumnProvider.KEY_PROVIDER);
+                        "variance");
         Presenter variancePresenter = new VariancesPresenter(eventBus,
                 varianceView);
 

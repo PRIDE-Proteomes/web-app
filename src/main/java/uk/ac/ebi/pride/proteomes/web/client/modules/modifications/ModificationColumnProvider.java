@@ -17,18 +17,6 @@ import java.util.List;
  *         Time: 10:53
  */
 public class ModificationColumnProvider {
-    /**
-     * The key provider that allows us to identify Contacts even if a field
-     * changes. We identify contacts by their unique ID.
-     */
-    public static final ProvidesKey<Multiset.Entry<String>> KEY_PROVIDER =
-            new ProvidesKey<Multiset.Entry<String>>() {
-                @Override
-                public Object getKey(Multiset.Entry<String>item) {
-                    return item.getElement();
-                }
-            };
-
     public static List<Column<Multiset.Entry<String>, ?>> getSortingColumns
             (ColumnSortEvent.ListHandler<Multiset.Entry<String>> sorter) {
         List<Column<Multiset.Entry<String>, ?>> columns = new ArrayList<Column<Multiset.Entry<String>, ?>>();

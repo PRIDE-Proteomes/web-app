@@ -15,18 +15,6 @@ import java.util.*;
  *         Time: 15:44
  */
 public class PeptideColumnProvider {
-    /**
-     * The key provider that allows us to identify Contacts even if a field
-     * changes. We identify contacts by their unique ID.
-     */
-    public static final ProvidesKey<PeptideMatch> KEY_PROVIDER =
-            new ProvidesKey<PeptideMatch>() {
-                @Override
-                public Object getKey(PeptideMatch item) {
-                    return item.getPosition() + item.getSequence();
-                }
-            };
-
     public static List<Column<PeptideMatch, ?>> getSortingColumns
             (ColumnSortEvent.ListHandler<PeptideMatch> sorter) {
 
@@ -108,8 +96,8 @@ public class PeptideColumnProvider {
             }
         };
 
-        tissuesColumn.setSortable(true);
-        sorter.setComparator(tissuesColumn, new Comparator<PeptideMatch>() {
+        modsColumn.setSortable(true);
+        sorter.setComparator(modsColumn, new Comparator<PeptideMatch>() {
             @Override
             public int compare(PeptideMatch o1, PeptideMatch o2) {
                 if(o1.getModifiedLocations().size() !=

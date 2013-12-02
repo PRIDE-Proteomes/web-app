@@ -132,14 +132,12 @@ public class VariancesPresenter implements Presenter,
 
     /**
      * This method is used whenever a new list is set as the model of the view.
-     * We have to update the list reference in the provider and the sorter,
-     * otherwise the sorting would not work anymore.
      *
-     * Alternatively we could also empty the list and repopulate it with the
-     * new data, but that would make it slower.
+     * We clear the list and repopulate it because if we simply reset the
+     * data provider and data sorter references to the list it won't work.
      */
     private void setList(final List<Peptide> peptideList) {
-        dataProvider.setList(peptideList);
-        dataSorter.setList(peptideList);
+        dataProvider.getList().clear();
+        dataProvider.getList().addAll(peptideList);
     }
 }
