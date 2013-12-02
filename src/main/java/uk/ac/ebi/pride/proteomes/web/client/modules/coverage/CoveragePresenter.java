@@ -210,14 +210,21 @@ public class CoveragePresenter implements Presenter,
         StateChanger changer = new StateChanger();
         List<String> regions = new ArrayList<String>();
         Set<String> peptides;
+        Region region;
 
         // if the selection is done right to left then start > end
         int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
         int end = event.getStart() + event.getEnd() - start;
 
         try {
-            regions.add(new Region(start, end).toString());
-            changer.addRegionChange(regions);
+            region = new Region(start, end);
+            if(region.getLength() == 0) {
+                //we don't want to select a single aminoacid,
+                // we want to reset the selection
+                region = Region.emptyRegion();
+            }
+
+            regions.add(region.toString());
 
             peptides = new HashSet<String>();
             for(PeptideMatch peptide : currentPeptides) {
@@ -226,10 +233,10 @@ public class CoveragePresenter implements Presenter,
                 }
             }
             changer.addPeptideChange(peptides);
-            StateChangingActionEvent.fire(this, changer);
-
         } catch (IllegalRegionValueException e) {
-            regions.add("");
+            region = Region.emptyRegion();
+            regions.add(region.toString());
+        } finally {
             changer.addRegionChange(regions);
             StateChangingActionEvent.fire(this, changer);
         }

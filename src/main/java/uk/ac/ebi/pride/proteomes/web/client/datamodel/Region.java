@@ -12,7 +12,7 @@ public class Region {
         EmptyRegion() {}
 
         EmptyRegion(int start, int end) throws IllegalRegionValueException {
-            super(0, 1);
+            super(0, 0);
         }
 
         @Override
@@ -42,7 +42,8 @@ public class Region {
     private Region(){}
 
     public Region(int start, int end) throws IllegalRegionValueException {
-        if(end - start < 1) {
+        if(end - start < 0 || (!(this instanceof EmptyRegion) && end == 0 &&
+                start == 0)) {
             throw new IllegalRegionValueException();
         }
 

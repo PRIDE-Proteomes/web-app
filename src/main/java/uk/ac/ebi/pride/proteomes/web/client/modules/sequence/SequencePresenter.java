@@ -191,7 +191,6 @@ public class SequencePresenter implements Presenter,
 
         try {
             regions.add(new Region(start, end).toString());
-            changer.addRegionChange(regions);
 
             peptides = new HashSet<String>();
             for(PeptideMatch peptide : currentPeptides) {
@@ -200,10 +199,10 @@ public class SequencePresenter implements Presenter,
                 }
             }
             changer.addPeptideChange(peptides);
-            StateChangingActionEvent.fire(this, changer);
 
         } catch (IllegalRegionValueException e) {
             regions.add("");
+        } finally {
             changer.addRegionChange(regions);
             StateChangingActionEvent.fire(this, changer);
         }
