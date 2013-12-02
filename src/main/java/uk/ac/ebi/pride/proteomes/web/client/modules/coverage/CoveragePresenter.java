@@ -267,7 +267,8 @@ public class CoveragePresenter implements Presenter,
 
         // If the peptide doesn't fit the region that's selected we ought to
         // change the region too.
-        if(!PeptideUtils.inRange(peptide, currentRegion.getStart(),
+        if(!currentRegion.isEmpty() &&
+                !PeptideUtils.inRange(peptide, currentRegion.getStart(),
                 currentRegion.getEnd())) {
             try {
                 regions.add(new Region(peptide.getSite(), peptide.getEnd()).toString());
