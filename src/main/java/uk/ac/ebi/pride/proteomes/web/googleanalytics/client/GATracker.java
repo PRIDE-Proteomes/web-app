@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.proteomes.web.googleanalytics;
+package uk.ac.ebi.pride.proteomes.web.googleanalytics.client;
 
 /**
  * Tracker - Google Analytics
