@@ -70,7 +70,7 @@ public class AppController implements
                     "explained them what you were doing before this " +
                     "message",
                     appState.getHistoryToken() + " + " +
-                           event.getChanger().getChanges());
+                           event.getChanger().toString());
             return;
         }
         requestData(freshState);

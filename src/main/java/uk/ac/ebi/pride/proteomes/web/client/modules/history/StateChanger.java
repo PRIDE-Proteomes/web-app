@@ -81,7 +81,7 @@ public class StateChanger {
      * @param oldState the old state used to create the new one
      * @return a new state with the new properties applied
      */
-    public State change(State oldState) throws InconsistentStateException {
+    State change(State oldState) throws InconsistentStateException {
         State changedState;
 
         if(orderedChanges.size() == 0) {
@@ -114,20 +114,34 @@ public class StateChanger {
         return changedState;
     }
 
-    public String getChanges() {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
 
         DefaultHashMap<Type, String> changesToApply = new DefaultHashMap<Type, String>();
         for(Change change : orderedChanges) {
             changesToApply.put(change.getKey(), change.getValue());
         }
-        sb.append(changesToApply.get(Type.Group, ""));
-        sb.append(changesToApply.get(Type.Protein, ""));
-        sb.append(changesToApply.get(Type.Region, ""));
-        sb.append(changesToApply.get(Type.Peptide, ""));
-        sb.append(changesToApply.get(Type.Variance, ""));
-        sb.append(changesToApply.get(Type.Modification, ""));
-        sb.append(changesToApply.get(Type.Tissue, ""));
-        return sb.toString();
+        sb.append(changesToApply.containsKey(Type.Group) ?
+                    "Group: " + changesToApply.get(Type.Group) + "; ":
+                    "");
+        sb.append(changesToApply.containsKey(Type.Protein) ?
+                    "Protein: " + changesToApply.get(Type.Protein) + "; ":
+                    "");
+        sb.append(changesToApply.containsKey(Type.Region) ?
+                    "Region: " + changesToApply.get(Type.Region) + "; ":
+                    "");
+        sb.append(changesToApply.containsKey(Type.Peptide) ?
+                    "Peptide: " + changesToApply.get(Type.Peptide) + "; ":
+                    "");
+        sb.append(changesToApply.containsKey(Type.Variance) ?
+                    "Variance: " + changesToApply.get(Type.Variance) + "; ":
+                    "");
+        sb.append(changesToApply.containsKey(Type.Modification) ?
+                    "Modification: " + changesToApply.get(Type.Modification) + "; ":
+                    "");
+        sb.append(changesToApply.containsKey(Type.Tissue) ?
+                    "Group: " + changesToApply.get(Type.Tissue) + "; ":
+                    "");
+        return sb.substring(0, sb.length() - 2);
     }
 }

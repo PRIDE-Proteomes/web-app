@@ -41,7 +41,7 @@ public class WhistleBlower implements
             String evName = event.getClass().toString();
             evName = evName.substring(evName.lastIndexOf(".") + 1);
 
-            String vType = event.getChanger().getChanges();
+            String vType = event.getChanger().toString();
 
             Console.info("(Whistler): " + getIndentation() + evName +
                     "(\"" + vType + "\")" + " <- " + clName);
