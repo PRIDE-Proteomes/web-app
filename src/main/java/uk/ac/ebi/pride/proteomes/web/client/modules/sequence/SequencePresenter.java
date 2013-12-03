@@ -109,23 +109,6 @@ public class SequencePresenter implements Presenter,
     }
 
     @Override
-    public void onRegionHighlighted(ProteinRegionHighlightedEvent event) {
-        List<Region> regions = new ArrayList<Region>();
-
-        // if the selection is done right to left then start > end
-        int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
-        int end = event.getStart() + event.getEnd() - start;
-
-        try {
-            regions.add(new Region(start, end));
-        } catch (IllegalRegionValueException e) {
-            regions.add(Region.emptyRegion());
-        } finally {
-            RegionUpdateEvent.fire(this, regions);
-        }
-    }
-
-    @Override
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
         Region region;
 
@@ -192,19 +175,41 @@ public class SequencePresenter implements Presenter,
         try {
             regions.add(new Region(start, end).toString());
 
-            peptides = new HashSet<String>();
-            for(PeptideMatch peptide : currentPeptides) {
-                if(PeptideUtils.inRange(peptide, start, end)) {
-                    peptides.add(peptide.getSequence());
+            // We should keep selecting only the peptides that fit in the new
+            // region
+            if(currentPeptides.size() > 0) {
+                peptides = new HashSet<String>();
+                for(PeptideMatch peptide : currentPeptides) {
+                    if(PeptideUtils.inRange(peptide, start, end)) {
+                        peptides.add(peptide.getSequence());
+                    }
                 }
+
+                changer.addPeptideChange(peptides);
             }
-            changer.addPeptideChange(peptides);
 
         } catch (IllegalRegionValueException e) {
             regions.add("");
         } finally {
             changer.addRegionChange(regions);
             StateChangingActionEvent.fire(this, changer);
+        }
+    }
+
+    @Override
+    public void onRegionHighlighted(ProteinRegionHighlightedEvent event) {
+        List<Region> regions = new ArrayList<Region>();
+
+        // if the selection is done right to left then start > end
+        int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
+        int end = event.getStart() + event.getEnd() - start;
+
+        try {
+            regions.add(new Region(start, end));
+        } catch (IllegalRegionValueException e) {
+            regions.add(Region.emptyRegion());
+        } finally {
+            RegionUpdateEvent.fire(this, regions);
         }
     }
 }
