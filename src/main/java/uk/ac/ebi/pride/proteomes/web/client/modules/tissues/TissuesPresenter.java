@@ -2,7 +2,6 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.tissues;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
@@ -15,6 +14,7 @@ import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.TissueUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 
@@ -37,8 +37,8 @@ public class TissuesPresenter implements Presenter,
     private final ListView<String> view;
     private final ListDataProvider<String> dataProvider = new
             ListDataProvider<String>();
-    private final ColumnSortEvent.ListHandler<String> dataSorter = new
-            ColumnSortEvent.ListHandler<String>(new ArrayList<String>());
+    private final ListSorter<String> dataSorter = new
+                                        ListSorter<String>(new ArrayList<String>());
 
     private boolean groups = true;
     private List<String> selectedTissues = Collections.emptyList();
@@ -184,5 +184,6 @@ public class TissuesPresenter implements Presenter,
     private void setList(final List<String> list) {
         dataProvider.getList().clear();
         dataProvider.getList().addAll(list);
+        dataSorter.repeatSort();
     }
 }

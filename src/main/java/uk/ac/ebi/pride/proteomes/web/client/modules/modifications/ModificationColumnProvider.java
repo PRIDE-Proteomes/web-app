@@ -5,6 +5,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.view.client.ProvidesKey;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public class ModificationColumnProvider {
     public static List<Column<Multiset.Entry<String>, ?>> getSortingColumns
-            (ColumnSortEvent.ListHandler<Multiset.Entry<String>> sorter) {
+            (ListSorter<Multiset.Entry<String>> sorter) {
         List<Column<Multiset.Entry<String>, ?>> columns = new ArrayList<Column<Multiset.Entry<String>, ?>>();
 
         TextColumn<Multiset.Entry<String>> nameColumn = new TextColumn<Multiset.Entry<String>>() {

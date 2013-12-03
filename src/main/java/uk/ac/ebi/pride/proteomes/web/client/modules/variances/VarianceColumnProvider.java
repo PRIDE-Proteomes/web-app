@@ -1,11 +1,10 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.variances;
 
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.view.client.ProvidesKey;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 
 import java.util.*;
 
@@ -15,7 +14,7 @@ import java.util.*;
  *         Time: 14:46
  */
 public class VarianceColumnProvider {
-    public static List<Column<Peptide, ?>> getSortingColumns(ColumnSortEvent.ListHandler<Peptide> sorter) {
+    public static List<Column<Peptide, ?>> getSortingColumns(ListSorter<Peptide> sorter) {
 
         List<Column<Peptide, ?>> columns = new ArrayList<Column<Peptide, ?>>();
 

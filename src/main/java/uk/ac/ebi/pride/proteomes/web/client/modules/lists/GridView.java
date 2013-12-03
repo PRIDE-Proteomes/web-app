@@ -1,7 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.lists;
 
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -105,7 +104,7 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
     }
 
     @Override
-    public void addColumnSortHandler(ColumnSortEvent.ListHandler<T> sorter) {
+    public void addColumnSortHandler(ListSorter<T> sorter) {
         grid.addColumnSortHandler(sorter);
     }
 

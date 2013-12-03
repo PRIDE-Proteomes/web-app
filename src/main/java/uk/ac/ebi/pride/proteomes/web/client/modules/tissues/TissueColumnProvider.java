@@ -1,9 +1,8 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.tissues;
 
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.view.client.ProvidesKey;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,8 +15,7 @@ import java.util.List;
  *         Time: 15:33
  */
 public class TissueColumnProvider {
-    public static List<Column<String, ?>> getSortingColumns
-            (ColumnSortEvent.ListHandler<String> sorter) {
+    public static List<Column<String, ?>> getSortingColumns(ListSorter<String> sorter) {
         List<Column<String, ?>> columns = new ArrayList<Column<String, ?>>();
 
         TextColumn<String> nameColumn = new TextColumn<String>() {

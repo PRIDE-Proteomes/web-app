@@ -4,7 +4,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
@@ -18,6 +17,7 @@ import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 
@@ -43,8 +43,8 @@ public class ModificationsPresenter implements Presenter,
     private final ListView<Multiset.Entry<String>> view;
     private final ListDataProvider<Multiset.Entry<String>> dataProvider = new
             ListDataProvider<Multiset.Entry<String>>();
-    private final ColumnSortEvent.ListHandler<Multiset.Entry<String>> dataSorter = new
-            ColumnSortEvent.ListHandler<Multiset.Entry<String>>(new ArrayList<Multiset.Entry<String>>());
+    private final ListSorter<Multiset.Entry<String>> dataSorter = new
+            ListSorter<Multiset.Entry<String>>(new ArrayList<Multiset.Entry<String>>());
 
     private boolean groups;
     private List<Multiset.Entry<String>> selectedModifications = new ArrayList<Multiset.Entry<String>>();
@@ -205,5 +205,6 @@ public class ModificationsPresenter implements Presenter,
     private void setList(final List<Multiset.Entry<String>> list) {
         dataProvider.getList().clear();
         dataProvider.getList().addAll(list);
+        dataSorter.repeatSort();
     }
 }

@@ -27,5 +27,5 @@ public interface ListView<T> extends View<ListUiHandler<T>> {
     // this frees the view from the list manipulation, e.g. sorting.
     void addDataProvider(ListDataProvider<T> dataProvider);
     void addColumns(List<Column<T, ?>> columns, List<String> titles, List<String> widths);
-    void addColumnSortHandler(ColumnSortEvent.ListHandler<T> sorter);
+    void addColumnSortHandler(ListSorter<T> sorter);
 }

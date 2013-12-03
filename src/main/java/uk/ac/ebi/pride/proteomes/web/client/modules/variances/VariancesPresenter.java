@@ -2,7 +2,6 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.variances;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
@@ -11,6 +10,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
@@ -31,8 +31,8 @@ public class VariancesPresenter implements Presenter,
     private final ListView<Peptide> view;
     private final ListDataProvider<Peptide> dataProvider = new
                                         ListDataProvider<Peptide>();
-    private final ColumnSortEvent.ListHandler<Peptide> dataSorter = new
-                                        ColumnSortEvent.ListHandler<Peptide>(new ArrayList<Peptide>());
+    private final ListSorter<Peptide> dataSorter = new
+                                       ListSorter<Peptide>(new ArrayList<Peptide>());
 
     private boolean groups = true;
     private PeptideList currentPeptide;
@@ -139,5 +139,6 @@ public class VariancesPresenter implements Presenter,
     private void setList(final List<Peptide> peptideList) {
         dataProvider.getList().clear();
         dataProvider.getList().addAll(peptideList);
+        dataSorter.repeatSort();
     }
 }

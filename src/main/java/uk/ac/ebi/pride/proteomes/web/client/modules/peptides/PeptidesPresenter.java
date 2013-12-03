@@ -2,7 +2,6 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.peptides;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
@@ -17,6 +16,7 @@ import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
@@ -41,8 +41,8 @@ public class PeptidesPresenter implements Presenter,
     private final ListView<PeptideMatch> view;
     private final ListDataProvider<PeptideMatch> dataProvider = new
                                             ListDataProvider<PeptideMatch>();
-    private final ColumnSortEvent.ListHandler<PeptideMatch> dataSorter = new
-                                            ColumnSortEvent.ListHandler<PeptideMatch>(new ArrayList<PeptideMatch>());
+    private final ListSorter<PeptideMatch> dataSorter = new
+                                    ListSorter<PeptideMatch>(new ArrayList<PeptideMatch>());
 
     private boolean groups = true;
     private Protein currentProtein;
@@ -290,11 +290,10 @@ public class PeptidesPresenter implements Presenter,
             int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList(),
                     peptide.getSequence());
             if(peptidePosition != -1) {
-            if(PeptideUtils.inRange(dataProvider.getList().get(peptidePosition),
-                    currentRegion.getStart(),
-                    currentRegion.getEnd())) {
-                selectItem(peptide);
-            }
+                if(PeptideUtils.inRange(dataProvider.getList().get(peptidePosition),
+                        currentRegion.getStart(), currentRegion.getEnd())) {
+                    selectItem(peptide);
+                }
             }
         }
     }
@@ -304,9 +303,12 @@ public class PeptidesPresenter implements Presenter,
      *
      * We clear the list and repopulate it because if we simply reset the
      * data provider and data sorter references to the list it won't work.
+     * We also sort the list afterwards so the list mantains the same order
+     * as the user has set.
      */
     private void setList(final List<PeptideMatch> peptideList) {
         dataProvider.getList().clear();
         dataProvider.getList().addAll(peptideList);
+        dataSorter.repeatSort();
     }
 }

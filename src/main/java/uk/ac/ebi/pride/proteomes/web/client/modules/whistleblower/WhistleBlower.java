@@ -2,7 +2,6 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower;
 
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.events.SnoopingEventBus;
-import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.InvalidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;

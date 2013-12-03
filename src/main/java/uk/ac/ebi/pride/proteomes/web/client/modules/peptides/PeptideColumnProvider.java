@@ -1,11 +1,10 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.peptides;
 
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.view.client.ProvidesKey;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
+import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 
 import java.util.*;
 
@@ -16,7 +15,7 @@ import java.util.*;
  */
 public class PeptideColumnProvider {
     public static List<Column<PeptideMatch, ?>> getSortingColumns
-            (ColumnSortEvent.ListHandler<PeptideMatch> sorter) {
+            (ListSorter<PeptideMatch> sorter) {
 
         List<Column<PeptideMatch, ?>> columns = new
                 ArrayList<Column<PeptideMatch, ?>>();
