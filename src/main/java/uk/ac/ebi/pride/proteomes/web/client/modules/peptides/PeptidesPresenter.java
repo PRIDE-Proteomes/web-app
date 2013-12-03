@@ -5,6 +5,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
@@ -225,6 +226,7 @@ public class PeptidesPresenter implements Presenter,
     @Override
     public void onSelectionChanged(Collection<PeptideMatch> items) {
         StateChanger changer;
+        UserAction action;
 
         // an empty selection is represented by a list with a null items,
         // we represent that with an empty list, so we have to add an
@@ -245,7 +247,15 @@ public class PeptidesPresenter implements Presenter,
 
         changer = new StateChanger();
         changer.addPeptideChange(peptideIds);
-        StateChangingActionEvent.fire(this, changer);
+
+        if(items.isEmpty()) {
+            action = new UserAction(UserAction.Type.peptide, "Click Reset");
+        }
+        else {
+            action = new UserAction(UserAction.Type.peptide, "Click Set");
+        }
+
+        StateChangingActionEvent.fire(this, changer, action);
     }
 
     private void updateList(List<PeptideMatch> peptideList) {

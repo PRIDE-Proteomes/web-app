@@ -122,25 +122,25 @@ public class StateChanger {
             changesToApply.put(change.getKey(), change.getValue());
         }
         sb.append(changesToApply.containsKey(Type.Group) ?
-                    "Group: " + changesToApply.get(Type.Group) + "; ":
+                    "group=" + changesToApply.get(Type.Group) + State.sepTypes:
                     "");
         sb.append(changesToApply.containsKey(Type.Protein) ?
-                    "Protein: " + changesToApply.get(Type.Protein) + "; ":
+                    "protein=" + changesToApply.get(Type.Protein) + State.sepTypes:
                     "");
         sb.append(changesToApply.containsKey(Type.Region) ?
-                    "Region: " + changesToApply.get(Type.Region) + "; ":
+                    "region=" + changesToApply.get(Type.Region) + State.sepTypes:
                     "");
         sb.append(changesToApply.containsKey(Type.Peptide) ?
-                    "Peptide: " + changesToApply.get(Type.Peptide) + "; ":
+                    "peptide=" + changesToApply.get(Type.Peptide) + State.sepTypes:
                     "");
         sb.append(changesToApply.containsKey(Type.Variance) ?
-                    "Variance: " + changesToApply.get(Type.Variance) + "; ":
+                    "variance=" + changesToApply.get(Type.Variance) + State.sepTypes:
                     "");
         sb.append(changesToApply.containsKey(Type.Modification) ?
-                    "Modification: " + changesToApply.get(Type.Modification) + "; ":
+                    "modification=" + changesToApply.get(Type.Modification) + State.sepTypes:
                     "");
         sb.append(changesToApply.containsKey(Type.Tissue) ?
-                    "Group: " + changesToApply.get(Type.Tissue) + "; ":
+                    "group=" + changesToApply.get(Type.Tissue) + State.sepTypes:
                     "");
         return sb.substring(0, sb.length() - 2);
     }

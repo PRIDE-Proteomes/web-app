@@ -28,7 +28,7 @@ public class SnoopingEventBus extends SimpleEventBus {
         if(Console.VERBOSE){
             String evName = getSimpleName(event.getClass().toString());
 
-            Console.info("(EventBus): " + getIndentation() + evName);
+            Console.info("(Event Bus):  " + getIndentation() + evName);
         }
 
         depth++;
@@ -42,7 +42,7 @@ public class SnoopingEventBus extends SimpleEventBus {
             String clName = getSimpleName(event.getSource().getClass().toString());
             String evName = getSimpleName(event.getClass().toString());
 
-            Console.info("(EventBus): " + getIndentation() + evName + " <- " + clName);
+            Console.info("(Event Bus):  " + getIndentation() + evName + " <- " + clName);
         }
 
         depth++;

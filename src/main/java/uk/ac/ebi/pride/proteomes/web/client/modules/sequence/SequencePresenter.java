@@ -3,6 +3,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.sequence;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
@@ -166,6 +167,7 @@ public class SequencePresenter implements Presenter,
     public void onRegionSelected(ProteinRegionSelectionEvent event) {
         StateChanger changer = new StateChanger();
         List<String> regions = new ArrayList<String>();
+        UserAction action = new UserAction(UserAction.Type.region, "Drag Set");
         Set<String> peptides;
 
         // if the selection is done right to left then start > end
@@ -190,9 +192,10 @@ public class SequencePresenter implements Presenter,
 
         } catch (IllegalRegionValueException e) {
             regions.add("");
+
         } finally {
             changer.addRegionChange(regions);
-            StateChangingActionEvent.fire(this, changer);
+            StateChangingActionEvent.fire(this, changer, action);
         }
     }
 

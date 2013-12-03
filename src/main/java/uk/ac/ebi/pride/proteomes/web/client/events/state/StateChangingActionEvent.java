@@ -3,6 +3,7 @@ package uk.ac.ebi.pride.proteomes.web.client.events.state;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
+import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 
 /**
@@ -20,21 +21,30 @@ public class StateChangingActionEvent extends
     private static final Type<StateChangingActionHandler> TYPE = new Type<StateChangingActionHandler>();
 
     private final StateChanger changer;
+    private final UserAction action;
 
-    protected StateChangingActionEvent(StateChanger changer, HasHandlers source) {
+    protected StateChangingActionEvent(HasHandlers source,
+                                       StateChanger changer,
+                                       UserAction action) {
         super();
         this.changer = changer;
+        this.action = action;
         setSource(source);
     }
 
-    public static void fire(HasHandlers source, StateChanger stateChanger) {
+    public static void fire(HasHandlers source, StateChanger stateChanger,
+                            UserAction action) {
         StateChangingActionEvent eventInstance =
-                new StateChangingActionEvent(stateChanger, source);
+                new StateChangingActionEvent(source, stateChanger, action);
         source.fireEvent(eventInstance);
     }
 
     public StateChanger getChanger() {
         return changer;
+    }
+
+    public UserAction getAction() {
+        return action;
     }
 
     public static Type<StateChangingActionHandler> getType() {

@@ -7,6 +7,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
@@ -154,7 +155,9 @@ public class ModificationsPresenter implements Presenter,
         changer = new StateChanger();
         changer.addModificationChange(selection);
         changer.addPeptideChange(filteredPeptides);
-        StateChangingActionEvent.fire(this, changer);
+        UserAction action = new UserAction(UserAction.Type.modification,
+                                           "Click");
+        StateChangingActionEvent.fire(this, changer, action);
     }
 
     @Override

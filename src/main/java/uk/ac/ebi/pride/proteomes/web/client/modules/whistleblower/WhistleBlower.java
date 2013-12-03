@@ -20,12 +20,11 @@ public class WhistleBlower implements
                         InvalidStateEvent.InvalidStateHandler
 {
 
-    private SnoopingEventBus eventBus = null;
+    private EventBus eventBus = null;
 
     public WhistleBlower(EventBus eventBus) {
-        if(eventBus instanceof SnoopingEventBus) {
-            this.eventBus = (SnoopingEventBus) eventBus;
-        }
+        this.eventBus = eventBus;
+
         eventBus.addHandler(StateChangingActionEvent.getType(), this);
         eventBus.addHandler(ErrorOnUpdateEvent.getType(), this);
         eventBus.addHandler(ValidStateEvent.getType(), this);
@@ -43,7 +42,7 @@ public class WhistleBlower implements
 
             String vType = event.getChanger().toString();
 
-            Console.info("(Whistler): " + getIndentation() + evName +
+            Console.info("(Whistler):   " + getIndentation() + evName +
                     "(\"" + vType + "\")" + " <- " + clName);
         }
     }
@@ -57,7 +56,7 @@ public class WhistleBlower implements
             String evName = event.getClass().toString();
             evName = evName.substring(evName.lastIndexOf(".") + 1);
 
-            Console.info("(Whistler): " + getIndentation() + evName +
+            Console.info("(Whistler):   " + getIndentation() + evName +
                     "(\"" + event.getMessage() + "\")" + " <- " + clName);
         }
     }
@@ -103,7 +102,12 @@ public class WhistleBlower implements
     }
 
     private String getIndentation() {
-        return eventBus.getIndentation().substring(0,
-                                    eventBus.getIndentation().length() - 2);
+        if(eventBus instanceof SnoopingEventBus) {
+            String indent = ((SnoopingEventBus) eventBus).getIndentation();
+            return indent.substring(0, indent.length() - 2);
+        }
+        else {
+            return "";
+        }
     }
 }

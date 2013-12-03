@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module rename-to='WebApp'>
-    <!-- Inherit GWT's libraries that we're using                        -->
+    <!-- Inherit GWT's libraries that we're using                   -->
     <inherits name='com.google.gwt.user.User'/>
     <inherits name='com.google.gwt.http.HTTP'/>
     <inherits name="com.google.web.bindery.autobean.AutoBean"/>
 
-    <!-- PRIDE modules -->
-    <inherits name="uk.ac.ebi.pride.widgets.PrideWidgets" />
+    <!-- Guava library                                              -->
     <inherits name="com.google.common.collect.Collect"/>
+
+    <!-- PRIDE modules                                              -->
+    <inherits name="uk.ac.ebi.pride.widgets.PrideWidgets" />
+    <inherits name="uk.ac.ebi.pride.proteomes.web.googleanalytics.googleanalytics" />
 
     <!-- Specify the app entry point class.                         -->
     <entry-point class='uk.ac.ebi.pride.proteomes.web.client.WebApp'/>

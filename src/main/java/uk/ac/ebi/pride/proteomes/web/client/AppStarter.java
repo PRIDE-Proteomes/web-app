@@ -17,6 +17,7 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoverageUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoverageView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
+import uk.ac.ebi.pride.proteomes.web.client.modules.googleanalytics.Reporter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.AppController;
@@ -132,6 +133,7 @@ public class AppStarter implements RunAsyncCallback {
 
         mainPresenter.bindToContainer(mainPanel);
 
+        new Reporter(eventBus);
         new WhistleBlower(eventBus);
 
         DataServer provider = new DataProvider(webServiceRoot);

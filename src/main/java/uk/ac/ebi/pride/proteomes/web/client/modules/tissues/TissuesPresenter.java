@@ -5,6 +5,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
@@ -128,6 +129,7 @@ public class TissuesPresenter implements Presenter,
     @Override
     public void onSelectionChanged(Collection<String> items) {
         StateChanger changer;
+        UserAction action;
         List<String> filteredPeptides;
 
         // an empty selection is represented by a list with a null items,
@@ -152,7 +154,15 @@ public class TissuesPresenter implements Presenter,
         changer = new StateChanger();
         changer.addTissueChange(items);
         changer.addPeptideChange(filteredPeptides);
-        StateChangingActionEvent.fire(this, changer);
+
+
+        if(items.isEmpty()) {
+            action = new UserAction(UserAction.Type.tissue, "Click Reset");
+        }
+        else {
+            action = new UserAction(UserAction.Type.tissue, "Click Set");
+        }
+        StateChangingActionEvent.fire(this, changer, action);
     }
 
     private void updateList(List<String> tissues) {

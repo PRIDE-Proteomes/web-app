@@ -3,6 +3,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.coverage;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
@@ -186,7 +187,7 @@ public class CoveragePresenter implements Presenter,
 
         try {
             region.add(new Region(event.getStart(), event.getStart() + event
-                    .getLength() - 1).toString());
+                    .getLength()).toString());
             changer.addRegionChange(region);
 
             peptides = new HashSet<String>();
@@ -198,7 +199,9 @@ public class CoveragePresenter implements Presenter,
             }
             changer.addPeptideChange(peptides);
 
-            StateChangingActionEvent.fire(this, changer);
+            UserAction action = new UserAction(UserAction.Type.region,
+                                               "Click Coverage Set");
+            StateChangingActionEvent.fire(this, changer, action);
         } catch (IllegalRegionValueException e) {
             // This is probably because of an empty selection,
             // we don't send any event
@@ -209,6 +212,7 @@ public class CoveragePresenter implements Presenter,
     public void onRegionDragSelected(ProteinAreaSelectedEvent event) {
         StateChanger changer = new StateChanger();
         List<String> regions = new ArrayList<String>();
+        UserAction action = UserAction.emptyAction();
         Set<String> peptides;
         Region region;
 
@@ -221,7 +225,13 @@ public class CoveragePresenter implements Presenter,
             if(region.getLength() == 0) {
                 //we don't want to select a single aminoacid,
                 // we want to reset the selection
+                action = new UserAction(UserAction.Type.region,
+                        "Drag Coverage Reset");
                 region = Region.emptyRegion();
+            }
+            else {
+                action = new UserAction(UserAction.Type.region,
+                        "Drag Coverage Set");
             }
 
             regions.add(region.toString());
@@ -234,11 +244,13 @@ public class CoveragePresenter implements Presenter,
             }
             changer.addPeptideChange(peptides);
         } catch (IllegalRegionValueException e) {
+            action = new UserAction(UserAction.Type.region,
+                    "Drag Coverage Reset");
             region = Region.emptyRegion();
             regions.add(region.toString());
         } finally {
             changer.addRegionChange(regions);
-            StateChangingActionEvent.fire(this, changer);
+            StateChangingActionEvent.fire(this, changer, action);
         }
     }
 
@@ -269,6 +281,8 @@ public class CoveragePresenter implements Presenter,
         StateChanger changer = new StateChanger();
         List<String> regions = new ArrayList<String>();
         List<String> peptides = new ArrayList<String>();
+        UserAction action = new UserAction(UserAction.Type.peptide,
+                                           "Click Set");
 
         PeptideAdapter peptide = (PeptideAdapter) event.getPeptide();
 
@@ -288,7 +302,7 @@ public class CoveragePresenter implements Presenter,
         peptides.add(peptide.getSequence());
         changer.addPeptideChange(peptides);
 
-        StateChangingActionEvent.fire(this, changer);
+        StateChangingActionEvent.fire(this, changer, action);
     }
 
     @Override
@@ -296,6 +310,8 @@ public class CoveragePresenter implements Presenter,
         StateChanger changer = new StateChanger();
         List<String> regions = new ArrayList<String>();
         List<String> modifications = new ArrayList<String>();
+        UserAction action = new UserAction(UserAction.Type.modification,
+                                           "Click Set");
 
         // Terminal modifications are ignored for now
         if(event.getSite() > 0 && event.getSite() < currentProtein
@@ -309,7 +325,7 @@ public class CoveragePresenter implements Presenter,
             }
             modifications.add(event.getSite().toString());
             changer.addModificationChange(modifications);
-            StateChangingActionEvent.fire(this, changer);
+            StateChangingActionEvent.fire(this, changer, action);
         }
     }
 }
