@@ -100,6 +100,9 @@ public class AppController implements
             State freshState;
             try {
                 freshState = State.tokenize(event.getValue());
+                if(freshState.getHistoryToken().equals("")) {
+                    throw new InconsistentStateException();
+                }
             }
             catch(InconsistentStateException e) {
                 // we tried to create an inconsistent state, that's bad,
@@ -431,11 +434,17 @@ public class AppController implements
         if(newState.getSelectedGroups().length > 0) {
             ValidStateEvent.fire(this, ValidStateEvent.ViewType.Group);
         }
-        else {
+        else if(newState.getSelectedProteins().length > 0) {
             ValidStateEvent.fire(this, ValidStateEvent.ViewType.Protein);
         }
+        else {
+            //we get an empty view, we don't do anything to update the view.
+            return;
+        }
 
-        History.newItem(newState.getHistoryToken(), false);
+        if(!newState.getHistoryToken().equals(History.getToken())) {
+            History.newItem(newState.getHistoryToken(), false);
+        }
 
         if(!Arrays.equals(newState.getSelectedGroups(),
                           appState.getSelectedGroups())) {
