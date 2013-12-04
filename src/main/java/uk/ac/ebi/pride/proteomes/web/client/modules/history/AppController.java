@@ -442,7 +442,10 @@ public class AppController implements
             return;
         }
 
-        if(!newState.getHistoryToken().equals(History.getToken())) {
+        // We only update the url if the new history token is different from
+        // the last one and that one
+        if(!newState.getHistoryToken().equals(History.getToken()) &&
+            History.getToken().equals(appState.getHistoryToken())) {
             History.newItem(newState.getHistoryToken(), false);
         }
 
