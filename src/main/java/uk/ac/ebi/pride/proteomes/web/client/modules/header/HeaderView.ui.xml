@@ -4,7 +4,7 @@
         <g:VerticalPanel horizontalAlignment="left" ui:field="vPanel">
             <g:Label ui:field="title"/>
             <g:Label ui:field="description"/>
-            <g:Label ui:field="attributes"/>
+            <g:FlowPanel ui:field="attributes"/>
         </g:VerticalPanel>
     </g:HTMLPanel>
 </ui:UiBinder>
