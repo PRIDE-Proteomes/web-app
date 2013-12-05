@@ -411,8 +411,13 @@ public class AppController implements
                 validModifications.add(mod);
             }
         }
-        sc.addTissueChange(validTissues);
-        sc.addModificationChange(validModifications);
+        if(validTissues.size() < uncheckedState.getSelectedTissues().length) {
+            sc.addTissueChange(validTissues);
+        }
+        if(validModifications.size() < uncheckedState.getSelectedModifications().length) {
+            sc.addModificationChange(validModifications);
+        }
+
         try {
             return sc.change(uncheckedState);
         } catch (InconsistentStateException e) {
