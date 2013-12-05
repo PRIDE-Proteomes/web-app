@@ -26,6 +26,7 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
     private ModuleContainer frame;
 
     private String baseType;
+    private boolean selectionEventsDisabled = false;
 
     public GridView(String title, String typeName) {
         frame = ModuleContainerFactory.getModuleContainer(title);
@@ -63,6 +64,7 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
     @Override
     public void deselectItemOn(int row) {
         if(row >= 0 && row < grid.getRowCount()) {
+            selectionEventsDisabled = true;
             grid.getSelectionModel().setSelected(grid.getVisibleItem(row), false);
             frame.clearPrimaryMessage();
         }
@@ -147,10 +149,15 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
                 SingleSelectionModel<T>();
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             public void onSelectionChange(SelectionChangeEvent event) {
-                Set<T> selection = new HashSet<T>();
-                selection.add(selectionModel.getSelectedObject());
-                for(ListUiHandler<T> handler : getUiHandlers()) {
-                    handler.onSelectionChanged(selection);
+                if(!selectionEventsDisabled) {
+                    Set<T> selection = new HashSet<T>();
+                    selection.add(selectionModel.getSelectedObject());
+                    for(ListUiHandler<T> handler : getUiHandlers()) {
+                        handler.onSelectionChanged(selection);
+                    }
+                }
+                else {
+                    selectionEventsDisabled = false;
                 }
             }
         });
