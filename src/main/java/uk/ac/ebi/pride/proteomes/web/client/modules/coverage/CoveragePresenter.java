@@ -113,6 +113,7 @@ public class CoveragePresenter implements Presenter,
     @Override
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
         Region region;
+        List<PeptideAdapter> selectionAdapters;
 
         if(event.getSource() == this) {
             return;
@@ -129,6 +130,17 @@ public class CoveragePresenter implements Presenter,
         else {
             currentRegion = Region.emptyRegion();
             view.resetRegionSelection();
+        }
+
+        // Apparently when the region gets modified the peptide selection
+        // gets reset, we must set it again manually.
+
+        if(!currentPeptides.isEmpty()) {
+            selectionAdapters = new ArrayList<PeptideAdapter>();
+            for(PeptideMatch match : currentPeptides) {
+                selectionAdapters.add(new PeptideAdapter(match));
+            }
+            view.updatePeptideSelection(selectionAdapters);
         }
     }
 
@@ -158,7 +170,6 @@ public class CoveragePresenter implements Presenter,
             }
             currentPeptides = selection;
             view.updatePeptideSelection(selectionAdapters);
-
         }
         else {
             view.resetPeptideSelection();
