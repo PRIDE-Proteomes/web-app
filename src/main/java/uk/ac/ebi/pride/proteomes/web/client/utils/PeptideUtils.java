@@ -17,15 +17,18 @@ import java.util.List;
 public class PeptideUtils {
     /**
      * Filters the peptide matches outside a region
-     * @param peptides the peptide matches to filter
+     * @param peptideMatches the peptide matches to filter
      * @param start the start point of the region
      * @param end the end point of the region
      * @return a new list containing only the peptide matches inside the region
      */
-    static public List<PeptideMatch> filterPeptidesNotIn(List<PeptideMatch> peptides, int start, int end) {
+    static public List<PeptideMatch> filterPeptideMatchesNotIn(List<PeptideMatch> peptideMatches, int start, int end) {
         List<PeptideMatch> filteredList = new ArrayList<PeptideMatch>();
 
-        for(PeptideMatch peptide : peptides) {
+        if(start == end && start == 0) {
+            return peptideMatches;
+        }
+        for(PeptideMatch peptide : peptideMatches) {
             if(inRange(peptide, start, end)) {
                 filteredList.add(peptide);
             }
@@ -53,25 +56,50 @@ public class PeptideUtils {
     }
 
     /**
-     * This will show ugly warning about "unchecked assignment",
-     * it's ok because we don't change the objects or create new ones
-     * (hopefully)
+     * @param peptides
+     * @param modification
+     * @return A list of items that where already contained in the original
+     * list
+     */
+    public static List<Peptide> filterPeptidesWithoutModification
+    (List<Peptide> peptides, String modification) {
+        List<Peptide> filteredList;
+
+        if(modification.isEmpty()) {
+            return peptides;
+        }
+
+        filteredList = new ArrayList<Peptide>();
+
+        for(Peptide peptide : peptides) {
+            for(ModifiedLocation modLoc : peptide.getModifiedLocations()) {
+                if(modLoc.getModification().equals(modification)) {
+                    filteredList.add(peptide);
+                    break;
+                }
+            }
+        }
+
+        return filteredList;
+    }
+
+    /**
      * @param peptideMatches
      * @param modification
      * @return A list of items that where already contained in the original
      * list
      */
-    public static List filterPeptidesWithoutModification
-            (List<? extends Peptide> peptideMatches, String modification) {
-        List<Peptide> filteredList;
+    public static List<PeptideMatch> filterPeptideMatchesWithoutModification
+    (List<PeptideMatch> peptideMatches, String modification) {
+        List<PeptideMatch> filteredList;
 
         if(modification.isEmpty()) {
             return peptideMatches;
         }
 
-        filteredList = new ArrayList<Peptide>();
+        filteredList = new ArrayList<PeptideMatch>();
 
-        for(Peptide peptide : peptideMatches) {
+        for(PeptideMatch peptide : peptideMatches) {
             for(ModifiedLocation modLoc : peptide.getModifiedLocations()) {
                 if(modLoc.getModification().equals(modification)) {
                     filteredList.add(peptide);
@@ -97,6 +125,9 @@ public class PeptideUtils {
     }
 
     public static boolean inRange(PeptideMatch peptide, int start, int end) {
+        if(start == end && start == 0) {
+            return true;
+        }
         return peptide.getPosition() >= start &&
                peptide.getSequence().length() + peptide.getPosition() - 1 <= end;
     }

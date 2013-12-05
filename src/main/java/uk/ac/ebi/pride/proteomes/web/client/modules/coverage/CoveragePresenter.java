@@ -8,6 +8,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
@@ -142,14 +143,15 @@ public class CoveragePresenter implements Presenter,
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
         List<PeptideAdapter> selectionAdapters;
         List<PeptideMatch> selection;
+        List<Peptide> eventPeptides;
 
         if(event.getPeptides().size() > 0 && event.getPeptides().size() > 0) {
             selectionAdapters = new ArrayList<PeptideAdapter>();
             selection = new ArrayList<PeptideMatch>();
 
+            eventPeptides = event.getPeptides().get(0).getPeptideList();
             for(PeptideMatch match : currentProtein.getPeptides()) {
-                if(match.getSequence().equals(event.getPeptides().get(0)
-                        .getPeptideList().get(0).getSequence())) {
+                if(match.getSequence().equals(eventPeptides.get(0).getSequence())) {
                     selectionAdapters.add(new PeptideAdapter(match));
                     selection.add(match);
                 }
@@ -236,13 +238,15 @@ public class CoveragePresenter implements Presenter,
 
             regions.add(region.toString());
 
-            peptides = new HashSet<String>();
-            for(PeptideMatch peptide : currentPeptides) {
-                if(PeptideUtils.inRange(peptide, start, end)) {
-                    peptides.add(peptide.getSequence());
+            if(!region.isEmpty()) {
+                peptides = new HashSet<String>();
+                for(PeptideMatch peptide : currentPeptides) {
+                    if(PeptideUtils.inRange(peptide, start, end)) {
+                        peptides.add(peptide.getSequence());
+                    }
                 }
+                changer.addPeptideChange(peptides);
             }
-            changer.addPeptideChange(peptides);
         } catch (IllegalRegionValueException e) {
             action = new UserAction(UserAction.Type.region,
                     "Drag Coverage Reset");

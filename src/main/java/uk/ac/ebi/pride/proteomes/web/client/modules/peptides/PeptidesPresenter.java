@@ -14,7 +14,6 @@ import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
-import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
@@ -103,11 +102,7 @@ public class PeptidesPresenter implements Presenter,
         // We need to extract a peptide list from the ones in the proteins
         if(!groups && event.getProteins().size() > 0) {
             currentProtein = event.getProteins().get(0);
-            try {
-                currentRegion = new Region(1, currentProtein.getSequence()
-                        .length());
-            } catch (IllegalRegionValueException e) {
-            }
+            currentRegion = Region.emptyRegion();
             // we should reset filters and ordering here
             updateList(currentProtein.getPeptides());
             view.showList();
@@ -131,19 +126,15 @@ public class PeptidesPresenter implements Presenter,
 
         // we change the peptide list
         if(event.getRegions().size() == 0) {
-            try {
-                currentRegion = new Region(1, currentProtein.getSequence().length());
-            } catch (IllegalRegionValueException e) {
-            }
-            updateList(currentProtein.getPeptides());
+            currentRegion = Region.emptyRegion();
         }
         else {
             currentRegion = event.getRegions().get(0);
-            updateList(PeptideUtils.filterPeptidesNotInTissue(
-                       PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
-                             currentRegion.getStart(), currentRegion.getEnd()),
-                       currentTissue));
         }
+
+        updateList(filterPeptides(currentProtein.getPeptides(),
+                currentRegion.getStart(), currentRegion.getEnd(),
+                currentTissue, currentModification));
 
         // we reselect the peptides, this is because the selected peptides
         // might not change when reselecting the region.
@@ -169,7 +160,7 @@ public class PeptidesPresenter implements Presenter,
             }
         }
 
-        if(event.getPeptides().size() > 0) {
+        if(!selectedPeptidesMatches.isEmpty()) {
             // we reselect the peptides only if there are any
             selectPeptides();
         }
@@ -184,18 +175,13 @@ public class PeptidesPresenter implements Presenter,
 
         if(event.getTissues().length > 0 && !event.getTissues()[0].equals("")) {
             currentTissue = event.getTissues()[0];
-            updateList(PeptideUtils.filterPeptidesWithoutModification(
-                       PeptideUtils.filterPeptidesNotInTissue(
-                       PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
-                               currentRegion.getStart(), currentRegion.getEnd()),
-                        currentTissue),
-                        currentModification));
         }
         else {
             currentTissue = "";
-            updateList(PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
-                    currentRegion.getStart(),currentRegion.getEnd()));
         }
+        updateList(filterPeptides(currentProtein.getPeptides(),
+                currentRegion.getStart(), currentRegion.getEnd(),
+                currentTissue, currentModification));
     }
 
 
@@ -209,18 +195,13 @@ public class PeptidesPresenter implements Presenter,
 
         if(event.getModifications().length > 0 && !event.getModifications()[0].equals("")) {
             currentTissue = event.getModifications()[0];
-            updateList(PeptideUtils.filterPeptidesWithoutModification(
-                       PeptideUtils.filterPeptidesNotInTissue(
-                       PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
-                               currentRegion.getStart(), currentRegion.getEnd()),
-                        currentTissue),
-                        currentModification));
         }
         else {
             currentTissue = "";
-            updateList(PeptideUtils.filterPeptidesNotIn(currentProtein.getPeptides(),
-                    currentRegion.getStart(),currentRegion.getEnd()));
         }
+        updateList(filterPeptides(currentProtein.getPeptides(),
+                currentRegion.getStart(), currentRegion.getEnd(),
+                currentTissue, currentModification));
     }
 
     @Override
@@ -296,14 +277,13 @@ public class PeptidesPresenter implements Presenter,
         //we reselect the peptides inside the range, to do this,
         // we must search first the first peptide match that has the same
         // sequence as the peptide we want to select.
+        // We assume that if a peptide is in the selected list it already
+        // passes all the filters
         for(Peptide peptide : selectedPeptidesMatches) {
             int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList(),
                     peptide.getSequence());
             if(peptidePosition != -1) {
-                if(PeptideUtils.inRange(dataProvider.getList().get(peptidePosition),
-                        currentRegion.getStart(), currentRegion.getEnd())) {
-                    selectItem(peptide);
-                }
+                selectItem(peptide);
             }
         }
     }
@@ -313,12 +293,28 @@ public class PeptidesPresenter implements Presenter,
      *
      * We clear the list and repopulate it because if we simply reset the
      * data provider and data sorter references to the list it won't work.
-     * We also sort the list afterwards so the list mantains the same order
-     * as the user has set.
+     * We also sort the list afterwards so the list maintains the same order
+     * as the user has set. We flush the data after updating the list to make
+     * sure the view gets the updated list at this instant and everything
+     * will be synchronized.
      */
     private void setList(final List<PeptideMatch> peptideList) {
         dataProvider.getList().clear();
         dataProvider.getList().addAll(peptideList);
         dataSorter.repeatSort();
+        dataProvider.flush();
+    }
+
+    private List<PeptideMatch> filterPeptides(List<PeptideMatch> peptides,
+                                              int start, int end,
+                                              String tissue, String mod) {
+
+        return PeptideUtils.filterPeptideMatchesWithoutModification(
+                PeptideUtils.filterPeptidesNotInTissue(
+                        PeptideUtils.filterPeptideMatchesNotIn(
+                                peptides,
+                                start, end),
+                        tissue),
+                mod);
     }
 }
