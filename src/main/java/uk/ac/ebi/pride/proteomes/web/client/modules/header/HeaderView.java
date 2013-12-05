@@ -6,9 +6,12 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.*;
 import uk.ac.ebi.pride.proteomes.web.client.modules.UiHandler;
+import uk.ac.ebi.pride.proteomes.web.client.utils.Pair;
+import uk.ac.ebi.pride.proteomes.web.client.utils.factories.HyperlinkFactory;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderPresenter.View;
 
@@ -35,16 +38,15 @@ public class HeaderView implements View {
     Label description;
 
     @UiField
-    Label attributes;
+    FlowPanel attributes;
 
     HTMLPanel root;
 
     public HeaderView() {
         root = ourUiBinder.createAndBindUi(this);
 
-        this.title.setText("");
-        this.description.setText("");
-        this.attributes.setText("");
+        title.setText("");
+        description.setText("");
 
     }
     @Override
@@ -58,8 +60,19 @@ public class HeaderView implements View {
     }
 
     @Override
-    public void updateProperties(String properties) {
-        this.attributes.setText(properties);
+    public void updateProperties(List<Pair<String, String>> links) {
+        clearProperties();
+        for(Pair<String, String> link : links) {
+            attributes.add(HyperlinkFactory.getInlineHyperLink(link.getA(), link.getB()));
+            if(link != links.get(links.size() - 1)) {
+                attributes.add(new InlineLabel(", "));
+            }
+        }
+    }
+
+    @Override
+    public void clearProperties() {
+        attributes.clear();
     }
 
     @Override

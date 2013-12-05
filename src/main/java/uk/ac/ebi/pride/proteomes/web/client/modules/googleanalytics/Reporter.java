@@ -32,7 +32,6 @@ public class Reporter implements
             String hostName = Window.Location.getHostName();
             if(hostName.equals("www.ebi.ac.uk") || hostName.equals("wwwdev" +
                 ".ebi.ac.uk")) {
-                // todo set the account name
                 GATracker.setAccount("UA-46176625-1");
                 GATracker.setDomainName("ebi.ac.uk");
                 trackingIsEnabled = true;

@@ -9,7 +9,9 @@ import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.GroupUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+import uk.ac.ebi.pride.proteomes.web.client.utils.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +27,8 @@ public class HeaderPresenter implements Presenter,
     public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View {
         public void updateTitle(String title);
         public void updateDescription(String description);
-        public void updateProperties(String properties);
+        public void updateProperties(List<Pair<String, String>> links);
+        public void clearProperties();
     }
     private final EventBus eventBus;
     private final View view;
@@ -64,14 +67,12 @@ public class HeaderPresenter implements Presenter,
         if(groupView && groups.size() > 0) {
             view.updateTitle("Protein group: " + groups.get(0).getId());
             view.updateDescription(groups.get(0).getDescription());
-            StringBuilder proteins = new StringBuilder("");
+            List<Pair<String, String>> proteins = new ArrayList<Pair<String, String>>();
+
             for(String protID : groups.get(0).getMemberProteins()) {
-                if(!proteins.toString().equals("")) {
-                    proteins.append(", ");
-                }
-                proteins.append(protID);
+                proteins.add(new Pair<String, String>(protID, "protein=" + protID));
             }
-            view.updateProperties(proteins.toString());
+            view.updateProperties(proteins);
         }
     }
 
@@ -82,7 +83,7 @@ public class HeaderPresenter implements Presenter,
         if(!groupView) {
             view.updateTitle("Protein: " + proteins.get(0).getAccession());
             view.updateDescription(proteins.get(0).getDescription());
-            view.updateProperties("");
+            view.clearProperties();
         }
     }
 }
