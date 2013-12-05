@@ -80,7 +80,7 @@ public class WhistleBlower implements
                     break;
             }
 
-            Console.info("(Whistler): " + getIndentation() + evName +
+            Console.info("(Whistler):   " + getIndentation() + evName +
                          "(\"" + vType + "\")" + " <- " + clName);
         }
     }
