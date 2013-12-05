@@ -106,7 +106,7 @@ public class GATracker {
      * the last octet of the IP address prior to its storage. Note that this will slightly reduce
      * the accuracy of geographic reporting.
      */
-    public static native void anonymaizeIp() /*-{
+    public static native void anonymizeIp() /*-{
         $wnd._gaq.push(['_gat._anonymizeIp']);
     }-*/;
 
