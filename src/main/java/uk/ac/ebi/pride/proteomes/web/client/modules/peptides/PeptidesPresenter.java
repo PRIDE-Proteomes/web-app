@@ -254,7 +254,7 @@ public class PeptidesPresenter implements Presenter,
     private void selectItem(Peptide peptide) {
         // search the first occurrence of the peptide, we can only select
         // one because of the selection model
-        int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList
+        int peptidePosition = PeptideUtils.firstIndexWithSequence(dataProvider.getList
                 (), peptide.getSequence());
 
         if(peptidePosition > -1) {
@@ -265,7 +265,7 @@ public class PeptidesPresenter implements Presenter,
     private void deselectItem(Peptide peptide) {
         // search the first occurrence of the peptide, we can only select
         // one because of the selection model
-        int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList
+        int peptidePosition = PeptideUtils.firstIndexWithSequence(dataProvider.getList
                 (), peptide.getSequence());
 
         if(peptidePosition > -1) {
@@ -280,11 +280,7 @@ public class PeptidesPresenter implements Presenter,
         // We assume that if a peptide is in the selected list it already
         // passes all the filters
         for(Peptide peptide : selectedPeptidesMatches) {
-            int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList(),
-                    peptide.getSequence());
-            if(peptidePosition != -1) {
-                selectItem(peptide);
-            }
+            selectItem(peptide);
         }
     }
 

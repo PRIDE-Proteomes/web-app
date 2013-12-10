@@ -19,7 +19,7 @@ public class PeptideAdapter implements PeptideHandler, PeptideMatch {
     }
 
     @Override
-    public int getId() {
+    public String getId() {
         return peptide.getId();
     }
 

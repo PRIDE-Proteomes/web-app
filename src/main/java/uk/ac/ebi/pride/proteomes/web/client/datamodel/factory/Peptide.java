@@ -8,7 +8,7 @@ import java.util.List;
  *         Time: 09:52
  */
 public interface Peptide {
-    public int getId();
+    public String getId();
     public boolean getSymbolic();
     public String getSequence();
     public int getTaxonID();

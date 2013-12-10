@@ -5,11 +5,16 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.VarianceUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
@@ -25,6 +30,7 @@ import java.util.*;
 public class VariancesPresenter implements Presenter,
                                            ValidStateEvent.ValidStateHandler,
                                            PeptideUpdateEvent.PeptideUpdateHandler,
+                                           VarianceUpdateEvent.VarianceUpdateHandler,
                                            ListUiHandler<Peptide>
 {
     private final EventBus eventBus;
@@ -55,6 +61,7 @@ public class VariancesPresenter implements Presenter,
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
+        eventBus.addHandler(VarianceUpdateEvent.getType(), this);
     }
 
     @Override
@@ -91,9 +98,48 @@ public class VariancesPresenter implements Presenter,
     }
 
     @Override
+    public void onVarianceUpdateEvent(VarianceUpdateEvent event) {
+        for(Peptide peptide : selectedVariances) {
+            deselectItem(peptide);
+        }
+
+        if(!selectedVariances.isEmpty()) {
+            // we reselect the peptides only if there are any
+            selectVariances();
+        }
+    }
+
+    @Override
     public void onSelectionChanged(Collection<Peptide> items) {
-        // For now there's no way we can rely the id of the peptide variance
-        // to the rest of the application, so we don't do anything at all.
+        StateChanger changer;
+        UserAction action;
+        // an empty selection is represented by a list with a null items,
+        // we represent that with an empty list, so we have to add an
+        // additional check for that.
+        if((items.containsAll(selectedVariances) &&
+            selectedVariances.containsAll(items)) ||
+                (items.contains(null) && selectedVariances.isEmpty())) {
+            return;
+        } else if(items.contains(null)) {
+            items = Collections.emptyList();
+        }
+
+        Set<String> peptideIds = new HashSet<String>();
+
+        for(Peptide peptide : items) {
+            peptideIds.add(peptide.getId());
+        }
+
+        changer = new StateChanger();
+        changer.addVarianceChange(peptideIds);
+
+        if(items.isEmpty()) {
+            action = new UserAction(UserAction.Type.variance, "Click Reset");
+        }
+        else {
+            action = new UserAction(UserAction.Type.variance, "Click Set");
+        }
+        StateChangingActionEvent.fire(this, changer, action);
     }
 
     private void updateList(List<Peptide> peptideList) {
@@ -111,9 +157,8 @@ public class VariancesPresenter implements Presenter,
     private void selectItem(Peptide peptide) {
         // search the first occurrence of the peptide, we can only select
         // one because of the selection model
-        int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList
-                (), peptide.getSequence());
-
+        int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(),
+                peptide.getId());
         if(peptidePosition > -1) {
             view.selectItemOn(peptidePosition);
         }
@@ -122,11 +167,16 @@ public class VariancesPresenter implements Presenter,
     private void deselectItem(Peptide peptide) {
         // search the first occurrence of the peptide, we can only select
         // one because of the selection model
-        int peptidePosition = PeptideUtils.firstIndexOf(dataProvider.getList
-                (), peptide.getSequence());
-
+        int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(),
+                peptide.getId());
         if(peptidePosition > -1) {
             view.deselectItemOn(peptidePosition);
+        }
+    }
+
+    private void selectVariances() {
+        for(Peptide peptide : selectedVariances) {
+            selectItem(peptide);
         }
     }
 

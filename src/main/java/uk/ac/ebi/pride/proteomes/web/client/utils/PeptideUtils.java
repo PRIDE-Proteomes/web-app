@@ -111,11 +111,24 @@ public class PeptideUtils {
         return filteredList;
     }
 
-    static public int firstIndexOf(List<? extends Peptide> peptides, String sequence) {
+    static public int firstIndexWithSequence(List<? extends Peptide> peptides, String sequence) {
         int index = -1;
 
         for(int i = 0; i < peptides.size(); i++) {
             if(peptides.get(i).getSequence().equals(sequence)) {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
+
+    static public int firstIndexWithId(List<? extends Peptide> peptides, String id) {
+        int index = -1;
+
+        for(int i = 0; i < peptides.size(); i++) {
+            if(peptides.get(i).getId().equals(id)) {
                 index = i;
                 break;
             }
