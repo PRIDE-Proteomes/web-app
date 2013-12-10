@@ -9,6 +9,7 @@ import java.util.List;
  */
 public interface Protein {
     public String getAccession();
+    public int getTaxonID();
     public String getSequence();
     public String getDescription();
     public List<ModifiedLocation> getModifiedLocations();

@@ -17,23 +17,20 @@ import java.util.List;
  */
 public class ProteinAdapter implements ProteinHandler {
     private final Protein protein;
-    private final List<ProteinModificationHandler> modificationHandlers;
+    private final List<ProteinModificationHandler> modifications;
     private List<PeptideHandler> peptideHandlers;
 
     public ProteinAdapter(Protein protein) {
         this.protein = protein;
 
         peptideHandlers = new ArrayList<PeptideHandler>();
-
         for(PeptideMatch p : protein.getPeptides()) {
             peptideHandlers.add(new PeptideAdapter(p));
         }
 
-        modificationHandlers = new ArrayList<ProteinModificationHandler>();
-
+        modifications = new ArrayList<ProteinModificationHandler>();
         for(ModifiedLocation mod : protein.getModifiedLocations()) {
-            modificationHandlers.add(new ProteinModificationAdapter(mod,
-                                                                    protein));
+            modifications.add(new ProteinModificationAdapter(mod, protein));
         }
     }
 
@@ -49,7 +46,7 @@ public class ProteinAdapter implements ProteinHandler {
 
     @Override
     public List<ProteinModificationHandler> getModifications() {
-        return modificationHandlers;
+        return modifications;
     }
 
     @Override

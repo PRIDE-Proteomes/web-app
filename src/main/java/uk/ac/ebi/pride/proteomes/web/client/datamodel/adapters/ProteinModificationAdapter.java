@@ -15,13 +15,19 @@ public class ProteinModificationAdapter implements ProteinModificationHandler {
     private final ModificationAdapter modification;
     private int count;
 
+    /**
+     *
+     * @param mod the modified location that needs to be wrapped.
+     * @param protein we need the protein because we need to count how many
+     *                times the modification is found in the protein.
+     */
     public ProteinModificationAdapter(ModifiedLocation mod, Protein protein) {
         modifiedLocation = mod;
         modification = new ModificationAdapter(mod.getModification());
         count = 0;
 
-        for(ModifiedLocation modif : protein.getModifiedLocations()) {
-            if(modif.getModification().equals(mod.getModification())) {
+        for(ModifiedLocation modLoc : protein.getModifiedLocations()) {
+            if(modLoc.getModification().equals(mod.getModification())) {
                 count++;
             }
         }
@@ -44,7 +50,7 @@ public class ProteinModificationAdapter implements ProteinModificationHandler {
 
     @Override
     public Integer getUniqueness() {
-        return null; // what is exactly this "uniqueness"?
+        return 0; // what is exactly this "uniqueness"?
     }
 
     @Override

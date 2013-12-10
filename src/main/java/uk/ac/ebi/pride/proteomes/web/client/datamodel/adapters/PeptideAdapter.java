@@ -19,6 +19,16 @@ public class PeptideAdapter implements PeptideHandler, PeptideMatch {
     }
 
     @Override
+    public int getId() {
+        return peptide.getId();
+    }
+
+    @Override
+    public boolean getSymbolic() {
+        return peptide.getSymbolic();
+    }
+
+    @Override
     public String getSequence() {
         return peptide.getSequence();
     }
@@ -45,7 +55,7 @@ public class PeptideAdapter implements PeptideHandler, PeptideMatch {
 
     @Override
     public Integer getEnd() {
-        return getPosition() + peptide.getSequence().length();
+        return getPosition() + peptide.getSequence().length() - 1;
     }
 
     @Override
