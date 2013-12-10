@@ -30,8 +30,8 @@ public class Reporter implements
 
         if(GWT.isScript()) {
             String hostName = Window.Location.getHostName();
-            if(hostName.equals("www.ebi.ac.uk") || hostName.equals("wwwdev" +
-                ".ebi.ac.uk")) {
+            if(hostName.equals("www.ebi.ac.uk") ||
+               hostName.equals("wwwdev.ebi.ac.uk")) {
                 GATracker.setAccount("UA-46176625-1");
                 GATracker.setDomainName("ebi.ac.uk");
                 trackingIsEnabled = true;
