@@ -65,7 +65,7 @@ public class HeaderPresenter implements Presenter,
         groups = event.getGroups();
 
         if(groupView && groups.size() > 0) {
-            view.updateTitle("Protein group: " + groups.get(0).getId());
+            view.updateTitle("Protein group " + groups.get(0).getId());
             view.updateDescription(groups.get(0).getDescription());
             List<Pair<String, String>> proteins = new ArrayList<Pair<String, String>>();
 
@@ -81,7 +81,7 @@ public class HeaderPresenter implements Presenter,
         List<Protein> proteins = event.getProteins();
 
         if(!groupView) {
-            view.updateTitle("Protein: " + proteins.get(0).getAccession());
+            view.updateTitle("Protein " + proteins.get(0).getAccession());
             view.updateDescription(proteins.get(0).getDescription());
             view.clearProperties();
         }
