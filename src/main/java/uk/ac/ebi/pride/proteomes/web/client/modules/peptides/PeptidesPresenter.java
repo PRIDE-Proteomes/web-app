@@ -36,7 +36,7 @@ public class PeptidesPresenter implements Presenter,
                                           PeptideUpdateEvent.PeptideUpdateHandler,
                                           TissueUpdateEvent.TissueUpdateHandler,
                                           ModificationUpdateEvent.ModificationUpdateHandler,
-                                          ListUiHandler<PeptideMatch> {
+                                          ListUiHandler<PeptideMatch>,VarianceUpdateEvent.VarianceUpdateHandler {
     private final EventBus eventBus;
     private final ListView<PeptideMatch> view;
     private final ListDataProvider<PeptideMatch> dataProvider = new
@@ -50,6 +50,7 @@ public class PeptidesPresenter implements Presenter,
     private Collection<PeptideMatch> selectedPeptidesMatches = Collections.emptyList();
     private String currentTissue = "";
     private String currentModification = "";
+    private List<String> selectedVariancesIDs = Collections.emptyList();
 
     public PeptidesPresenter(EventBus eventBus, ListView<PeptideMatch> view) {
         this.eventBus = eventBus;
@@ -71,7 +72,9 @@ public class PeptidesPresenter implements Presenter,
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
+        eventBus.addHandler(VarianceUpdateEvent.getType(), this);
         eventBus.addHandler(TissueUpdateEvent.getType(), this);
+        eventBus.addHandler(ModificationUpdateEvent.getType(), this);
     }
 
     @Override
@@ -167,6 +170,11 @@ public class PeptidesPresenter implements Presenter,
     }
 
     @Override
+    public void onVarianceUpdateEvent(VarianceUpdateEvent event) {
+        selectedVariancesIDs = Arrays.asList(event.getVarianceIDs());
+    }
+
+    @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
         // we deselect all the peptides, we can select them again.
         for(Peptide peptide : selectedPeptidesMatches) {
@@ -183,8 +191,6 @@ public class PeptidesPresenter implements Presenter,
                 currentRegion.getStart(), currentRegion.getEnd(),
                 currentTissue, currentModification));
     }
-
-
 
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
@@ -221,13 +227,26 @@ public class PeptidesPresenter implements Presenter,
         }
 
         Set<String> peptideIds = new HashSet<String>();
+        Set<String> varianceIDs = new HashSet<String>();
 
         for(PeptideMatch peptide : items) {
             peptideIds.add(peptide.getSequence());
         }
 
+        // we should change the variance selection if it doesn't fit the
+        // current peptide selection
+
+        for(String varianceID : selectedVariancesIDs) {
+            if(peptideIds.contains(varianceID.split("[|]")[0].substring(1))) {
+                varianceIDs.add(varianceID);
+            }
+        }
+
         changer = new StateChanger();
         changer.addPeptideChange(peptideIds);
+        if(!varianceIDs.containsAll(selectedVariancesIDs)) {
+            changer.addVarianceChange(varianceIDs);
+        }
 
         if(items.isEmpty()) {
             action = new UserAction(UserAction.Type.peptide, "Click Reset");

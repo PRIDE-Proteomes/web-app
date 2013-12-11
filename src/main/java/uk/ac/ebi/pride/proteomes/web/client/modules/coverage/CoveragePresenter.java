@@ -35,8 +35,7 @@ public class CoveragePresenter implements Presenter,
                                           RegionUpdateEvent.RegionUpdateHandler,
                                           PeptideUpdateEvent.PeptideUpdateHandler,
                                           ModificationUpdateEvent.ModificationUpdateHandler,
-                                          CoverageUiHandler
-{
+                                          CoverageUiHandler, VarianceUpdateEvent.VarianceUpdateHandler {
     public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View<CoverageUiHandler> {
         public void updateProtein(ProteinAdapter protein);
         public void updateRegionSelection(int start, int end);
@@ -56,6 +55,7 @@ public class CoveragePresenter implements Presenter,
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
     private List<PeptideMatch> currentPeptides = Collections.emptyList();
+    private Collection<String> selectedVarianceIDs = Collections.emptyList();
     private String currentModification = "";
 
     public CoveragePresenter(EventBus eventBus, View view) {
@@ -71,6 +71,7 @@ public class CoveragePresenter implements Presenter,
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(ModificationUpdateEvent.getType(), this);
+        eventBus.addHandler(VarianceUpdateEvent.getType(), this);
     }
 
     @Override
@@ -175,6 +176,11 @@ public class CoveragePresenter implements Presenter,
             view.resetPeptideSelection();
             currentPeptides = Collections.emptyList();
         }
+    }
+
+    @Override
+    public void onVarianceUpdateEvent(VarianceUpdateEvent event) {
+        selectedVarianceIDs = Arrays.asList(event.getVarianceIDs());
     }
 
     @Override
@@ -313,6 +319,17 @@ public class CoveragePresenter implements Presenter,
                 // this shouldn't happen, unless the peptide is somehow empty.
                 e.printStackTrace();
             }
+        }
+
+        List<String> varianceIDs = new ArrayList<String>();
+        for(String varianceID : selectedVarianceIDs) {
+            if(peptide.getSequence().equals(varianceID.split("[|]")[0].substring(1))) {
+                varianceIDs.add(varianceID);
+            }
+        }
+
+        if(!varianceIDs.containsAll(selectedVarianceIDs)) {
+            changer.addVarianceChange(varianceIDs);
         }
         peptides.add(peptide.getSequence());
         changer.addPeptideChange(peptides);

@@ -18,11 +18,11 @@ public class VarianceUpdateEvent extends
 
     private static final Type<VarianceUpdateHandler> TYPE = new Type<VarianceUpdateHandler>();
 
-    private String[] variances;
+    private String[] varianceIDs;
 
-    public VarianceUpdateEvent(String[] variances, HasHandlers source) {
+    public VarianceUpdateEvent(String[] varianceIDs, HasHandlers source) {
         super();
-        this.variances = variances;
+        this.varianceIDs = varianceIDs;
         setSource(source);
     }
 
@@ -31,8 +31,8 @@ public class VarianceUpdateEvent extends
         source.fireEvent(eventInstance);
     }
 
-    public String[] getVariances() {
-        return variances;
+    public String[] getVarianceIDs() {
+        return varianceIDs;
     }
 
     public static Type<VarianceUpdateHandler> getType() {

@@ -3,6 +3,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.history;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -47,7 +48,7 @@ final class State {
      * information to check whether the state is semantically correct,
      * so another check using all the data pointed in here must be made.
      */
-    State(String groupIds, String proteinIds, String regionIds,
+    private State(String groupIds, String proteinIds, String regionIds,
           String peptideIds, String varianceIds, String modificationIds,
           String tissueIds)
              throws InconsistentStateException {
@@ -238,6 +239,7 @@ final class State {
             isValid = false;
         }
         else {
+            // we do more complex checks here.
             for(String regionId : regions.split(sepValues)) {
                 if(!regionId.isEmpty()) {
                     try {
@@ -248,8 +250,56 @@ final class State {
                     }
                 }
             }
+            for(String varianceId : variances.split(sepValues)) {
+                if(!varianceId.isEmpty()) {
+                    String varSeq = varianceId.split("[|]")[0].substring(1);
+                    if(!Arrays.asList(peptides.split(sepValues)).contains(varSeq)) {
+                        isValid = false;
+                    }
+                }
+            }
         }
 
         return isValid;
+    }
+
+    /**
+     * Using some string that may create an invalid state,
+     * we create a valid one to our best effort without using the data,
+     * otherwise an exception is thrown.
+     * @param groupIds
+     * @param proteinIds
+     * @param regionIds
+     * @param peptideIds
+     * @param varianceIds
+     * @param modificationIds
+     * @param tissueIds
+     * @return
+     * @throws InconsistentStateException
+     */
+    public static State simplifyState(String groupIds, String proteinIds,
+                                      String regionIds, String peptideIds,
+                                      String varianceIds, String modificationIds,
+                                      String tissueIds)
+                                       throws InconsistentStateException {
+        String newRegionIds = "", newPeptideIds = "", newVariancesIds = "",
+                newModIds = "", newTissueIds = "";
+
+        if(!proteinIds.isEmpty()) {
+            newRegionIds = regionIds;
+            newPeptideIds = peptideIds;
+        }
+
+        if(!newPeptideIds.isEmpty()) {
+            newVariancesIds = varianceIds;
+        }
+
+        if(!proteinIds.isEmpty() || !groupIds.isEmpty()) {
+            newModIds = modificationIds;
+            newTissueIds = tissueIds;
+        }
+
+        return new State(groupIds, proteinIds, newRegionIds, newPeptideIds,
+                         newVariancesIds, newModIds, newTissueIds);
     }
 }

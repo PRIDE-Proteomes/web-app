@@ -8,7 +8,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
@@ -103,6 +102,14 @@ public class VariancesPresenter implements Presenter,
             deselectItem(peptide);
         }
 
+        selectedVariances = new ArrayList<Peptide>();
+        for(String Id : event.getVarianceIDs()) {
+            int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(), Id);
+            if(peptidePosition > -1) {
+                selectedVariances.add(dataProvider.getList().get(peptidePosition));
+            }
+        }
+
         if(!selectedVariances.isEmpty()) {
             // we reselect the peptides only if there are any
             selectVariances();
@@ -190,5 +197,6 @@ public class VariancesPresenter implements Presenter,
         dataProvider.getList().clear();
         dataProvider.getList().addAll(peptideList);
         dataSorter.repeatSort();
+        dataProvider.flush();
     }
 }

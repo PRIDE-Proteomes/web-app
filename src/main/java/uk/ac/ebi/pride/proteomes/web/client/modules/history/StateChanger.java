@@ -103,13 +103,14 @@ public class StateChanger {
             String oldModifications = State.getToken(oldState.getSelectedModifications());
             String oldTissues = State.getToken(oldState.getSelectedTissues());
 
-            changedState = new State(changesToApply.get(Type.Group, oldGroups),
-                                     changesToApply.get(Type.Protein, oldProteins),
-                                     changesToApply.get(Type.Region, oldRegions),
-                                     changesToApply.get(Type.Peptide, oldPeptides),
-                                     changesToApply.get(Type.Variance, oldVariances),
-                                     changesToApply.get(Type.Modification, oldModifications),
-                                     changesToApply.get(Type.Tissue, oldTissues));
+            changedState = State.simplifyState(
+                    changesToApply.get(Type.Group, oldGroups),
+                    changesToApply.get(Type.Protein, oldProteins),
+                    changesToApply.get(Type.Region, oldRegions),
+                    changesToApply.get(Type.Peptide, oldPeptides),
+                    changesToApply.get(Type.Variance, oldVariances),
+                    changesToApply.get(Type.Modification, oldModifications),
+                    changesToApply.get(Type.Tissue, oldTissues));
         }
         return changedState;
     }
