@@ -66,6 +66,7 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
         if(row >= 0 && row < grid.getRowCount()) {
             selectionEventsDisabled = true;
             grid.getSelectionModel().setSelected(grid.getVisibleItem(row), false);
+            selectionEventsDisabled = false;
             frame.clearPrimaryMessage();
         }
     }
