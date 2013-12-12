@@ -6,6 +6,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.EmptyPeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
@@ -88,9 +89,13 @@ public class VariancesPresenter implements Presenter,
 
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
-        if(!groups && event.getPeptides().size() > 0) {
-            currentPeptide = event.getPeptides().get(0);
-
+        if(!groups) {
+            if(event.getPeptides().size() > 0) {
+                currentPeptide = event.getPeptides().get(0);
+            }
+            else {
+                currentPeptide = new EmptyPeptideList();
+            }
             updateList(currentPeptide.getPeptideList());
             view.showList();
         }
