@@ -115,8 +115,8 @@ public class TissuesPresenter implements Presenter,
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
-        for(String item : selectedTissues) {
-            deselectItem(item);
+        for(String tissue : selectedTissues) {
+            deselectItem(tissue);
         }
 
         selectedTissues = new ArrayList<String>();
@@ -195,5 +195,6 @@ public class TissuesPresenter implements Presenter,
         dataProvider.getList().clear();
         dataProvider.getList().addAll(list);
         dataSorter.repeatSort();
+        dataProvider.flush();
     }
 }

@@ -209,5 +209,6 @@ public class ModificationsPresenter implements Presenter,
         dataProvider.getList().clear();
         dataProvider.getList().addAll(list);
         dataSorter.repeatSort();
+        dataProvider.flush();
     }
 }
