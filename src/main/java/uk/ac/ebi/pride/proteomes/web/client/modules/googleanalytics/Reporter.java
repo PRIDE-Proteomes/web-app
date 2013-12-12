@@ -34,6 +34,7 @@ public class Reporter implements
                hostName.equals("wwwdev.ebi.ac.uk")) {
                 GATracker.setAccount("UA-46176625-1");
                 GATracker.setDomainName("ebi.ac.uk");
+                GATracker.trackPageview();
                 trackingIsEnabled = true;
             }
         }

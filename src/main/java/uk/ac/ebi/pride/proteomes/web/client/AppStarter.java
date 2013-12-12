@@ -78,6 +78,16 @@ public class AppStarter implements RunAsyncCallback {
         List<AcceptsOneWidget> placeHolderList = new
                 ArrayList<AcceptsOneWidget>();
 
+        // Startup loggers&reporters
+        new Reporter(eventBus);
+        new WhistleBlower(eventBus);
+
+        // Startup the History and Data Retrieval modules
+        DataServer provider = new DataProvider(webServiceRoot);
+        AppController appController = new AppController(eventBus, provider);
+        provider.bind(appController);
+
+        // Startup the widget-containing modules
         View headerView = new HeaderView();
         Presenter headerPresenter = new HeaderPresenter(eventBus,
                                             (HeaderPresenter.View) headerView);
@@ -111,6 +121,8 @@ public class AppStarter implements RunAsyncCallback {
         Presenter variancePresenter = new VariancesPresenter(eventBus,
                 varianceView);
 
+        // Startup the main presenter, it's used as a container to hold the
+        // rest of the widget-showing modules.
         presenterList.add(headerPresenter);
         presenterList.add(tissuePresenter);
         presenterList.add(modPresenter);
@@ -128,20 +140,13 @@ public class AppStarter implements RunAsyncCallback {
                                                     mainView,
                                                     presenterList);
 
+        // Link the main presenter to the root container.
         SimplePanel mainPanel = new SimplePanel();
         container.add(mainPanel);
 
         mainPresenter.bindToContainer(mainPanel);
 
-        new Reporter(eventBus);
-        new WhistleBlower(eventBus);
-
-        DataServer provider = new DataProvider(webServiceRoot);
-        AppController appController = new AppController(eventBus, provider);
-        provider.bind(appController);
-
         // fire first event to reach initial state
-
         History.fireCurrentHistoryState();
     }
 }
