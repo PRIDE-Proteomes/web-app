@@ -33,6 +33,7 @@ public class MainView implements MainPresenter.View {
             if(i == 1) {
                 layout.add(subHeader);
                 subHeader.add((Widget) panelList.get(i));
+                subHeader.setCellWidth((Widget) panelList.get(i), "50%");
             }
             else if(i == 2) {
                 subHeader.add((Widget) panelList.get(i));

@@ -108,7 +108,8 @@ public class PeptidesPresenter implements Presenter,
             currentRegion = Region.emptyRegion();
             // we should reset filters and ordering here
             updateList(currentProtein.getPeptides());
-            view.showList();
+            view.loadList();
+            view.showContent();
         }
     }
 
@@ -116,7 +117,7 @@ public class PeptidesPresenter implements Presenter,
     public void onProteinRequestEvent(ProteinRequestEvent event) {
         // We should display that the list is being loaded
         if(!groups) {
-            view.showLoadingMessage();
+            view.loadLoadingMessage();
         }
     }
 

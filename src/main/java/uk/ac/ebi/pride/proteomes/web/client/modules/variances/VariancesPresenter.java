@@ -92,12 +92,13 @@ public class VariancesPresenter implements Presenter,
         if(!groups) {
             if(event.getPeptides().size() > 0) {
                 currentPeptide = event.getPeptides().get(0);
+                view.showContent();
             }
             else {
                 currentPeptide = new EmptyPeptideList();
             }
             updateList(currentPeptide.getPeptideList());
-            view.showList();
+            view.loadList();
         }
     }
 

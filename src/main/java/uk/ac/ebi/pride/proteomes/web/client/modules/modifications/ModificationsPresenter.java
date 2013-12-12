@@ -63,6 +63,7 @@ public class ModificationsPresenter implements Presenter,
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
+        view.hideContent();
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
@@ -101,9 +102,8 @@ public class ModificationsPresenter implements Presenter,
             for(ModifiedLocation loc : event.getProteins().get(0).getModifiedLocations()) {
                 mods.add(loc.getModification());
             }
-
             updateList(mods.entrySet());
-            view.showList();
+            view.loadList();
         }
     }
 
@@ -111,7 +111,7 @@ public class ModificationsPresenter implements Presenter,
     public void onProteinRequestEvent(ProteinRequestEvent event) {
         // We should display that the list is being loaded
         if(!groups) {
-            view.showLoadingMessage();
+            view.loadLoadingMessage();
         }
     }
 

@@ -57,6 +57,7 @@ public class TissuesPresenter implements Presenter,
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
+        view.hideContent();
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
@@ -91,7 +92,7 @@ public class TissuesPresenter implements Presenter,
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
         if(!groups && event.getProteins().size() > 0) {
             updateList(event.getProteins().get(0).getTissues());
-            view.showList();
+            view.loadList();
         }
     }
 
@@ -99,7 +100,7 @@ public class TissuesPresenter implements Presenter,
     public void onProteinRequestEvent(ProteinRequestEvent event) {
         // We should display that the list is being loaded
         if(!groups) {
-            view.showLoadingMessage();
+            view.loadLoadingMessage();
         }
     }
 

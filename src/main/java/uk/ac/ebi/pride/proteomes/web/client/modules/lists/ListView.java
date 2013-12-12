@@ -20,8 +20,11 @@ public interface ListView<T> extends View<ListUiHandler<T>> {
     // Used to scroll to a row in the list
     void focusItemOn(int row);
 
-    void showLoadingMessage();
-    void showList();
+    void loadLoadingMessage();
+    void loadList();
+
+    void showContent();
+    void hideContent();
 
     // Used to inject the list displayed in the view,
     // this frees the view from the list manipulation, e.g. sorting.

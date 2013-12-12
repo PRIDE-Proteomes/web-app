@@ -81,16 +81,25 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
     }
 
     @Override
-    public void showLoadingMessage() {
+    public void loadLoadingMessage() {
         frame.setContent(ModuleContainer.getLoadingPanel());
     }
 
     @Override
-    public void showList() {
+    public void loadList() {
         frame.setContent(grid);
         frame.clearPrimaryMessage();
-        frame.setOpen(true);
         updateItemCount(grid.getRowCount());
+    }
+
+    @Override
+    public void showContent() {
+        frame.setOpen(true);
+    }
+
+    @Override
+    public void hideContent() {
+        frame.setOpen(false);
     }
 
     @Override
