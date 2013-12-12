@@ -143,6 +143,6 @@ public class StateChanger {
         sb.append(changesToApply.containsKey(Type.Tissue) ?
                     "group=" + changesToApply.get(Type.Tissue) + State.sepTypes:
                     "");
-        return sb.substring(0, sb.length() > 0 ? sb.length() - 2 : 0);
+        return sb.substring(0, sb.length() > 0 ? sb.length() - 1 : 0);
     }
 }
