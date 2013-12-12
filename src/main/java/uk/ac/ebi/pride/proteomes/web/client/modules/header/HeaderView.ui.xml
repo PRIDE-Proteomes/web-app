@@ -2,9 +2,21 @@
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
     <g:HTMLPanel>
         <g:VerticalPanel horizontalAlignment="left" ui:field="vPanel">
-            <g:Label ui:field="title"/>
-            <g:Label ui:field="description"/>
-            <g:FlowPanel ui:field="attributes"/>
+            <g:HTMLPanel>
+                <h2>
+                <g:Label ui:field="title"/>
+                </h2>
+            </g:HTMLPanel>
+            <g:HTMLPanel>
+                <p>
+                <g:Label ui:field="description"/>
+                </p>
+            </g:HTMLPanel>
+            <g:HTMLPanel>
+                <p>
+                <g:FlowPanel ui:field="attributes"/>
+                </p>
+            </g:HTMLPanel>
         </g:VerticalPanel>
     </g:HTMLPanel>
 </ui:UiBinder>
