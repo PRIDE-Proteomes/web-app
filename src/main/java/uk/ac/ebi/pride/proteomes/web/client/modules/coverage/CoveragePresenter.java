@@ -364,11 +364,10 @@ public class CoveragePresenter implements Presenter,
                 .getSequence().length() + 1) {
             // The region only gets changed if the modification doesn't fit
             // in it.
-            if(!currentRegion.isEmpty() &&
-                (event.getSite() < currentRegion.getStart() ||
-                 event.getSite() > currentRegion.getEnd())) {
+            if(event.getSite() < currentRegion.getStart() ||
+               event.getSite() > currentRegion.getEnd()) {
                 try {
-                        regions.add(new Region(event.getSite(), event.getSite()).toString());
+                    regions.add(new Region(event.getSite(), event.getSite()).toString());
                     changer.addRegionChange(regions);
                 } catch (IllegalRegionValueException e) {
                     // this shouldn't happen, at all.
