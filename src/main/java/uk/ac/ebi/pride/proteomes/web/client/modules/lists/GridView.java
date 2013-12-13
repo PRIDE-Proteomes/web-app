@@ -1,9 +1,12 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.lists;
 
+import com.google.gwt.event.logical.shared.OpenEvent;
+import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.*;
@@ -19,8 +22,9 @@ import java.util.*;
  *         Time: 14:27
  */
 public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
-                                                     RowCountChangeEvent.Handler
-{
+                                                     RowCountChangeEvent.Handler, OpenHandler<DisclosurePanel> {
+    private static String grid_height = "150px";
+
     private List<ListUiHandler<T>> handlers = new ArrayList<ListUiHandler<T>>();
     private DataGrid<T> grid;
     private ModuleContainer frame;
@@ -42,7 +46,7 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
                 baseType + "s match the selection."));
 
         grid.setWidth("99%");
-        grid.setHeight("150px");
+        grid.setHeight(grid_height);
 
         // This allows for the data grid to show up to 4096 peptides in the
         // view, there should be a way to allow the view to adjust for any
@@ -51,6 +55,8 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
 
         frame.setWidth("100%");
         frame.setContent(grid);
+
+        frame.addOpenHandler(this);
     }
     @Override
     public void selectItemOn(int row) {
@@ -95,10 +101,12 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
     @Override
     public void showContent() {
         frame.setOpen(true);
+        grid.setVisible(true);
     }
 
     @Override
     public void hideContent() {
+        grid.setVisible(false);
         frame.setOpen(false);
     }
 
@@ -172,5 +180,10 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
             }
         });
         return selectionModel;
+    }
+
+    @Override
+    public void onOpen(OpenEvent<DisclosurePanel> event) {
+        grid.redraw();
     }
 }
