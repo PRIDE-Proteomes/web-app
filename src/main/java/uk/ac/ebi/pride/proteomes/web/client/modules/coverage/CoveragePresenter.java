@@ -349,7 +349,7 @@ public class CoveragePresenter implements Presenter,
         if(event.getSite() > 0 && event.getSite() < currentProtein
                 .getSequence().length() + 1) {
             try {
-                regions.add(new Region(event.getSite(), event.getSite() + 1).toString());
+                regions.add(new Region(event.getSite(), event.getSite()).toString());
                 changer.addRegionChange(regions);
             } catch (IllegalRegionValueException e) {
                 // this shouldn't happen, at all.
