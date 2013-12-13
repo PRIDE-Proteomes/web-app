@@ -253,6 +253,8 @@ public class CoveragePresenter implements Presenter,
 
         try {
             region = new Region(start, end);
+            // We have to check if a highlight has been done just before to
+            // know if the user wants to reset or want to select a 1-site region
             if(region.getLength() == 0 && !justHighlighted) {
                 //we don't want to select a single aminoacid,
                 // we want to reset the selection
@@ -362,8 +364,6 @@ public class CoveragePresenter implements Presenter,
         // Terminal modifications are ignored for now
         if(event.getSite() > 0 && event.getSite() < currentProtein
                 .getSequence().length() + 1) {
-            // The region only gets changed if the modification doesn't fit
-            // in it.
             if(event.getSite() < currentRegion.getStart() ||
                event.getSite() > currentRegion.getEnd()) {
                 try {
