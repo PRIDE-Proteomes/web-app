@@ -329,8 +329,8 @@ public class AppController implements
                                 try {
                                     Region region = Region.tokenize(regionId);
                                     if(region.getStart() <= match.getPosition() &&
-                                       region.getEnd() >= match.getPosition() + match
-                                               .getSequence().length()) {
+                                       region.getEnd() >= match.getPosition() +
+                                                          match.getSequence().length() - 1) {
                                         isContained = true;
                                         break;
                                     }
