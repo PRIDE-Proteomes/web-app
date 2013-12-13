@@ -136,7 +136,7 @@ public class PeptidesPresenter implements Presenter,
             currentRegion = event.getRegions().get(0);
         }
 
-        updateList(filterPeptides(currentProtein.getPeptides(),
+        updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
                 currentTissue, currentModification));
 
@@ -188,7 +188,7 @@ public class PeptidesPresenter implements Presenter,
         else {
             currentTissue = "";
         }
-        updateList(filterPeptides(currentProtein.getPeptides(),
+        updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
                 currentTissue, currentModification));
     }
@@ -200,27 +200,27 @@ public class PeptidesPresenter implements Presenter,
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-        try {
-            Integer.parseInt(event.getModifications()[0]);
-            currentModification = "";
+        // we deselect all the peptides, we can select them again.
+        for(Peptide peptide : selectedPeptidesMatches) {
+            deselectItem(peptide);
         }
-        catch(NumberFormatException e) {
-            // we deselect all the peptides, we can select them again.
-            for(Peptide peptide : selectedPeptidesMatches) {
-                deselectItem(peptide);
-            }
 
-            if(event.getModifications().length > 0 && !event.getModifications()[0].equals("")) {
-                currentModification = event.getModifications()[0];
-            }
-            else {
+        if(event.getModifications().length > 0 && !event.getModifications()[0].equals("")) {
+            try {
+                Integer.parseInt(event.getModifications()[0]);
                 currentModification = "";
             }
+            catch(NumberFormatException e) {
+                currentModification = event.getModifications()[0];
+            }
+            finally {
+                updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
+                            currentRegion.getStart(), currentRegion.getEnd(),
+                            currentTissue, currentModification));
+            }
         }
-        finally {
-            updateList(filterPeptides(currentProtein.getPeptides(),
-                    currentRegion.getStart(), currentRegion.getEnd(),
-                    currentTissue, currentModification));
+        else {
+            currentModification = "";
         }
     }
 
@@ -332,18 +332,5 @@ public class PeptidesPresenter implements Presenter,
         dataProvider.getList().addAll(peptideList);
         dataSorter.repeatSort();
         dataProvider.flush();
-    }
-
-    private List<PeptideMatch> filterPeptides(List<PeptideMatch> peptides,
-                                              int start, int end,
-                                              String tissue, String mod) {
-
-        return PeptideUtils.filterPeptideMatchesWithoutModification(
-                PeptideUtils.filterPeptidesNotInTissue(
-                        PeptideUtils.filterPeptideMatchesNotIn(
-                                peptides,
-                                start, end),
-                        tissue),
-                mod);
     }
 }
