@@ -156,4 +156,17 @@ public class PeptideUtils {
 
         return peptides;
     }
+
+    public static List<PeptideMatch> filterPeptides(List<PeptideMatch> peptides,
+                                                    int start, int end,
+                                                    String tissue, String mod) {
+
+        return filterPeptideMatchesWithoutModification(
+                filterPeptidesNotInTissue(
+                        filterPeptideMatchesNotIn(
+                                peptides,
+                                start, end),
+                        tissue),
+                mod);
+    }
 }

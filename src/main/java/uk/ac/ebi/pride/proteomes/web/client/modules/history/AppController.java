@@ -19,6 +19,7 @@ import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
+import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 import uk.ac.ebi.pride.proteomes.web.client.utils.RegionUtils;
 
 import java.util.*;
@@ -299,7 +300,7 @@ public class AppController implements
         boolean isCorrect = true;
 
         // for each peptide in the state check if they belong in all the
-        // selected groups and proteins.
+        // selected groups, proteins and match the filters.
         for(String sequence : state.getSelectedPeptides()) {
             for(String id : state.getSelectedGroups()) {
                 if(!server.getGroup(id).getMemberProteins().contains
@@ -319,23 +320,84 @@ public class AppController implements
                 for(PeptideMatch match : server.getProtein(accession).getPeptides()) {
                     if(sequence.equals(match.getSequence())) {
                         // Check if the peptide match is inside any region,
-                        // the lack of region means it's contained,
-                        // because all the protein is relevant.
-                        if(state.getSelectedRegions().length == 0) {
-                            isContained = true;
+                        // any tissue and any modification type. The lack of
+                        // filters should yield that the peptide is contained.
+                        isContained = state.getSelectedRegions().length == 0
+                                && state.getSelectedModifications().length == 0
+                                && state.getSelectedTissues().length == 0;
+
+                        if(isContained) {
+                            break;
                         }
-                        else {
-                            for(String regionId : state.getSelectedRegions()) {
-                                try {
-                                    Region region = Region.tokenize(regionId);
-                                    if(region.getStart() <= match.getPosition() &&
-                                       region.getEnd() >= match.getPosition() +
-                                                          match.getSequence().length() - 1) {
+                        // todo
+                        // the code below is very ugly,
+                        // we can clean it up putting it away in a function
+                        // and for each filter that is not available creating
+                        // a list with an empty region/string
+                        if(state.getSelectedRegions().length == 0) {
+                            if(state.getSelectedTissues().length == 0) {
+                                // neither the regions nor the tissues are
+                                // present, we only apply a single filter
+                                for(String mod : state.getSelectedModifications()) {
+                                    List<PeptideMatch> pList = new ArrayList<PeptideMatch>();
+                                    pList.add(match);
+                                    if(!PeptideUtils.filterPeptideMatchesWithoutModification(pList, mod).isEmpty()) {
                                         isContained = true;
+                                    }
+                                    if(isContained) {
                                         break;
                                     }
-                                } catch (IllegalRegionValueException e) {
-                                    isCorrect = false;
+                                }
+                            }
+                            else {
+                                // The region is no filtering anything,
+                                // we only apply 2 filters
+                                for(String tissue : state.getSelectedTissues()) {
+                                    for(String mod : state.getSelectedModifications()) {
+                                        List<PeptideMatch> pList = new ArrayList<PeptideMatch>();
+                                        pList.add(match);
+
+                                        if(!PeptideUtils.filterPeptideMatchesWithoutModification(PeptideUtils.filterPeptidesNotInTissue(pList, tissue), mod).isEmpty()) {
+                                            isContained = true;
+                                            break;
+                                        }
+                                    }
+                                    if(isContained) {
+                                        break;
+                                    }
+                                }
+                                if(isContained) {
+                                    break;
+                                }
+                            }
+                        }
+                        else {
+                            //the region is present, we check if there are
+                            // any peptide match that pass all three filters
+                            for(String regionId : state.getSelectedRegions()) {
+                                for(String tissue : state.getSelectedTissues()) {
+                                    for(String mod : state.getSelectedModifications()) {
+                                        try {
+                                            Region region = Region.tokenize(regionId);
+                                            List<PeptideMatch> pList = new ArrayList<PeptideMatch>();
+                                            pList.add(match);
+
+                                            if(!PeptideUtils.filterPeptides(pList,
+                                                    region.getStart(), region.getEnd(),
+                                                    tissue, mod).isEmpty()) {
+                                                isContained = true;
+                                                break;
+                                            }
+                                        } catch (IllegalRegionValueException e) {
+                                                isCorrect = false;
+                                        }
+                                    }
+                                    if(isContained) {
+                                        break;
+                                    }
+                                }
+                                if(isContained) {
+                                    break;
                                 }
                             }
                         }
@@ -358,7 +420,7 @@ public class AppController implements
     }
 
     /**
-     *  This method checks if the selected peptides are filtered out by some
+     *  This method checks he selected peptides are filtered out by some
      *  filters and removes said filters to achieve a consistent state.
      *  This is done because not all modules use filters before displaying
      *  the peptides and can select them. This frees these modules from
