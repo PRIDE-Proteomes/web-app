@@ -52,6 +52,7 @@ public class CoveragePresenter implements Presenter,
     private final View view;
 
     private boolean hiding = true;
+    private boolean justHighlighted = false;
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
     private List<PeptideMatch> currentPeptides = Collections.emptyList();
@@ -252,7 +253,7 @@ public class CoveragePresenter implements Presenter,
 
         try {
             region = new Region(start, end);
-            if(region.getLength() == 0) {
+            if(region.getLength() == 0 && !justHighlighted) {
                 //we don't want to select a single aminoacid,
                 // we want to reset the selection
                 action = new UserAction(UserAction.Type.region,
@@ -262,6 +263,7 @@ public class CoveragePresenter implements Presenter,
             else {
                 action = new UserAction(UserAction.Type.region,
                         "Drag Coverage Set");
+                justHighlighted = false;
             }
 
             regions.add(region.toString());
@@ -301,6 +303,7 @@ public class CoveragePresenter implements Presenter,
 
         try {
             regions.add(new Region(start, end));
+            justHighlighted = true;
         } catch (IllegalRegionValueException e) {
             regions.add(Region.emptyRegion());
         } finally {
