@@ -183,12 +183,23 @@ public class CoveragePresenter implements Presenter,
         selectedVarianceIDs = Arrays.asList(event.getVarianceIDs());
     }
 
+    /**
+     * This function has to take into account that a modification can be a
+     * position or a type of modification
+     * @param event
+     */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
         if(event.getModifications().length > 0) {
             currentModification = event.getModifications()[0];
-            view.updateModificationHighlight(
-                    new ModificationAdapter(event.getModifications()[0]));
+            try {
+                int position = Integer.parseInt(currentModification);
+
+                view.updateModificationHighlight(position, position);
+            }
+            catch (NumberFormatException e) {
+                view.updateModificationHighlight(new ModificationAdapter(currentModification));
+            }
         }
         else {
             view.resetModificationHighlight();
@@ -348,12 +359,18 @@ public class CoveragePresenter implements Presenter,
         // Terminal modifications are ignored for now
         if(event.getSite() > 0 && event.getSite() < currentProtein
                 .getSequence().length() + 1) {
-            try {
-                regions.add(new Region(event.getSite(), event.getSite()).toString());
-                changer.addRegionChange(regions);
-            } catch (IllegalRegionValueException e) {
-                // this shouldn't happen, at all.
-                e.printStackTrace();
+            // The region only gets changed if the modification doesn't fit
+            // in it.
+            if(!currentRegion.isEmpty() &&
+                (event.getSite() < currentRegion.getStart() ||
+                 event.getSite() > currentRegion.getEnd())) {
+                try {
+                        regions.add(new Region(event.getSite(), event.getSite()).toString());
+                    changer.addRegionChange(regions);
+                } catch (IllegalRegionValueException e) {
+                    // this shouldn't happen, at all.
+                    e.printStackTrace();
+                }
             }
             modifications.add(event.getSite().toString());
             changer.addModificationChange(modifications);

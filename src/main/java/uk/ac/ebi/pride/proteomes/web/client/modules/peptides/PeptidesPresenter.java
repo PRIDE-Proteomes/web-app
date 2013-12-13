@@ -193,22 +193,35 @@ public class PeptidesPresenter implements Presenter,
                 currentTissue, currentModification));
     }
 
+    /**
+     * If the modification is in a position the modification filter needs to
+     * get reset.
+     * @param event
+     */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-        // we deselect all the peptides, we can select them again.
-        for(Peptide peptide : selectedPeptidesMatches) {
-            deselectItem(peptide);
+        try {
+            Integer.parseInt(event.getModifications()[0]);
+            currentModification = "";
         }
+        catch(NumberFormatException e) {
+            // we deselect all the peptides, we can select them again.
+            for(Peptide peptide : selectedPeptidesMatches) {
+                deselectItem(peptide);
+            }
 
-        if(event.getModifications().length > 0 && !event.getModifications()[0].equals("")) {
-            currentTissue = event.getModifications()[0];
+            if(event.getModifications().length > 0 && !event.getModifications()[0].equals("")) {
+                currentModification = event.getModifications()[0];
+            }
+            else {
+                currentModification = "";
+            }
         }
-        else {
-            currentTissue = "";
+        finally {
+            updateList(filterPeptides(currentProtein.getPeptides(),
+                    currentRegion.getStart(), currentRegion.getEnd(),
+                    currentTissue, currentModification));
         }
-        updateList(filterPeptides(currentProtein.getPeptides(),
-                currentRegion.getStart(), currentRegion.getEnd(),
-                currentTissue, currentModification));
     }
 
     @Override

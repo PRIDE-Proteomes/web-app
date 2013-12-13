@@ -154,8 +154,12 @@ public class SequencePresenter implements Presenter,
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
         if(event.getModifications().length > 0) {
             currentModification = event.getModifications()[0];
-            view.updateModificationHighlight(
-                    new ModificationAdapter(event.getModifications()[0]));
+            try {
+                Integer.parseInt(currentModification);
+            }
+            catch (NumberFormatException e) {
+                view.updateModificationHighlight(new ModificationAdapter(currentModification));
+            }
         }
         else {
             view.resetModificationHighlight();
