@@ -217,7 +217,7 @@ public class CoveragePresenter implements Presenter,
 
         try {
             region.add(new Region(event.getStart(), event.getStart() + event
-                    .getLength()).toString());
+                    .getLength() - 1).toString());
             changer.addRegionChange(region);
 
             peptides = new HashSet<String>();
