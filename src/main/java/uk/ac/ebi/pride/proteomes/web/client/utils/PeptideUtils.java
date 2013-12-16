@@ -1,9 +1,11 @@
 package uk.ac.ebi.pride.proteomes.web.client.utils;
 
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
+import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -168,5 +170,71 @@ public class PeptideUtils {
                                 start, end),
                         tissue),
                 mod);
+    }
+
+    public static boolean isPeptideMatchNotFiltered(PeptideMatch match,
+                                                    String[] regions,
+                                                    String[] mods,
+                                                    String[] tissues) {
+        boolean notFiltered;
+        String[] newRegions, newMods, newTissues;
+
+        // Check if the peptide match is inside any region,
+        // any tissue and any modification type. The lack of
+        // filters should yield that the peptide is contained.
+        notFiltered = regions.length == 0 && mods.length == 0 && tissues.length == 0;
+
+        if(notFiltered) {
+            return true;
+        }
+
+        // Because the filtering code for peptide lists checks for empty
+        // filters we initialize the filter lists accordingly,
+        // otherwise we have to use a lot of nested ifs to check for all
+        // possible cases where some filter lists are empty.
+
+        if(regions.length == 0) {
+            newRegions = new String[1];
+            newRegions[0] = "0-0";
+        }
+        else {
+            newRegions = regions;
+        }
+
+        if(mods.length == 0) {
+            newMods = new String[1];
+            newMods[0] = "";
+        }
+        else {
+            newMods = mods;
+        }
+
+        if(tissues.length == 0) {
+            newTissues = new String[1];
+            newTissues[0] = "";
+        }
+        else {
+            newTissues = tissues;
+        }
+
+        for(String regionId : newRegions) {
+            for(String tissue : newTissues) {
+                for(String mod : newMods) {
+                    try {
+                        Region region = Region.tokenize(regionId);
+                        List<PeptideMatch> pList = new ArrayList<PeptideMatch>();
+                        pList.add(match);
+
+                        if(!filterPeptides(pList,
+                                region.getStart(), region.getEnd(),
+                                tissue, mod).isEmpty()) {
+                            return true;
+                        }
+                    } catch (IllegalRegionValueException e) {
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
