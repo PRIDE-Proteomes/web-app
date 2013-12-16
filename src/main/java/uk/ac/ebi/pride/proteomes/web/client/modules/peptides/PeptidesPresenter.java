@@ -48,8 +48,8 @@ public class PeptidesPresenter implements Presenter,
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
     private Collection<PeptideMatch> selectedPeptidesMatches = Collections.emptyList();
-    private String currentTissue = "";
-    private String currentModification = "";
+    private List<String> currentTissues = Collections.emptyList();
+    private List<String> currentModifications = Collections.emptyList();
     private List<String> selectedVariancesIDs = Collections.emptyList();
 
     public PeptidesPresenter(EventBus eventBus, ListView<PeptideMatch> view) {
@@ -138,7 +138,7 @@ public class PeptidesPresenter implements Presenter,
 
         updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
-                currentTissue, currentModification));
+                currentTissues, currentModifications));
 
         // we reselect the peptides, this is because the selected peptides
         // might not change when reselecting the region.
@@ -177,20 +177,15 @@ public class PeptidesPresenter implements Presenter,
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
-        // we deselect all the peptides, we can select them again.
-        for(Peptide peptide : selectedPeptidesMatches) {
-            deselectItem(peptide);
-        }
-
-        if(event.getTissues().length > 0 && !event.getTissues()[0].equals("")) {
-            currentTissue = event.getTissues()[0];
-        }
-        else {
-            currentTissue = "";
+        currentTissues = new ArrayList<String>();
+        for(String tissue : event.getTissues()) {
+            if(!tissue.equals("")) {
+                currentTissues.add(tissue);
+            }
         }
         updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
-                currentTissue, currentModification));
+                currentTissues, currentModifications));
     }
 
     /**
@@ -200,28 +195,21 @@ public class PeptidesPresenter implements Presenter,
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-        // we deselect all the peptides, we can select them again.
-        for(Peptide peptide : selectedPeptidesMatches) {
-            deselectItem(peptide);
-        }
-
-        if(event.getModifications().length > 0 && !event.getModifications()[0].equals("")) {
-            try {
-                Integer.parseInt(event.getModifications()[0]);
-                currentModification = "";
-            }
-            catch(NumberFormatException e) {
-                currentModification = event.getModifications()[0];
-            }
-            finally {
-                updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
-                            currentRegion.getStart(), currentRegion.getEnd(),
-                            currentTissue, currentModification));
+        currentModifications = new ArrayList<String>();
+        for(String mod : event.getModifications()) {
+            if(!mod.equals("")) {
+                try {
+                    Integer.parseInt(mod);
+                    currentModifications.add("");
+                }
+                catch(NumberFormatException e) {
+                    currentModifications.add(mod);
+                }
             }
         }
-        else {
-            currentModification = "";
-        }
+        updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
+                currentRegion.getStart(), currentRegion.getEnd(),
+                currentTissues, currentModifications));
     }
 
     @Override

@@ -328,7 +328,7 @@ public class AppController implements
                         }
                     }
                 }
-                if(!isContained || !isCorrect) {
+                if(!isContained) {
                     isCorrect = false;
                     break;
                 }

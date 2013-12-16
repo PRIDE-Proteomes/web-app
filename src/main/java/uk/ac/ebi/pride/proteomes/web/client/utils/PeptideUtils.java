@@ -8,6 +8,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,18 +40,29 @@ public class PeptideUtils {
         return filteredList;
     }
 
-    public static List<PeptideMatch> filterPeptidesNotInTissue(List<PeptideMatch> peptideMatches, String tissue) {
+    public static List<PeptideMatch> filterPeptidesNotInTissues
+            (List<PeptideMatch> peptideMatches, List<String> tissues) {
         List<PeptideMatch> filteredList;
+        List<String> properTissues = new ArrayList<String>();
 
-        if(tissue.isEmpty()) {
+        for(String tissue : tissues) {
+            if(!tissue.equals("")) {
+                properTissues.add(tissue);
+            }
+        }
+
+        if(properTissues.isEmpty()) {
             return peptideMatches;
         }
 
         filteredList = new ArrayList<PeptideMatch>();
 
         for(PeptideMatch peptide : peptideMatches) {
-            if(peptide.getTissues().contains(tissue)) {
-                filteredList.add(peptide);
+            for(String tissue : properTissues) {
+                if(peptide.getTissues().contains(tissue)) {
+                    filteredList.add(peptide);
+                    break;
+                }
             }
         }
 
@@ -87,25 +99,35 @@ public class PeptideUtils {
 
     /**
      * @param peptideMatches
-     * @param modification
+     * @param modifications
      * @return A list of items that where already contained in the original
      * list
      */
-    public static List<PeptideMatch> filterPeptideMatchesWithoutModification
-    (List<PeptideMatch> peptideMatches, String modification) {
+    public static List<PeptideMatch> filterPeptideMatchesWithoutAnyModifications
+    (List<PeptideMatch> peptideMatches, List<String> modifications) {
         List<PeptideMatch> filteredList;
+        List<String> properModifications = new ArrayList<String>();
 
-        if(modification.isEmpty()) {
+        for(String modification : modifications) {
+            if(!modification.equals("")) {
+                properModifications.add(modification);
+            }
+        }
+
+        if(properModifications.isEmpty()) {
             return peptideMatches;
         }
 
         filteredList = new ArrayList<PeptideMatch>();
 
         for(PeptideMatch peptide : peptideMatches) {
+            modLoc:
             for(ModifiedLocation modLoc : peptide.getModifiedLocations()) {
-                if(modLoc.getModification().equals(modification)) {
-                    filteredList.add(peptide);
-                    break;
+                for(String mod : properModifications) {
+                    if(modLoc.getModification().equals(mod)) {
+                        filteredList.add(peptide);
+                        break modLoc;
+                    }
                 }
             }
         }
@@ -161,15 +183,16 @@ public class PeptideUtils {
 
     public static List<PeptideMatch> filterPeptides(List<PeptideMatch> peptides,
                                                     int start, int end,
-                                                    String tissue, String mod) {
+                                                    List<String> tissues,
+                                                    List<String> mods) {
 
-        return filterPeptideMatchesWithoutModification(
-                filterPeptidesNotInTissue(
+        return filterPeptideMatchesWithoutAnyModifications(
+                filterPeptidesNotInTissues(
                         filterPeptideMatchesNotIn(
                                 peptides,
                                 start, end),
-                        tissue),
-                mod);
+                        tissues),
+                mods);
     }
 
     public static boolean isPeptideMatchNotFiltered(PeptideMatch match,
@@ -177,7 +200,7 @@ public class PeptideUtils {
                                                     String[] mods,
                                                     String[] tissues) {
         boolean notFiltered;
-        String[] newRegions, newMods, newTissues;
+        List<String> newRegions, newMods, newTissues;
 
         // Check if the peptide match is inside any region,
         // any tissue and any modification type. The lack of
@@ -194,40 +217,47 @@ public class PeptideUtils {
         // possible cases where some filter lists are empty.
 
         if(regions.length == 0) {
-            newRegions = new String[1];
-            newRegions[0] = "0-0";
+            newRegions = new ArrayList<String>();
+            newRegions.add("0-0");
         }
         else {
-            newRegions = regions;
+            newRegions = Arrays.asList(regions);
         }
 
         if(mods.length == 0) {
-            newMods = new String[1];
-            newMods[0] = "";
+            newMods = new ArrayList<String>();
+            newMods.add("");
         }
         else {
-            newMods = mods;
+            newMods = Arrays.asList(mods);
         }
 
         if(tissues.length == 0) {
-            newTissues = new String[1];
-            newTissues[0] = "";
+            newTissues = new ArrayList<String>();
+            newTissues.add("");
         }
         else {
-            newTissues = tissues;
+            newTissues = Arrays.asList(tissues);
         }
 
         for(String regionId : newRegions) {
             for(String tissue : newTissues) {
                 for(String mod : newMods) {
                     try {
+                        //We want to check permutations,
+                        // so we  pack the single tissues and modifications
+                        // into lists and use the filterPeptides method
                         Region region = Region.tokenize(regionId);
                         List<PeptideMatch> pList = new ArrayList<PeptideMatch>();
                         pList.add(match);
+                        List<String> tList = new ArrayList<String>();
+                        tList.add(tissue);
+                        List<String> mList = new ArrayList<String>();
+                        mList.add(mod);
 
                         if(!filterPeptides(pList,
                                 region.getStart(), region.getEnd(),
-                                tissue, mod).isEmpty()) {
+                                tList, mList).isEmpty()) {
                             return true;
                         }
                     } catch (IllegalRegionValueException e) {

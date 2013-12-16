@@ -116,10 +116,6 @@ public class TissuesPresenter implements Presenter,
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
-        for(String tissue : selectedTissues) {
-            deselectItem(tissue);
-        }
-
         selectedTissues = new ArrayList<String>();
         for(String item : event.getTissues()) {
             selectItem(item);
@@ -147,15 +143,16 @@ public class TissuesPresenter implements Presenter,
         for(Peptide pep : selectedPeptides) {
             // If the collections are disjoint means the peptide doesn't have
             // any tissue in items. If this happens, we filter it out.
-            if(!Collections.disjoint(pep.getTissues(), items)) {
+            if(!Collections.disjoint(pep.getTissues(), items) || items.isEmpty()) {
                 filteredPeptides.add(pep.getSequence());
             }
         }
 
         changer = new StateChanger();
         changer.addTissueChange(items);
-        changer.addPeptideChange(filteredPeptides);
-
+        if(filteredPeptides.size() < selectedPeptides.size()) {
+            changer.addPeptideChange(filteredPeptides);
+        }
 
         if(items.isEmpty()) {
             action = new UserAction(UserAction.Type.tissue, "Click Reset");

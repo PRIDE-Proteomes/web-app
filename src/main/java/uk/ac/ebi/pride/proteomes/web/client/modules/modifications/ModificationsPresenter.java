@@ -22,10 +22,7 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -126,8 +123,24 @@ public class ModificationsPresenter implements Presenter,
     }
 
     @Override
+    public void onModificationUpdateEvent(ModificationUpdateEvent event) {
+        selectedModifications = new ArrayList<Multiset.Entry<String>>();
+        for(String item : event.getModifications()) {
+            for(Multiset.Entry<String> entry : dataProvider.getList()) {
+                if(entry.getElement().equals(item)) {
+                    selectItem(entry);
+                    selectedModifications.add(entry);
+                    break;
+                }
+            }
+
+        }
+    }
+
+    @Override
     public void onSelectionChanged(Collection<Multiset.Entry<String>> items) {
         StateChanger changer;
+        UserAction action;
         List<String> filteredPeptides;
 
         if((items.containsAll(selectedModifications) &&
@@ -145,38 +158,30 @@ public class ModificationsPresenter implements Presenter,
 
         filteredPeptides = new ArrayList<String>();
         for(Peptide pep : selectedPeptides) {
+            Set<String> mods = new HashSet<String>();
+            for(ModifiedLocation modLoc : pep.getModifiedLocations()) {
+                mods.add(modLoc.getModification());
+            }
+
             // If the collections are disjoint means the peptide doesn't have
-            // any tissue in items. If this happens, we filter it out.
-            if(!Collections.disjoint(pep.getTissues(), items)) {
+            // any modifications in items. If this happens, we filter it out.
+            if(!Collections.disjoint(mods, selection) || selection.isEmpty()) {
                 filteredPeptides.add(pep.getSequence());
             }
         }
 
         changer = new StateChanger();
         changer.addModificationChange(selection);
-        changer.addPeptideChange(filteredPeptides);
-        UserAction action = new UserAction(UserAction.Type.modification,
-                                           "Click");
+        if(filteredPeptides.size() < selectedPeptides.size()) {
+            changer.addPeptideChange(filteredPeptides);
+        }
+        if(selection.isEmpty()) {
+            action = new UserAction(UserAction.Type.modification, "Click Reset");
+        }
+        else {
+            action = new UserAction(UserAction.Type.modification, "Click Set");
+        }
         StateChangingActionEvent.fire(this, changer, action);
-    }
-
-    @Override
-    public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-        for(Multiset.Entry<String> item : selectedModifications) {
-            deselectItem(item);
-        }
-
-        selectedModifications = new ArrayList<Multiset.Entry<String>>();
-        for(String item : event.getModifications()) {
-            for(Multiset.Entry<String> entry : dataProvider.getList()) {
-                if(entry.getElement().equals(item)) {
-                    selectItem(entry);
-                    selectedModifications.add(entry);
-                    break;
-                }
-            }
-
-        }
     }
 
     private void updateList(Collection<Multiset.Entry<String>> mods) {
