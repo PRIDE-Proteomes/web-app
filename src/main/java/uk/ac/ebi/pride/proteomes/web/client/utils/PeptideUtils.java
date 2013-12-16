@@ -218,7 +218,7 @@ public class PeptideUtils {
 
         if(regions.length == 0) {
             newRegions = new ArrayList<String>();
-            newRegions.add("0-0");
+            newRegions.add("");
         }
         else {
             newRegions = Arrays.asList(regions);
@@ -247,7 +247,13 @@ public class PeptideUtils {
                         //We want to check permutations,
                         // so we  pack the single tissues and modifications
                         // into lists and use the filterPeptides method
-                        Region region = Region.tokenize(regionId);
+                        Region region;
+                        if(regionId.equals("")) {
+                            region = Region.emptyRegion();
+                        }
+                        else {
+                            region = Region.tokenize(regionId);
+                        }
                         List<PeptideMatch> pList = new ArrayList<PeptideMatch>();
                         pList.add(match);
                         List<String> tList = new ArrayList<String>();
