@@ -67,7 +67,7 @@ public class VarianceColumnProvider {
             public String getValue(Peptide object) {
                 Set<String> modSet = new HashSet<String>();
                 for(ModifiedLocation modLoc : object.getModifiedLocations()) {
-                    modSet.add(modLoc.getModification());
+                    modSet.add(modLoc.getPosition() + ":" + modLoc.getModification());
                 }
                 StringBuilder sb = new StringBuilder();
                 for(String mod : modSet) {
