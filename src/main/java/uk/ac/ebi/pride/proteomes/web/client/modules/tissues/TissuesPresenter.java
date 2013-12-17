@@ -60,6 +60,7 @@ public class TissuesPresenter implements Presenter, ListUiHandler<String>,
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
+        eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(TissueUpdateEvent.getType(), this);
 
     }
@@ -127,7 +128,7 @@ public class TissuesPresenter implements Presenter, ListUiHandler<String>,
         UserAction action;
         List<String> filteredPeptides;
 
-        // an empty selection is represented by a list with a null items,
+        // an empty selection is represented by a list with a null item,
         // we represent that with an empty list, so we have to add an
         // additional check for that.
         if((items.containsAll(selectedTissues) && selectedTissues.containsAll(items)) ||
