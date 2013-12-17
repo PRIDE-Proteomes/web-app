@@ -27,12 +27,10 @@ import java.util.*;
  *         Date: 29/11/13
  *         Time: 14:46
  */
-public class VariancesPresenter implements Presenter,
-                                           ValidStateEvent.ValidStateHandler,
-                                           PeptideUpdateEvent.PeptideUpdateHandler,
-                                           VarianceUpdateEvent.VarianceUpdateHandler,
-                                           ListUiHandler<Peptide>
-{
+public class VariancesPresenter implements Presenter, ListUiHandler<Peptide>,
+                                           ValidStateEvent.Handler,
+                                           PeptideUpdateEvent.Handler,
+                                           VarianceUpdateEvent.Handler {
     private final EventBus eventBus;
     private final ListView<Peptide> view;
     private final ListDataProvider<Peptide> dataProvider = new

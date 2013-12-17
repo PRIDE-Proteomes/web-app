@@ -12,16 +12,14 @@ import java.util.List;
  *         Date: 04/11/13
  *         Time: 14:15
  */
-public class ProteinUpdateEvent extends
-        GwtEvent<ProteinUpdateEvent.ProteinUpdateHandler> {
+public class ProteinUpdateEvent extends GwtEvent<ProteinUpdateEvent.Handler> {
+    public interface Handler extends EventHandler {
+        public void onProteinUpdateEvent(ProteinUpdateEvent event);
+    }
 
-public interface ProteinUpdateHandler extends EventHandler {
-    public void onProteinUpdateEvent(ProteinUpdateEvent event);
-}
+    private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<Handler>();
 
-private static final GwtEvent.Type<ProteinUpdateHandler> TYPE = new GwtEvent.Type<ProteinUpdateHandler>();
-
-private List<Protein> ProteinList;
+    private List<Protein> ProteinList;
 
     public ProteinUpdateEvent(List<Protein> Proteins, HasHandlers source) {
         super();
@@ -38,17 +36,17 @@ private List<Protein> ProteinList;
         return ProteinList;
     }
 
-    public static GwtEvent.Type<ProteinUpdateHandler> getType() {
+    public static GwtEvent.Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public GwtEvent.Type<ProteinUpdateHandler> getAssociatedType() {
+    public GwtEvent.Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(ProteinUpdateHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onProteinUpdateEvent(this);
     }
 }

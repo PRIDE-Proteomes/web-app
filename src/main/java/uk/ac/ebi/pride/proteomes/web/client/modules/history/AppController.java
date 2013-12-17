@@ -28,12 +28,9 @@ import java.util.*;
  *         Date: 22/10/13
  *         Time: 10:38
  */
-public class AppController implements
-                           StateChangingActionEvent.StateChangingActionHandler,
-                           ValueChangeHandler<String>,
-                           HasHandlers,
-                           DataServer.DataClient
-{
+public class AppController implements HasHandlers, DataServer.DataClient,
+                                      ValueChangeHandler<String>,
+                                      StateChangingActionEvent.Handler {
     private final EventBus eventBus;
     private final DataServer server;
     private State appState;

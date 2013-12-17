@@ -19,9 +19,7 @@ import uk.ac.ebi.pride.proteomes.web.googleanalytics.client.GATracker;
  *         Date: 02/12/13
  *         Time: 16:06
  */
-public class Reporter implements
-        StateChangingActionEvent.StateChangingActionHandler
-{
+public class Reporter implements StateChangingActionEvent.Handler {
     private final EventBus eventBus;
     private boolean trackingIsEnabled = false;
 

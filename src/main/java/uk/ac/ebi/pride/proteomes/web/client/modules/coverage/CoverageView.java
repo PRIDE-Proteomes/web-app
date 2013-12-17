@@ -6,6 +6,7 @@ import com.google.gwt.user.client.ui.Widget;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.ViewWithUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 import uk.ac.ebi.pride.widgets.client.protein.client.ProteinViewer;
@@ -19,7 +20,8 @@ import java.util.*;
  *         Date: 11/11/13
  *         Time: 12:10
  */
-public class CoverageView implements CoveragePresenter.View,
+public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
+                          implements CoveragePresenter.ThisView,
                                      ProteinAreaSelectedHandler,
                                      ProteinAreaHighlightedHandler,
                                      ProteinRegionSelectedHandler,
@@ -30,8 +32,6 @@ public class CoverageView implements CoveragePresenter.View,
     private ModuleContainer outerBox;
     private ProteinViewer coverage;
     private Map<ProteinAdapter, ProteinViewer> viewersCache;
-
-    private List<CoverageUiHandler> uiHandlers = new ArrayList<CoverageUiHandler>();
 
     public CoverageView() {
         viewersCache = new HashMap<ProteinAdapter, ProteinViewer>();
@@ -105,16 +105,6 @@ public class CoverageView implements CoveragePresenter.View,
     }
 
     @Override
-    public void addUiHandler(CoverageUiHandler handler) {
-        getUiHandlers().add(handler);
-    }
-
-    @Override
-    public Collection<CoverageUiHandler> getUiHandlers() {
-        return uiHandlers;
-    }
-
-    @Override
     public void setVisible(boolean visible) {
         asWidget().setVisible(visible);
     }
@@ -131,42 +121,42 @@ public class CoverageView implements CoveragePresenter.View,
      */
     @Override
     public void onProteinAreaSelected(ProteinAreaSelectedEvent e) {
-        for(CoverageUiHandler handler : uiHandlers) {
+        for(CoverageUiHandler handler : getUiHandlers()) {
             handler.onRegionDragSelected(e);
         }
     }
 
     @Override
     public void onProteinRegionSelectionChanged(ProteinRegionSelectionEvent e) {
-        for(CoverageUiHandler handler : uiHandlers) {
+        for(CoverageUiHandler handler : getUiHandlers()) {
             handler.onRegionClickSelected(e);
         }
     }
 
     @Override
     public void onProteinAreaHighlighted(ProteinAreaHighlightEvent e) {
-        for(CoverageUiHandler handler : uiHandlers) {
+        for(CoverageUiHandler handler : getUiHandlers()) {
             handler.onRegionDragHighlighted(e);
         }
     }
 
     @Override
     public void onProteinRegionHighlighted(ProteinRegionHighlightEvent e) {
-        for(CoverageUiHandler handler : uiHandlers) {
+        for(CoverageUiHandler handler : getUiHandlers()) {
             handler.onRegionClickHighlighted(e);
         }
     }
 
     @Override
     public void onPeptideSelected(PeptideSelectedEvent e) {
-        for(CoverageUiHandler handler : uiHandlers) {
+        for(CoverageUiHandler handler : getUiHandlers()) {
             handler.onPeptideSelected(e);
         }
     }
 
     @Override
     public void onModificationSelected(ModificationSelectedEvent e) {
-        for(CoverageUiHandler handler : uiHandlers) {
+        for(CoverageUiHandler handler : getUiHandlers()) {
             handler.onModificationSelected(e);
         }
     }

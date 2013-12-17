@@ -9,14 +9,12 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Date: 22/10/13
  *         Time: 11:17
  */
-public class ErrorOnUpdateEvent extends
-        GwtEvent<ErrorOnUpdateEvent.ErrorOnUpdateHandler> {
-
-    public interface ErrorOnUpdateHandler extends EventHandler {
+public class ErrorOnUpdateEvent extends GwtEvent<ErrorOnUpdateEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onUpdateErrorEvent(ErrorOnUpdateEvent event);
     }
 
-    private static final Type<ErrorOnUpdateHandler> TYPE = new Type<ErrorOnUpdateHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
 
     private String text;
 
@@ -35,17 +33,17 @@ public class ErrorOnUpdateEvent extends
         return text;
     }
 
-    public static Type<ErrorOnUpdateHandler> getType() {
+    public static Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public Type<ErrorOnUpdateHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(ErrorOnUpdateHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onUpdateErrorEvent(this);
     }
 }

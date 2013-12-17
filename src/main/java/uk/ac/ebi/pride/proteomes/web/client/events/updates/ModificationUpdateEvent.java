@@ -9,14 +9,12 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Date: 04/11/13
  *         Time: 15:15
  */
-public class ModificationUpdateEvent extends
-        GwtEvent<ModificationUpdateEvent.ModificationUpdateHandler> {
-
-    public interface ModificationUpdateHandler extends EventHandler {
+public class ModificationUpdateEvent extends GwtEvent<ModificationUpdateEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onModificationUpdateEvent(ModificationUpdateEvent event);
     }
 
-    private static final Type<ModificationUpdateHandler> TYPE = new Type<ModificationUpdateHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
 
     private String[] modifications;
 
@@ -35,17 +33,17 @@ public class ModificationUpdateEvent extends
         return modifications;
     }
 
-    public static Type<ModificationUpdateHandler> getType() {
+    public static Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public Type<ModificationUpdateHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(ModificationUpdateHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onModificationUpdateEvent(this);
     }
 }

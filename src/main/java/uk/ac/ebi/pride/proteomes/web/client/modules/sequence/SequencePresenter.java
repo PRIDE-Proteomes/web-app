@@ -18,7 +18,9 @@ import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.RegionUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
+import uk.ac.ebi.pride.proteomes.web.client.modules.HasUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.View;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 import uk.ac.ebi.pride.widgets.client.sequence.events.ProteinRegionHighlightedEvent;
@@ -31,22 +33,18 @@ import java.util.*;
  *         Date: 27/11/13
  *         Time: 10:57
  */
-public class SequencePresenter implements Presenter,
-                                          ValidStateEvent.ValidStateHandler,
-                                          ProteinUpdateEvent.ProteinUpdateHandler,
-                                          ProteinRequestEvent.ProteinRequestHandler,
-                                          RegionUpdateEvent.RegionUpdateHandler,
-                                          PeptideUpdateEvent.PeptideUpdateHandler,
-                                          ModificationUpdateEvent.ModificationUpdateHandler,
-                                          SequenceUiHandler
-{
+public class SequencePresenter implements Presenter, SequenceUiHandler,
+                                          ValidStateEvent.Handler,
+                                          ProteinUpdateEvent.Handler,
+                                          ProteinRequestEvent.Handler,
+                                          RegionUpdateEvent.Handler,
+                                          PeptideUpdateEvent.Handler,
+                                          ModificationUpdateEvent.Handler {
     private boolean hiding = true;
     private Protein currentProtein;
-    private Region currentRegion = Region.emptyRegion();
     private List<PeptideMatch> currentPeptides = Collections.emptyList();
-    private String currentModification = "";
 
-    public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View<SequenceUiHandler> {
+    public interface ThisView extends View, HasUiHandlers<SequenceUiHandler> {
         void updateProtein(ProteinAdapter proteinAdapter);
         void updateRegionSelection(int start, int end);
         void resetRegionSelection();
@@ -58,9 +56,9 @@ public class SequencePresenter implements Presenter,
     }
 
     private final EventBus eventBus;
-    private final View view;
+    private final ThisView view;
 
-    public SequencePresenter(EventBus eventBus, View view) {
+    public SequencePresenter(EventBus eventBus, ThisView view) {
         this.eventBus = eventBus;
         this.view = view;
 
@@ -115,11 +113,9 @@ public class SequencePresenter implements Presenter,
 
         if(event.getRegions().size() > 0) {
             region = event.getRegions().get(0);
-            currentRegion = region;
             view.updateRegionSelection(region.getStart(), region.getEnd());
         }
         else {
-            currentRegion = Region.emptyRegion();
             view.resetRegionSelection();
         }
     }
@@ -153,7 +149,7 @@ public class SequencePresenter implements Presenter,
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
         if(event.getModifications().length > 0) {
-            currentModification = event.getModifications()[0];
+            String currentModification = event.getModifications()[0];
             try {
                 Integer.parseInt(currentModification);
             }
@@ -163,7 +159,6 @@ public class SequencePresenter implements Presenter,
         }
         else {
             view.resetModificationHighlight();
-            currentModification = null;
         }
     }
 

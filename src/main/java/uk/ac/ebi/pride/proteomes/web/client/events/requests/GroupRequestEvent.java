@@ -9,14 +9,12 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Date: 30/10/13
  *         Time: 11:49
  */
-public class GroupRequestEvent extends
-        GwtEvent<GroupRequestEvent.GroupRequestHandler> {
-
-    public interface GroupRequestHandler extends EventHandler {
+public class GroupRequestEvent extends GwtEvent<GroupRequestEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onGroupRequestEvent(GroupRequestEvent event);
     }
 
-    private static final Type<GroupRequestHandler> TYPE = new Type<GroupRequestHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
 
     public GroupRequestEvent(HasHandlers source) {
         super();
@@ -28,17 +26,17 @@ public class GroupRequestEvent extends
         source.fireEvent(eventInstance);
     }
 
-    public static Type<GroupRequestHandler> getType() {
+    public static Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public Type<GroupRequestHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(GroupRequestHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onGroupRequestEvent(this);
     }
 }

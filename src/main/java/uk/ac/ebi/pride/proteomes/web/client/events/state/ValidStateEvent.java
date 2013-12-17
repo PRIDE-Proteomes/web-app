@@ -9,9 +9,8 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Date: 14/11/13
  *         Time: 15:30
  */
-public class ValidStateEvent extends GwtEvent<ValidStateEvent.ValidStateHandler> {
-
-    public interface ValidStateHandler extends EventHandler {
+public class ValidStateEvent extends GwtEvent<ValidStateEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onValidStateEvent(ValidStateEvent event);
     }
 
@@ -19,7 +18,7 @@ public class ValidStateEvent extends GwtEvent<ValidStateEvent.ValidStateHandler>
         Group, Protein
     }
 
-    private static final GwtEvent.Type<ValidStateHandler> TYPE = new GwtEvent.Type<ValidStateHandler>();
+    private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<Handler>();
     private final ViewType viewType;
 
     public ValidStateEvent(HasHandlers source, ViewType viewType) {
@@ -33,7 +32,7 @@ public class ValidStateEvent extends GwtEvent<ValidStateEvent.ValidStateHandler>
         source.fireEvent(eventInstance);
     }
 
-    public static GwtEvent.Type<ValidStateHandler> getType() {
+    public static GwtEvent.Type<Handler> getType() {
         return TYPE;
     }
 
@@ -41,12 +40,12 @@ public class ValidStateEvent extends GwtEvent<ValidStateEvent.ValidStateHandler>
         return viewType;
     }
     @Override
-    public Type<ValidStateHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(ValidStateHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onValidStateEvent(this);
     }
 }

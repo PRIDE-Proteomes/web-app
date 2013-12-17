@@ -28,15 +28,15 @@ import java.util.*;
  *         Date: 12/11/13
  *         Time: 09:40
  */
-public class PeptidesPresenter implements Presenter,
-                                          ValidStateEvent.ValidStateHandler,
-                                          ProteinUpdateEvent.ProteinUpdateHandler,
-                                          ProteinRequestEvent.ProteinRequestHandler,
-                                          RegionUpdateEvent.RegionUpdateHandler,
-                                          PeptideUpdateEvent.PeptideUpdateHandler,
-                                          TissueUpdateEvent.TissueUpdateHandler,
-                                          ModificationUpdateEvent.ModificationUpdateHandler,
-                                          ListUiHandler<PeptideMatch>,VarianceUpdateEvent.VarianceUpdateHandler {
+public class PeptidesPresenter implements Presenter, ListUiHandler<PeptideMatch>,
+                                          ValidStateEvent.Handler,
+                                          ProteinUpdateEvent.Handler,
+                                          ProteinRequestEvent.Handler,
+                                          RegionUpdateEvent.Handler,
+                                          PeptideUpdateEvent.Handler,
+                                          TissueUpdateEvent.Handler,
+                                          ModificationUpdateEvent.Handler,
+                                          VarianceUpdateEvent.Handler {
     private final EventBus eventBus;
     private final ListView<PeptideMatch> view;
     private final ListDataProvider<PeptideMatch> dataProvider = new
@@ -191,7 +191,8 @@ public class PeptidesPresenter implements Presenter,
     /**
      * If the modification is in a position the modification filter needs to
      * get reset.
-     * @param event
+     * @param event Event containing the string identifying a type of
+     *              modification.
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {

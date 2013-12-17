@@ -9,6 +9,7 @@ import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.GroupUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.View;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Pair;
 
 import java.util.ArrayList;
@@ -19,24 +20,21 @@ import java.util.List;
  *         Date: 07/11/13
  *         Time: 10:46
  */
-public class HeaderPresenter implements Presenter,
-                                        ValidStateEvent.ValidStateHandler,
-                                        GroupUpdateEvent.GroupUpdateHandler,
-                                        ProteinUpdateEvent.ProteinUpdateHandler {
+public class HeaderPresenter implements Presenter, ValidStateEvent.Handler,
+                                        GroupUpdateEvent.Handler,
+                                        ProteinUpdateEvent.Handler {
 
-    public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View {
+    public interface ThisView extends View {
         public void updateTitle(String title);
         public void updateDescription(String description);
         public void updateProperties(List<Pair<String, String>> links);
         public void clearProperties();
     }
     private final EventBus eventBus;
-    private final View view;
+    private final ThisView view;
     private boolean groupView;
 
-    private List<Group> groups;
-
-    public HeaderPresenter(EventBus eventBus, View view) {
+    public HeaderPresenter(EventBus eventBus, ThisView view) {
         this.eventBus = eventBus;
         this.view = view;
 
@@ -62,7 +60,7 @@ public class HeaderPresenter implements Presenter,
 
     @Override
     public void onGroupUpdateEvent(GroupUpdateEvent event) {
-        groups = event.getGroups();
+        List<Group> groups = event.getGroups();
 
         if(groupView && groups.size() > 0) {
             view.updateTitle("Protein group " + groups.get(0).getId());

@@ -12,14 +12,12 @@ import java.util.List;
  *         Date: 04/11/13
  *         Time: 16:34
  */
-public class RegionUpdateEvent extends
-        GwtEvent<RegionUpdateEvent.RegionUpdateHandler> {
-
-    public interface RegionUpdateHandler extends EventHandler {
+public class RegionUpdateEvent extends GwtEvent<RegionUpdateEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onRegionUpdateEvent(RegionUpdateEvent event);
     }
 
-    private static final Type<RegionUpdateHandler> TYPE = new Type<RegionUpdateHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
 
     private List<Region> regionList;
 
@@ -38,17 +36,17 @@ public class RegionUpdateEvent extends
         return regionList;
     }
 
-    public static Type<RegionUpdateHandler> getType() {
+    public static Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public Type<RegionUpdateHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(RegionUpdateHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onRegionUpdateEvent(this);
     }
 }

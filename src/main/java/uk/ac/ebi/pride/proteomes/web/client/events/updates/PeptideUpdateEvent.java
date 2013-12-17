@@ -12,14 +12,12 @@ import java.util.List;
  *         Date: 04/11/13
  *         Time: 14:15
  */
-public class PeptideUpdateEvent extends
-        GwtEvent<PeptideUpdateEvent.PeptideUpdateHandler> {
-
-    public interface PeptideUpdateHandler extends EventHandler {
+public class PeptideUpdateEvent extends GwtEvent<PeptideUpdateEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onPeptideUpdateEvent(PeptideUpdateEvent event);
     }
 
-    private static final GwtEvent.Type<PeptideUpdateHandler> TYPE = new GwtEvent.Type<PeptideUpdateHandler>();
+    private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<Handler>();
 
     private List<PeptideList> peptideVariances;
 
@@ -42,17 +40,17 @@ public class PeptideUpdateEvent extends
         return peptideVariances;
     }
 
-    public static GwtEvent.Type<PeptideUpdateHandler> getType() {
+    public static GwtEvent.Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public GwtEvent.Type<PeptideUpdateHandler> getAssociatedType() {
+    public GwtEvent.Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(PeptideUpdateHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onPeptideUpdateEvent(this);
     }
 }

@@ -26,14 +26,12 @@ import java.util.*;
  *         Date: 22/11/13
  *         Time: 15:23
  */
-public class TissuesPresenter implements Presenter,
-                                         ValidStateEvent.ValidStateHandler,
-                                         ProteinUpdateEvent.ProteinUpdateHandler,
-                                         ProteinRequestEvent.ProteinRequestHandler,
-                                         PeptideUpdateEvent.PeptideUpdateHandler,
-                                         TissueUpdateEvent.TissueUpdateHandler,
-                                         ListUiHandler<String>
-{
+public class TissuesPresenter implements Presenter, ListUiHandler<String>,
+                                         ValidStateEvent.Handler,
+                                         ProteinUpdateEvent.Handler,
+                                         ProteinRequestEvent.Handler,
+                                         PeptideUpdateEvent.Handler,
+                                         TissueUpdateEvent.Handler {
     private final EventBus eventBus;
     private final ListView<String> view;
     private final ListDataProvider<String> dataProvider = new
