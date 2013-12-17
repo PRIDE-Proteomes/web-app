@@ -1,7 +1,5 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.sequence;
 
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
@@ -33,7 +31,8 @@ import java.util.*;
  *         Date: 27/11/13
  *         Time: 10:57
  */
-public class SequencePresenter implements Presenter, SequenceUiHandler,
+public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
+                               implements SequenceUiHandler,
                                           ValidStateEvent.Handler,
                                           ProteinUpdateEvent.Handler,
                                           ProteinRequestEvent.Handler,
@@ -55,12 +54,8 @@ public class SequencePresenter implements Presenter, SequenceUiHandler,
         void displayLoadingMessage();
     }
 
-    private final EventBus eventBus;
-    private final ThisView view;
-
     public SequencePresenter(EventBus eventBus, ThisView view) {
-        this.eventBus = eventBus;
-        this.view = view;
+        super(eventBus, view);
 
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
@@ -72,25 +67,16 @@ public class SequencePresenter implements Presenter, SequenceUiHandler,
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(ModificationUpdateEvent.getType(), this);
     }
-    @Override
-    public void bindToContainer(AcceptsOneWidget container) {
-        view.bindToContainer(container);
-    }
-
-    @Override
-    public void fireEvent(GwtEvent<?> event) {
-        eventBus.fireEventFromSource(event, this);
-    }
 
     @Override
     public void onValidStateEvent(ValidStateEvent event) {
         if(event.getViewType() == ValidStateEvent.ViewType.Protein) {
             hiding = false;
-            view.asWidget().setVisible(true);
+            getView().asWidget().setVisible(true);
         }
         else {
             hiding = true;
-            view.asWidget().setVisible(false);
+            getView().asWidget().setVisible(false);
         }
     }
 
@@ -98,13 +84,13 @@ public class SequencePresenter implements Presenter, SequenceUiHandler,
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
         if(!hiding && event.getProteins().size() > 0) {
             currentProtein = event.getProteins().get(0);
-            view.updateProtein(new ProteinAdapter(currentProtein));
+            getView().updateProtein(new ProteinAdapter(currentProtein));
         }
     }
 
     @Override
     public void onProteinRequestEvent(ProteinRequestEvent event) {
-        view.displayLoadingMessage();
+        getView().displayLoadingMessage();
     }
 
     @Override
@@ -113,10 +99,10 @@ public class SequencePresenter implements Presenter, SequenceUiHandler,
 
         if(event.getRegions().size() > 0) {
             region = event.getRegions().get(0);
-            view.updateRegionSelection(region.getStart(), region.getEnd());
+            getView().updateRegionSelection(region.getStart(), region.getEnd());
         }
         else {
-            view.resetRegionSelection();
+            getView().resetRegionSelection();
         }
     }
 
@@ -137,11 +123,11 @@ public class SequencePresenter implements Presenter, SequenceUiHandler,
                 }
             }
             currentPeptides = selection;
-            view.updatePeptideSelection(selectionAdapters);
+            getView().updatePeptideSelection(selectionAdapters);
 
         }
         else {
-            view.resetPeptideSelection();
+            getView().resetPeptideSelection();
             currentPeptides = Collections.emptyList();
         }
     }
@@ -154,11 +140,11 @@ public class SequencePresenter implements Presenter, SequenceUiHandler,
                 Integer.parseInt(currentModification);
             }
             catch (NumberFormatException e) {
-                view.updateModificationHighlight(new ModificationAdapter(currentModification));
+                getView().updateModificationHighlight(new ModificationAdapter(currentModification));
             }
         }
         else {
-            view.resetModificationHighlight();
+            getView().resetModificationHighlight();
         }
     }
 

@@ -1,8 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.peptides;
 
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
@@ -28,7 +26,8 @@ import java.util.*;
  *         Date: 12/11/13
  *         Time: 09:40
  */
-public class PeptidesPresenter implements Presenter, ListUiHandler<PeptideMatch>,
+public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
+                               implements ListUiHandler<PeptideMatch>,
                                           ValidStateEvent.Handler,
                                           ProteinUpdateEvent.Handler,
                                           ProteinRequestEvent.Handler,
@@ -37,8 +36,6 @@ public class PeptidesPresenter implements Presenter, ListUiHandler<PeptideMatch>
                                           TissueUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler,
                                           VarianceUpdateEvent.Handler {
-    private final EventBus eventBus;
-    private final ListView<PeptideMatch> view;
     private final ListDataProvider<PeptideMatch> dataProvider = new
                                             ListDataProvider<PeptideMatch>();
     private final ListSorter<PeptideMatch> dataSorter = new
@@ -53,8 +50,7 @@ public class PeptidesPresenter implements Presenter, ListUiHandler<PeptideMatch>
     private List<String> selectedVariancesIDs = Collections.emptyList();
 
     public PeptidesPresenter(EventBus eventBus, ListView<PeptideMatch> view) {
-        this.eventBus = eventBus;
-        this.view = view;
+        super(eventBus, view);
         List<Column<PeptideMatch, ?>> columns = PeptideColumnProvider
                                             .getSortingColumns(dataSorter);
         List<String> columnTitles = PeptideColumnProvider.getColumnTitles();
@@ -78,25 +74,15 @@ public class PeptidesPresenter implements Presenter, ListUiHandler<PeptideMatch>
     }
 
     @Override
-    public void fireEvent(GwtEvent<?> event) {
-        eventBus.fireEventFromSource(event, this);
-    }
-
-    @Override
-    public void bindToContainer(AcceptsOneWidget container) {
-        view.bindToContainer(container);
-    }
-
-    @Override
     public void onValidStateEvent(ValidStateEvent event) {
         // We should check if we have to stay hidden or not
         if(event.getViewType() == ValidStateEvent.ViewType.Group) {
             groups = true;
-            view.asWidget().setVisible(false);
+            getView().asWidget().setVisible(false);
         }
         else {
             groups = false;
-            view.asWidget().setVisible(true);
+            getView().asWidget().setVisible(true);
         }
     }
 
@@ -108,8 +94,8 @@ public class PeptidesPresenter implements Presenter, ListUiHandler<PeptideMatch>
             currentRegion = Region.emptyRegion();
             // we should reset filters and ordering here
             updateList(currentProtein.getPeptides());
-            view.loadList();
-            view.showContent();
+            getView().loadList();
+            getView().showContent();
         }
     }
 
@@ -117,7 +103,7 @@ public class PeptidesPresenter implements Presenter, ListUiHandler<PeptideMatch>
     public void onProteinRequestEvent(ProteinRequestEvent event) {
         // We should display that the list is being loaded
         if(!groups) {
-            view.loadLoadingMessage();
+            getView().loadLoadingMessage();
         }
     }
 
@@ -280,7 +266,7 @@ public class PeptidesPresenter implements Presenter, ListUiHandler<PeptideMatch>
                 (), peptide.getSequence());
 
         if(peptidePosition > -1) {
-            view.selectItemOn(peptidePosition);
+            getView().selectItemOn(peptidePosition);
         }
     }
 
@@ -291,7 +277,7 @@ public class PeptidesPresenter implements Presenter, ListUiHandler<PeptideMatch>
                 (), peptide.getSequence());
 
         if(peptidePosition > -1) {
-            view.deselectItemOn(peptidePosition);
+            getView().deselectItemOn(peptidePosition);
         }
     }
 

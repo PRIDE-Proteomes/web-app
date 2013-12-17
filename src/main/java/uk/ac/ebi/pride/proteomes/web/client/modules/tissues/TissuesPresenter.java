@@ -1,8 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.tissues;
 
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
@@ -26,14 +24,13 @@ import java.util.*;
  *         Date: 22/11/13
  *         Time: 15:23
  */
-public class TissuesPresenter implements Presenter, ListUiHandler<String>,
+public class TissuesPresenter extends Presenter<ListView<String>>
+                              implements ListUiHandler<String>,
                                          ValidStateEvent.Handler,
                                          ProteinUpdateEvent.Handler,
                                          ProteinRequestEvent.Handler,
                                          PeptideUpdateEvent.Handler,
                                          TissueUpdateEvent.Handler {
-    private final EventBus eventBus;
-    private final ListView<String> view;
     private final ListDataProvider<String> dataProvider = new
             ListDataProvider<String>();
     private final ListSorter<String> dataSorter = new
@@ -44,8 +41,8 @@ public class TissuesPresenter implements Presenter, ListUiHandler<String>,
     private List<Peptide> selectedPeptides = Collections.emptyList();
 
     public TissuesPresenter(EventBus eventBus, ListView<String> view) {
-        this.eventBus = eventBus;
-        this.view = view;
+        super(eventBus, view);
+
         List<Column<String, ?>> columns = TissueColumnProvider.getSortingColumns(dataSorter);
         List<String> columnTitles = TissueColumnProvider.getColumnTitles();
         List<String> columnWidths = TissueColumnProvider.getColumnWidths();
@@ -64,26 +61,17 @@ public class TissuesPresenter implements Presenter, ListUiHandler<String>,
         eventBus.addHandler(TissueUpdateEvent.getType(), this);
 
     }
-    @Override
-    public void bindToContainer(AcceptsOneWidget container) {
-        view.bindToContainer(container);
-    }
-
-    @Override
-    public void fireEvent(GwtEvent<?> event) {
-        eventBus.fireEventFromSource(event, this);
-    }
 
     @Override
     public void onValidStateEvent(ValidStateEvent event) {
         // We should check if we have to stay hidden or not
         if(event.getViewType() == ValidStateEvent.ViewType.Group) {
             groups = true;
-            view.asWidget().setVisible(false);
+            getView().asWidget().setVisible(false);
         }
         else {
             groups = false;
-            view.asWidget().setVisible(true);
+            getView().asWidget().setVisible(true);
         }
     }
 
@@ -91,7 +79,7 @@ public class TissuesPresenter implements Presenter, ListUiHandler<String>,
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
         if(!groups && event.getProteins().size() > 0) {
             updateList(event.getProteins().get(0).getTissues());
-            view.loadList();
+            getView().loadList();
         }
     }
 
@@ -99,7 +87,7 @@ public class TissuesPresenter implements Presenter, ListUiHandler<String>,
     public void onProteinRequestEvent(ProteinRequestEvent event) {
         // We should display that the list is being loaded
         if(!groups) {
-            view.loadLoadingMessage();
+            getView().loadLoadingMessage();
         }
     }
 
@@ -175,11 +163,11 @@ public class TissuesPresenter implements Presenter, ListUiHandler<String>,
     }
 
     private void selectItem(String tissue) {
-        view.selectItemOn(dataProvider.getList().indexOf(tissue));
+        getView().selectItemOn(dataProvider.getList().indexOf(tissue));
     }
 
     private void deselectItem(String tissue) {
-        view.deselectItemOn(dataProvider.getList().indexOf(tissue));
+        getView().deselectItemOn(dataProvider.getList().indexOf(tissue));
     }
 
     /**

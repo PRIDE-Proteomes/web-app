@@ -1,7 +1,5 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.header;
 
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
@@ -20,7 +18,8 @@ import java.util.List;
  *         Date: 07/11/13
  *         Time: 10:46
  */
-public class HeaderPresenter implements Presenter, ValidStateEvent.Handler,
+public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
+                             implements ValidStateEvent.Handler,
                                         GroupUpdateEvent.Handler,
                                         ProteinUpdateEvent.Handler {
 
@@ -30,27 +29,14 @@ public class HeaderPresenter implements Presenter, ValidStateEvent.Handler,
         public void updateProperties(List<Pair<String, String>> links);
         public void clearProperties();
     }
-    private final EventBus eventBus;
-    private final ThisView view;
     private boolean groupView;
 
     public HeaderPresenter(EventBus eventBus, ThisView view) {
-        this.eventBus = eventBus;
-        this.view = view;
+        super(eventBus, view);
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(GroupUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
-    }
-
-    @Override
-    public void fireEvent(GwtEvent<?> event) {
-        eventBus.fireEventFromSource(event, this);
-    }
-
-    @Override
-    public void bindToContainer(AcceptsOneWidget container) {
-        view.bindToContainer(container);
     }
 
     @Override
@@ -63,14 +49,14 @@ public class HeaderPresenter implements Presenter, ValidStateEvent.Handler,
         List<Group> groups = event.getGroups();
 
         if(groupView && groups.size() > 0) {
-            view.updateTitle("Protein group " + groups.get(0).getId());
-            view.updateDescription(groups.get(0).getDescription());
+            getView().updateTitle("Protein group " + groups.get(0).getId());
+            getView().updateDescription(groups.get(0).getDescription());
             List<Pair<String, String>> proteins = new ArrayList<Pair<String, String>>();
 
             for(String protID : groups.get(0).getMemberProteins()) {
                 proteins.add(new Pair<String, String>(protID, "protein=" + protID));
             }
-            view.updateProperties(proteins);
+            getView().updateProperties(proteins);
         }
     }
 
@@ -79,9 +65,9 @@ public class HeaderPresenter implements Presenter, ValidStateEvent.Handler,
         List<Protein> proteins = event.getProteins();
 
         if(!groupView) {
-            view.updateTitle("Protein " + proteins.get(0).getAccession());
-            view.updateDescription(proteins.get(0).getDescription());
-            view.clearProperties();
+            getView().updateTitle("Protein " + proteins.get(0).getAccession());
+            getView().updateDescription(proteins.get(0).getDescription());
+            getView().clearProperties();
         }
     }
 }

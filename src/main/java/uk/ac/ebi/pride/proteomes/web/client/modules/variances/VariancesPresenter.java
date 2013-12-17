@@ -1,6 +1,5 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.variances;
 
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -27,12 +26,11 @@ import java.util.*;
  *         Date: 29/11/13
  *         Time: 14:46
  */
-public class VariancesPresenter implements Presenter, ListUiHandler<Peptide>,
+public class VariancesPresenter extends Presenter<ListView<Peptide>>
+                                implements ListUiHandler<Peptide>,
                                            ValidStateEvent.Handler,
                                            PeptideUpdateEvent.Handler,
                                            VarianceUpdateEvent.Handler {
-    private final EventBus eventBus;
-    private final ListView<Peptide> view;
     private final ListDataProvider<Peptide> dataProvider = new
                                         ListDataProvider<Peptide>();
     private final ListSorter<Peptide> dataSorter = new
@@ -43,8 +41,7 @@ public class VariancesPresenter implements Presenter, ListUiHandler<Peptide>,
     private Collection<Peptide> selectedVariances = Collections.emptyList();
 
     public VariancesPresenter(EventBus eventBus, ListView<Peptide> view) {
-        this.eventBus = eventBus;
-        this.view = view;
+        super(eventBus, view);
 
         List<Column<Peptide, ?>> columns = VarianceColumnProvider
                                             .getSortingColumns(dataSorter);
@@ -63,13 +60,8 @@ public class VariancesPresenter implements Presenter, ListUiHandler<Peptide>,
     }
 
     @Override
-    public void fireEvent(GwtEvent<?> event) {
-        eventBus.fireEventFromSource(event, this);
-    }
-
-    @Override
     public void bindToContainer(AcceptsOneWidget container) {
-        view.bindToContainer(container);
+        getView().bindToContainer(container);
     }
 
     @Override
@@ -77,11 +69,11 @@ public class VariancesPresenter implements Presenter, ListUiHandler<Peptide>,
         // We should check if we have to stay hidden or not
         if(event.getViewType() == ValidStateEvent.ViewType.Group) {
             groups = true;
-            view.asWidget().setVisible(false);
+            getView().asWidget().setVisible(false);
         }
         else {
             groups = false;
-            view.asWidget().setVisible(true);
+            getView().asWidget().setVisible(true);
         }
     }
 
@@ -90,13 +82,13 @@ public class VariancesPresenter implements Presenter, ListUiHandler<Peptide>,
         if(!groups) {
             if(event.getPeptides().size() > 0) {
                 currentPeptide = event.getPeptides().get(0);
-                view.showContent();
+                getView().showContent();
             }
             else {
                 currentPeptide = new EmptyPeptideList();
             }
             updateList(currentPeptide.getPeptideList());
-            view.loadList();
+            getView().loadList();
         }
     }
 
@@ -171,7 +163,7 @@ public class VariancesPresenter implements Presenter, ListUiHandler<Peptide>,
         int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(),
                 peptide.getId());
         if(peptidePosition > -1) {
-            view.selectItemOn(peptidePosition);
+            getView().selectItemOn(peptidePosition);
         }
     }
 
@@ -181,7 +173,7 @@ public class VariancesPresenter implements Presenter, ListUiHandler<Peptide>,
         int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(),
                 peptide.getId());
         if(peptidePosition > -1) {
-            view.deselectItemOn(peptidePosition);
+            getView().deselectItemOn(peptidePosition);
         }
     }
 

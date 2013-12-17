@@ -1,7 +1,5 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.coverage;
 
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
@@ -30,7 +28,8 @@ import java.util.*;
  *         Date: 08/11/13
  *         Time: 14:43
  */
-public class CoveragePresenter implements Presenter, CoverageUiHandler,
+public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
+                               implements CoverageUiHandler,
                                           ValidStateEvent.Handler,
                                           ProteinUpdateEvent.Handler,
                                           ProteinRequestEvent.Handler,
@@ -50,9 +49,6 @@ public class CoveragePresenter implements Presenter, CoverageUiHandler,
         public void displayLoadingMessage();
     }
 
-    private final EventBus eventBus;
-    private final ThisView view;
-
     private boolean hiding = true;
     private boolean justHighlighted = false;
     private Protein currentProtein;
@@ -62,8 +58,7 @@ public class CoveragePresenter implements Presenter, CoverageUiHandler,
     private String currentModification = "";
 
     public CoveragePresenter(EventBus eventBus, ThisView view) {
-        this.eventBus = eventBus;
-        this.view = view;
+        super(eventBus, view);
 
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
@@ -77,27 +72,17 @@ public class CoveragePresenter implements Presenter, CoverageUiHandler,
         eventBus.addHandler(VarianceUpdateEvent.getType(), this);
     }
 
-    @Override
-    public void fireEvent(GwtEvent<?> event) {
-        eventBus.fireEventFromSource(event, this);
-    }
-
-    @Override
-    public void bindToContainer(AcceptsOneWidget container) {
-        view.bindToContainer(container);
-    }
-
     // Callbacks that handle event bus events
 
     @Override
     public void onValidStateEvent(ValidStateEvent event) {
         if(event.getViewType() == ValidStateEvent.ViewType.Protein) {
             hiding = false;
-            view.asWidget().setVisible(true);
+            getView().asWidget().setVisible(true);
         }
         else {
             hiding = true;
-            view.asWidget().setVisible(false);
+            getView().asWidget().setVisible(false);
         }
     }
 
@@ -105,13 +90,13 @@ public class CoveragePresenter implements Presenter, CoverageUiHandler,
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
         if(!hiding && event.getProteins().size() > 0) {
             currentProtein = event.getProteins().get(0);
-            view.updateProtein(new ProteinAdapter(currentProtein));
+            getView().updateProtein(new ProteinAdapter(currentProtein));
         }
     }
 
     @Override
     public void onProteinRequestEvent(ProteinRequestEvent event) {
-        view.displayLoadingMessage();
+        getView().displayLoadingMessage();
     }
 
     @Override
@@ -126,14 +111,14 @@ public class CoveragePresenter implements Presenter, CoverageUiHandler,
         if(event.getRegions().size() > 0) {
             region = event.getRegions().get(0);
             currentRegion = region;
-            view.updateRegionSelection(region.getStart(), region.getEnd());
+            getView().updateRegionSelection(region.getStart(), region.getEnd());
             if(region.getLength() == 1) {
-                view.updateModificationHighlight(region.getStart(), region.getEnd());
+                getView().updateModificationHighlight(region.getStart(), region.getEnd());
             }
         }
         else {
             currentRegion = Region.emptyRegion();
-            view.resetRegionSelection();
+            getView().resetRegionSelection();
         }
 
         // Apparently when the region gets modified the peptide selection
@@ -144,7 +129,7 @@ public class CoveragePresenter implements Presenter, CoverageUiHandler,
             for(PeptideMatch match : currentPeptides) {
                 selectionAdapters.add(new PeptideAdapter(match));
             }
-            view.updatePeptideSelection(selectionAdapters);
+            getView().updatePeptideSelection(selectionAdapters);
         }
     }
 
@@ -173,10 +158,10 @@ public class CoveragePresenter implements Presenter, CoverageUiHandler,
                 }
             }
             currentPeptides = selection;
-            view.updatePeptideSelection(selectionAdapters);
+            getView().updatePeptideSelection(selectionAdapters);
         }
         else {
-            view.resetPeptideSelection();
+            getView().resetPeptideSelection();
             currentPeptides = Collections.emptyList();
         }
     }
@@ -198,14 +183,14 @@ public class CoveragePresenter implements Presenter, CoverageUiHandler,
             try {
                 int position = Integer.parseInt(currentModification);
 
-                view.updateModificationHighlight(position, position);
+                getView().updateModificationHighlight(position, position);
             }
             catch (NumberFormatException e) {
-                view.updateModificationHighlight(new ModificationAdapter(currentModification));
+                getView().updateModificationHighlight(new ModificationAdapter(currentModification));
             }
         }
         else {
-            view.resetModificationHighlight();
+            getView().resetModificationHighlight();
             currentModification = null;
         }
     }
