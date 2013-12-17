@@ -10,6 +10,7 @@ import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.*;
+import uk.ac.ebi.pride.proteomes.web.client.modules.ViewWithUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
@@ -21,11 +22,10 @@ import java.util.*;
  *         Date: 19/11/13
  *         Time: 14:27
  */
-public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
-                                                     RowCountChangeEvent.Handler, OpenHandler<DisclosurePanel> {
-    private static String grid_height = "150px";
+public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
+                         implements ListView<T>, RowCountChangeEvent.Handler,
+                                    OpenHandler<DisclosurePanel> {
 
-    private List<ListUiHandler<T>> handlers = new ArrayList<ListUiHandler<T>>();
     private DataGrid<T> grid;
     private ModuleContainer frame;
 
@@ -46,7 +46,7 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
                 baseType + "s match the selection."));
 
         grid.setWidth("99%");
-        grid.setHeight(grid_height);
+        grid.setHeight("150px");
 
         // This allows for the data grid to show up to 4096 peptides in the
         // view, there should be a way to allow the view to adjust for any
@@ -131,16 +131,6 @@ public class GridView<H extends ListUiHandler<T>, T> implements ListView<T>,
     @Override
     public void bindToContainer(AcceptsOneWidget container) {
         container.setWidget(frame);
-    }
-
-    @Override
-    public void addUiHandler(ListUiHandler<T> handler) {
-        handlers.add(handler);
-    }
-
-    @Override
-    public Collection<ListUiHandler<T>> getUiHandlers() {
-        return handlers;
     }
 
     @Override

@@ -9,14 +9,12 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Date: 01/11/13
  *         Time: 11:33
  */
-public class ProteinRequestEvent extends
-        GwtEvent<ProteinRequestEvent.ProteinRequestHandler> {
-
-    public interface ProteinRequestHandler extends EventHandler {
+public class ProteinRequestEvent extends GwtEvent<ProteinRequestEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onProteinRequestEvent(ProteinRequestEvent event);
     }
 
-    private static final Type<ProteinRequestHandler> TYPE = new Type<ProteinRequestHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
 
     public ProteinRequestEvent(HasHandlers source) {
         super();
@@ -28,17 +26,17 @@ public class ProteinRequestEvent extends
         source.fireEvent(eventInstance);
     }
 
-    public static Type<ProteinRequestHandler> getType() {
+    public static Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public Type<ProteinRequestHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(ProteinRequestHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onProteinRequestEvent(this);
     }
 }

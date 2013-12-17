@@ -13,11 +13,10 @@ import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
  *         Date: 22/10/13
  *         Time: 15:27
  */
-public class WhistleBlower implements
-                        StateChangingActionEvent.StateChangingActionHandler,
-                        ErrorOnUpdateEvent.ErrorOnUpdateHandler,
-                        ValidStateEvent.ValidStateHandler,
-                        InvalidStateEvent.InvalidStateHandler
+public class WhistleBlower implements StateChangingActionEvent.Handler,
+                                      ErrorOnUpdateEvent.Handler,
+                                      ValidStateEvent.Handler,
+                                      InvalidStateEvent.Handler
 {
 
     private EventBus eventBus = null;

@@ -9,14 +9,12 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Date: 01/11/13
  *         Time: 11:36
  */
-public class PeptideRequestEvent extends
-        GwtEvent<PeptideRequestEvent.PeptideRequestHandler> {
-
-    public interface PeptideRequestHandler extends EventHandler {
+public class PeptideRequestEvent extends GwtEvent<PeptideRequestEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onPeptideRequestEvent(PeptideRequestEvent event);
     }
 
-    private static final Type<PeptideRequestHandler> TYPE = new Type<PeptideRequestHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
 
     public PeptideRequestEvent(HasHandlers source) {
         super();
@@ -28,17 +26,17 @@ public class PeptideRequestEvent extends
         source.fireEvent(eventInstance);
     }
 
-    public static Type<PeptideRequestHandler> getType() {
+    public static Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public Type<PeptideRequestHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(PeptideRequestHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onPeptideRequestEvent(this);
     }
 }

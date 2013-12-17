@@ -4,9 +4,7 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
-import uk.ac.ebi.pride.proteomes.web.client.modules.UiHandler;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -14,7 +12,7 @@ import java.util.List;
  *         Date: 16/10/13
  *         Time: 11:26
  */
-public class MainView implements MainPresenter.View {
+public class MainView implements MainPresenter.ThisView {
 
     private final Panel layout;
     private final List<AcceptsOneWidget> panelList;
@@ -57,16 +55,6 @@ public class MainView implements MainPresenter.View {
     @Override
     public void bindToContainer(AcceptsOneWidget container) {
         container.setWidget(layout);
-    }
-
-    @Override
-    public void addUiHandler(UiHandler handler) {
-        // TODO
-    }
-
-    @Override
-    public Collection<UiHandler> getUiHandlers() {
-        return null;  // TODO
     }
 
     @Override

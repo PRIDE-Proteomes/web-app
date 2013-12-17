@@ -9,14 +9,12 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Date: 04/11/13
  *         Time: 15:10
  */
-public class TissueUpdateEvent extends
-        GwtEvent<TissueUpdateEvent.TissueUpdateHandler> {
-
-    public interface TissueUpdateHandler extends EventHandler {
+public class TissueUpdateEvent extends GwtEvent<TissueUpdateEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onTissueUpdateEvent(TissueUpdateEvent event);
     }
 
-    private static final Type<TissueUpdateHandler> TYPE = new Type<TissueUpdateHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
 
     private String[] tissues;
 
@@ -35,17 +33,17 @@ public class TissueUpdateEvent extends
         return tissues;
     }
 
-    public static Type<TissueUpdateHandler> getType() {
+    public static Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public Type<TissueUpdateHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(TissueUpdateHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onTissueUpdateEvent(this);
     }
 }

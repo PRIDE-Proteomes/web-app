@@ -16,7 +16,9 @@ import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEven
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
+import uk.ac.ebi.pride.proteomes.web.client.modules.HasUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.View;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 import uk.ac.ebi.pride.widgets.client.protein.events.*;
@@ -28,15 +30,15 @@ import java.util.*;
  *         Date: 08/11/13
  *         Time: 14:43
  */
-public class CoveragePresenter implements Presenter,
-                                          ValidStateEvent.ValidStateHandler,
-                                          ProteinUpdateEvent.ProteinUpdateHandler,
-                                          ProteinRequestEvent.ProteinRequestHandler,
-                                          RegionUpdateEvent.RegionUpdateHandler,
-                                          PeptideUpdateEvent.PeptideUpdateHandler,
-                                          ModificationUpdateEvent.ModificationUpdateHandler,
-                                          CoverageUiHandler, VarianceUpdateEvent.VarianceUpdateHandler {
-    public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View<CoverageUiHandler> {
+public class CoveragePresenter implements Presenter, CoverageUiHandler,
+                                          ValidStateEvent.Handler,
+                                          ProteinUpdateEvent.Handler,
+                                          ProteinRequestEvent.Handler,
+                                          RegionUpdateEvent.Handler,
+                                          PeptideUpdateEvent.Handler,
+                                          ModificationUpdateEvent.Handler,
+                                          VarianceUpdateEvent.Handler {
+    public interface ThisView extends View, HasUiHandlers<CoverageUiHandler> {
         public void updateProtein(ProteinAdapter protein);
         public void updateRegionSelection(int start, int end);
         public void resetRegionSelection();
@@ -49,7 +51,7 @@ public class CoveragePresenter implements Presenter,
     }
 
     private final EventBus eventBus;
-    private final View view;
+    private final ThisView view;
 
     private boolean hiding = true;
     private boolean justHighlighted = false;
@@ -59,7 +61,7 @@ public class CoveragePresenter implements Presenter,
     private Collection<String> selectedVarianceIDs = Collections.emptyList();
     private String currentModification = "";
 
-    public CoveragePresenter(EventBus eventBus, View view) {
+    public CoveragePresenter(EventBus eventBus, ThisView view) {
         this.eventBus = eventBus;
         this.view = view;
 
@@ -187,7 +189,7 @@ public class CoveragePresenter implements Presenter,
     /**
      * This function has to take into account that a modification can be a
      * position or a type of modification
-     * @param event
+     * @param event event containing the string identifying a modification.
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {

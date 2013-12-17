@@ -6,6 +6,7 @@ import com.google.gwt.user.client.ui.Widget;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.ViewWithUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 import uk.ac.ebi.pride.widgets.client.sequence.client.SequenceViewer;
@@ -23,7 +24,8 @@ import java.util.*;
  *         Date: 27/11/13
  *         Time: 10:58
  */
-public class SequenceView implements SequencePresenter.View,
+public class SequenceView extends ViewWithUiHandlers<SequenceUiHandler>
+                          implements SequencePresenter.ThisView,
                                      ProteinRegionSelectedHandler,
                                      ProteinRegionHighlightedHandler {
 
@@ -31,8 +33,6 @@ public class SequenceView implements SequencePresenter.View,
     private ModuleContainer outerBox;
     private SequenceViewer sequence;
     private Map<ProteinAdapter, SequenceViewer> viewersCache;
-
-    private List<SequenceUiHandler> uiHandlers = new ArrayList<SequenceUiHandler>();
 
     public SequenceView() {
         viewersCache = new HashMap<ProteinAdapter, SequenceViewer>();
@@ -102,16 +102,6 @@ public class SequenceView implements SequencePresenter.View,
     }
 
     @Override
-    public void addUiHandler(SequenceUiHandler handler) {
-        getUiHandlers().add(handler);
-    }
-
-    @Override
-    public Collection<SequenceUiHandler> getUiHandlers() {
-        return uiHandlers;
-    }
-
-    @Override
     public void setVisible(boolean visible) {
         asWidget().setVisible(visible);
     }
@@ -123,14 +113,14 @@ public class SequenceView implements SequencePresenter.View,
 
     @Override
     public void onProteinRegionHighlighted(ProteinRegionHighlightedEvent e) {
-        for(SequenceUiHandler handler : uiHandlers) {
+        for(SequenceUiHandler handler : getUiHandlers()) {
             handler.onRegionHighlighted(e);
         }
     }
 
     @Override
     public void onProteinRegionSelectionChanged(ProteinRegionSelectionEvent e) {
-        for(SequenceUiHandler handler : uiHandlers) {
+        for(SequenceUiHandler handler : getUiHandlers()) {
             handler.onRegionSelected(e);
         }
     }

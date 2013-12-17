@@ -8,6 +8,7 @@ import uk.ac.ebi.pride.proteomes.web.client.events.state.InvalidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ErrorOnUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.View;
 
 import java.util.List;
 
@@ -16,13 +17,12 @@ import java.util.List;
  *         Date: 17/10/13
  *         Time: 10:56
  */
-public class MainPresenter implements Presenter,
-                                      EmptyViewEvent.EmptyViewHandler,
-                                      ValidStateEvent.ValidStateHandler,
-                                      InvalidStateEvent.InvalidStateHandler,
-                                      ErrorOnUpdateEvent.ErrorOnUpdateHandler {
+public class MainPresenter implements Presenter, EmptyViewEvent.Handler,
+                                      ValidStateEvent.Handler,
+                                      InvalidStateEvent.Handler,
+                                      ErrorOnUpdateEvent.Handler {
 
-    public interface View extends uk.ac.ebi.pride.proteomes.web.client.modules.View {
+    public interface ThisView extends View {
         public void hideMessage();
         public void showLoadingMessage();
         public void showInfoMessage(String message);
@@ -30,10 +30,10 @@ public class MainPresenter implements Presenter,
     }
 
     private final EventBus eventBus;
-    private final View view;
+    private final ThisView view;
     private final List<Presenter> presenterList;
 
-    public MainPresenter(EventBus eventBus, View view,
+    public MainPresenter(EventBus eventBus, ThisView view,
                          List<Presenter> presenters) {
         this.eventBus = eventBus;
         this.view = view;

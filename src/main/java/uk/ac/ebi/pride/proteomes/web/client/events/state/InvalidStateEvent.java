@@ -9,12 +9,12 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Date: 04/11/13
  *         Time: 11:24
  */
-public class InvalidStateEvent extends GwtEvent<InvalidStateEvent.InvalidStateHandler> {
-    public interface InvalidStateHandler extends EventHandler {
+public class InvalidStateEvent extends GwtEvent<InvalidStateEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onInvalidStateEvent(InvalidStateEvent event);
     }
 
-    private static final Type<InvalidStateHandler> TYPE = new Type<InvalidStateHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
     private final String message;
     private final String state;
 
@@ -31,7 +31,7 @@ public class InvalidStateEvent extends GwtEvent<InvalidStateEvent.InvalidStateHa
         source.fireEvent(eventInstance);
     }
 
-    public static  Type<InvalidStateHandler> getType() {
+    public static  Type<Handler> getType() {
         return TYPE;
     }
 
@@ -44,12 +44,12 @@ public class InvalidStateEvent extends GwtEvent<InvalidStateEvent.InvalidStateHa
     }
 
     @Override
-    public Type<InvalidStateHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(InvalidStateHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onInvalidStateEvent(this);
     }
 }

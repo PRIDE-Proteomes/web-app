@@ -12,14 +12,12 @@ import java.util.List;
  *         Date: 04/11/13
  *         Time: 14:15
  */
-public class GroupUpdateEvent extends
-        GwtEvent<GroupUpdateEvent.GroupUpdateHandler> {
-
-    public interface GroupUpdateHandler extends EventHandler {
+public class GroupUpdateEvent extends GwtEvent<GroupUpdateEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onGroupUpdateEvent(GroupUpdateEvent event);
     }
 
-    private static final GwtEvent.Type<GroupUpdateHandler> TYPE = new GwtEvent.Type<GroupUpdateHandler>();
+    private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<Handler>();
 
     private List<Group> GroupList;
 
@@ -38,17 +36,17 @@ public class GroupUpdateEvent extends
         return GroupList;
     }
 
-    public static GwtEvent.Type<GroupUpdateHandler> getType() {
+    public static GwtEvent.Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public GwtEvent.Type<GroupUpdateHandler> getAssociatedType() {
+    public GwtEvent.Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(GroupUpdateHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onGroupUpdateEvent(this);
     }
 }

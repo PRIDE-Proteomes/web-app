@@ -12,13 +12,13 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
  *         Time: 11:37
  */
 public class StateChangingActionEvent extends
-        GwtEvent<StateChangingActionEvent.StateChangingActionHandler> {
+        GwtEvent<StateChangingActionEvent.Handler> {
 
-    public interface StateChangingActionHandler extends EventHandler {
+    public interface Handler extends EventHandler {
         public void onStateChangingActionEvent(StateChangingActionEvent event);
     }
 
-    private static final Type<StateChangingActionHandler> TYPE = new Type<StateChangingActionHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
 
     private final StateChanger changer;
     private final UserAction action;
@@ -47,17 +47,17 @@ public class StateChangingActionEvent extends
         return action;
     }
 
-    public static Type<StateChangingActionHandler> getType() {
+    public static Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public Type<StateChangingActionHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(StateChangingActionHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onStateChangingActionEvent(this);
     }
 }

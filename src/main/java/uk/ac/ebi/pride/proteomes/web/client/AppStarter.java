@@ -13,7 +13,6 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.View;
 import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoveragePresenter;
-import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoverageUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoverageView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
@@ -22,14 +21,12 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.AppController;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.GridView;
-import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.modifications.ModificationsPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptidesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequencePresenter;
-import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequenceUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequenceView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissuesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.variances.VariancesPresenter;
@@ -90,33 +87,30 @@ public class AppStarter implements RunAsyncCallback {
         // Startup the widget-containing modules
         View headerView = new HeaderView();
         Presenter headerPresenter = new HeaderPresenter(eventBus,
-                                            (HeaderPresenter.View) headerView);
+                                            (HeaderPresenter.ThisView) headerView);
 
-        ListView<String> tissueView = new GridView<ListUiHandler<String>,
-                String>("Tissues", "tissue");
+        ListView<String> tissueView = new GridView<String>("Tissues", "tissue");
         Presenter tissuePresenter = new TissuesPresenter(eventBus, tissueView);
 
         ListView<Multiset.Entry<String>> modView = new
-                GridView<ListUiHandler<Multiset.Entry<String>>,
-                Multiset.Entry<String>>("Modifications", "modification");
+                GridView<Multiset.Entry<String>>("Modifications", "modification");
         Presenter modPresenter = new ModificationsPresenter(eventBus, modView);
 
-        View<CoverageUiHandler> coverageView = new CoverageView();
+        View coverageView = new CoverageView();
         Presenter coveragePresenter = new CoveragePresenter(eventBus,
-                                          (CoveragePresenter.View) coverageView);
+                                          (CoveragePresenter.ThisView) coverageView);
 
-        View<SequenceUiHandler> sequenceView = new SequenceView();
+        View sequenceView = new SequenceView();
         Presenter sequencePresenter = new SequencePresenter(eventBus,
-                                          (SequencePresenter.View) sequenceView);
+                                          (SequencePresenter.ThisView) sequenceView);
 
         ListView<PeptideMatch> peptideView =
-                new GridView<ListUiHandler<PeptideMatch>,
-                        PeptideMatch>("Peptides", "peptide");
+                new GridView<PeptideMatch>("Peptides", "peptide");
         Presenter peptidePresenter = new PeptidesPresenter(eventBus,
                 peptideView);
 
         ListView<Peptide> varianceView =
-                new GridView<ListUiHandler<Peptide>, Peptide>("Variances",
+                new GridView<Peptide>("Variances",
                         "variance");
         Presenter variancePresenter = new VariancesPresenter(eventBus,
                 varianceView);
@@ -135,7 +129,7 @@ public class AppStarter implements RunAsyncCallback {
             placeHolderList.add(new SimplePanel());
         }
 
-        MainPresenter.View mainView = new MainView(placeHolderList);
+        MainPresenter.ThisView mainView = new MainView(placeHolderList);
         Presenter mainPresenter = new MainPresenter(eventBus,
                                                     mainView,
                                                     presenterList);

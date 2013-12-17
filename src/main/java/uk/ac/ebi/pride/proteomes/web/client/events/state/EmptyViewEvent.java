@@ -9,12 +9,12 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Date: 04/11/13
  *         Time: 10:48
  */
-public class EmptyViewEvent extends GwtEvent<EmptyViewEvent.EmptyViewHandler> {
-    public interface EmptyViewHandler extends EventHandler {
+public class EmptyViewEvent extends GwtEvent<EmptyViewEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onEmptyViewEvent(EmptyViewEvent event);
     }
 
-    private static final Type<EmptyViewHandler> TYPE = new Type<EmptyViewHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
     private final String message;
 
     public EmptyViewEvent(HasHandlers source, String message) {
@@ -28,7 +28,7 @@ public class EmptyViewEvent extends GwtEvent<EmptyViewEvent.EmptyViewHandler> {
         source.fireEvent(eventInstance);
     }
 
-    public static Type<EmptyViewHandler> getType() {
+    public static Type<Handler> getType() {
         return TYPE;
     }
 
@@ -37,12 +37,12 @@ public class EmptyViewEvent extends GwtEvent<EmptyViewEvent.EmptyViewHandler> {
     }
 
     @Override
-    public Type<EmptyViewHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(EmptyViewHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onEmptyViewEvent(this);
     }
 }

@@ -9,14 +9,12 @@ import com.google.gwt.event.shared.HasHandlers;
  *         Date: 04/11/13
  *         Time: 15:13
  */
-public class VarianceUpdateEvent extends
-        GwtEvent<VarianceUpdateEvent.VarianceUpdateHandler> {
-
-    public interface VarianceUpdateHandler extends EventHandler {
+public class VarianceUpdateEvent extends GwtEvent<VarianceUpdateEvent.Handler> {
+    public interface Handler extends EventHandler {
         public void onVarianceUpdateEvent(VarianceUpdateEvent event);
     }
 
-    private static final Type<VarianceUpdateHandler> TYPE = new Type<VarianceUpdateHandler>();
+    private static final Type<Handler> TYPE = new Type<Handler>();
 
     private String[] varianceIDs;
 
@@ -35,17 +33,17 @@ public class VarianceUpdateEvent extends
         return varianceIDs;
     }
 
-    public static Type<VarianceUpdateHandler> getType() {
+    public static Type<Handler> getType() {
         return TYPE;
     }
 
     @Override
-    public Type<VarianceUpdateHandler> getAssociatedType() {
+    public Type<Handler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(VarianceUpdateHandler handler) {
+    protected void dispatch(Handler handler) {
         handler.onVarianceUpdateEvent(this);
     }
 }

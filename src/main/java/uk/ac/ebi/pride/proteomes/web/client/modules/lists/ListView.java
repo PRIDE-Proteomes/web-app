@@ -1,8 +1,8 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.lists;
 
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.view.client.ListDataProvider;
+import uk.ac.ebi.pride.proteomes.web.client.modules.HasUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.modules.View;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  *         Date: 19/11/13
  *         Time: 14:22
  */
-public interface ListView<T> extends View<ListUiHandler<T>> {
+public interface ListView<T> extends View, HasUiHandlers<ListUiHandler<T>> {
 
     void selectItemOn(int row);
     void deselectItemOn(int row);

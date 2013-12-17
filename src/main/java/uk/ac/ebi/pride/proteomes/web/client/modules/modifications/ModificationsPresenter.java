@@ -29,13 +29,12 @@ import java.util.*;
  *         Date: 26/11/13
  *         Time: 10:35
  */
-public class ModificationsPresenter implements Presenter,
-                                          ValidStateEvent.ValidStateHandler,
-                                          ProteinUpdateEvent.ProteinUpdateHandler,
-                                          ProteinRequestEvent.ProteinRequestHandler,
-                                          PeptideUpdateEvent.PeptideUpdateHandler,
-                                          ModificationUpdateEvent.ModificationUpdateHandler,
-                                          ListUiHandler<Multiset.Entry<String>>
+public class ModificationsPresenter implements Presenter, ListUiHandler<Multiset.Entry<String>>,
+                                               ValidStateEvent.Handler,
+                                               ProteinUpdateEvent.Handler,
+                                               ProteinRequestEvent.Handler,
+                                               PeptideUpdateEvent.Handler,
+                                               ModificationUpdateEvent.Handler
 {
     private final EventBus eventBus;
     private final ListView<Multiset.Entry<String>> view;
