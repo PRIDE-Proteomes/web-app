@@ -49,6 +49,11 @@ public class PeptideAdapter implements PeptideHandler, PeptideMatch {
     }
 
     @Override
+    public List<String> getAssays() {
+        return peptide.getAssays();
+    }
+
+    @Override
     public Integer getSite() {
         return getPosition();
     }

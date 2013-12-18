@@ -14,4 +14,5 @@ public interface Peptide {
     public int getTaxonID();
     public List<ModifiedLocation> getModifiedLocations();
     public List<String> getTissues();
+    public List<String> getAssays();
 }

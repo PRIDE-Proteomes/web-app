@@ -77,8 +77,8 @@ public class VarianceColumnProvider {
             }
         };
 
-        tissuesColumn.setSortable(true);
-        sorter.setComparator(tissuesColumn, new Comparator<Peptide>() {
+        modsColumn.setSortable(true);
+        sorter.setComparator(modsColumn, new Comparator<Peptide>() {
             @Override
             public int compare(Peptide o1, Peptide o2) {
                 if(o1.getModifiedLocations().size() !=
@@ -100,21 +100,58 @@ public class VarianceColumnProvider {
             }
         });
 
+
+
+
+                // Column that shows the tissues the peptide has been seen in.
+        TextColumn<Peptide> assaysColumn = new TextColumn<Peptide>() {
+            @Override
+            public String getValue(Peptide object) {
+                StringBuilder sb = new StringBuilder();
+                for(String assay : object.getAssays()) {
+                    sb.append(assay).append(", ");
+                }
+                return sb.length() == 0 ? "None" : sb.substring(0, sb.length() - 2);
+            }
+        };
+
+        assaysColumn.setSortable(true);
+        sorter.setComparator(assaysColumn, new Comparator<Peptide>() {
+            @Override
+            public int compare(Peptide o1, Peptide o2) {
+                StringBuilder sb1 = new StringBuilder();
+                StringBuilder sb2 = new StringBuilder();
+                for(String assay : o1.getAssays()) {
+                    sb1.append(assay);
+                }
+                for(String assay : o2.getAssays()) {
+                    sb2.append(assay);
+                }
+                return sb1.toString().compareTo(sb2.toString());
+            }
+        });
+
+
+
+
+
+
         columns.add(sequenceColumn);
         columns.add(modsColumn);
         columns.add(tissuesColumn);
+        columns.add(assaysColumn);
         return columns;
     }
 
     public static List<String> getColumnTitles() {
         List<String> titles = new ArrayList<String>();
-        Collections.addAll(titles, "Sequence", "Modifications", "Tissues");
+        Collections.addAll(titles, "Sequence", "Modifications", "Tissues", "Assays");
         return titles;
     }
 
     public static List<String> getColumnWidths() {
         List<String> widths = new ArrayList<String>();
-        Collections.addAll(widths, "20%", "40%", "40%");
+        Collections.addAll(widths, "25%", "25%", "25%", "25%");
         return widths;
     }
 }
