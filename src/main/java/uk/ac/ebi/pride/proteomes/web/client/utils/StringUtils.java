@@ -2,6 +2,7 @@ package uk.ac.ebi.pride.proteomes.web.client.utils;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 
 /**
@@ -38,8 +39,11 @@ public class StringUtils {
         else if(o instanceof Protein) {
             return ((Protein) o).getAccession();
         }
+        else if(o instanceof PeptideMatch) {
+            return ((PeptideMatch) o).getSequence() + ":" + ((PeptideMatch) o).getPosition().toString();
+        }
         else if(o instanceof Peptide) {
-            return ((Peptide) o).getSequence();
+            return ((Peptide) o).getId().substring(1, ((Peptide) o).getId().length() - 1);
         }
         else {
             return o.toString();
