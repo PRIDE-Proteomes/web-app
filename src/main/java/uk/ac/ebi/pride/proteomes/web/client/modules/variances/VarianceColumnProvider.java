@@ -1,5 +1,12 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.variances;
 
+import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.client.SafeHtmlTemplates;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
@@ -14,6 +21,22 @@ import java.util.*;
  *         Time: 14:46
  */
 public class VarianceColumnProvider {
+
+    public interface SimpleCellTemplates extends SafeHtmlTemplates {
+      @Template("<a href=\"{0}\" target=\"_blank\">{1}</a>")
+      SafeHtml anchor(SafeUri href, String name);
+
+    }
+    public interface MultiLinkCellTemplates extends SafeHtmlTemplates {
+      @Template(" {0} ")
+      SafeHtml anchor(SafeHtml text);
+
+    }
+
+    static final SimpleCellTemplates cell = GWT.create(SimpleCellTemplates.class);
+    static final MultiLinkCellTemplates multiCell = GWT.create(MultiLinkCellTemplates.class);
+
+
     public static List<Column<Peptide, ?>> getSortingColumns(ListSorter<Peptide> sorter) {
 
         List<Column<Peptide, ?>> columns = new ArrayList<Column<Peptide, ?>>();
@@ -131,15 +154,38 @@ public class VarianceColumnProvider {
             }
         });
 
+        Column<Peptide, SafeHtml> assayLinkColumn = new Column<Peptide, SafeHtml>(new SafeHtmlCell()) {
+           @Override
+           public SafeHtml getValue(Peptide obj)
+           {
+               String assayId = obj.getAssays().iterator().next();
+                   SafeUri href = UriUtils.fromString("http://wwwdev.ebi.ac.uk/pride/archive/assay/" + assayId);
+            return cell.anchor(href, assayId);
+           }
+        };
 
 
+        Column<Peptide, SafeHtml> multiAssayLinkColumn = new Column<Peptide, SafeHtml>(new SafeHtmlCell()) {
+           @Override
+           public SafeHtml getValue(Peptide obj)
+           {
+               StringBuilder sb = new StringBuilder();
+               SafeHtmlBuilder builder = new SafeHtmlBuilder();
+               for (String assayId : obj.getAssays()) {
+                   sb.append("<a href=\"http://wwwdev.ebi.ac.uk/pride/archive/assay/").append(assayId).append("\" target=\"_blank\">").append(assayId).append("</a>&nbsp;");
+               }
+               builder.appendHtmlConstant(sb.toString());
+               return multiCell.anchor(builder.toSafeHtml());
+           }
+        };
 
 
 
         columns.add(sequenceColumn);
         columns.add(modsColumn);
         columns.add(tissuesColumn);
-        columns.add(assaysColumn);
+//        columns.add(assaysColumn);
+        columns.add(multiAssayLinkColumn);
         return columns;
     }
 
