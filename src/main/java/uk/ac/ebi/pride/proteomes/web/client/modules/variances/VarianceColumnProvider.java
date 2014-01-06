@@ -19,24 +19,14 @@ import java.util.*;
  *         Time: 14:46
  */
 public class VarianceColumnProvider {
-
-//    public interface SimpleCellTemplates extends SafeHtmlTemplates {
-//      @Template("<a href=\"{0}\" target=\"_blank\">{1}</a>")
-//      SafeHtml anchor(SafeUri href, String name);
-//
-//    }
     public interface MultiLinkCellTemplates extends SafeHtmlTemplates {
       @Template(" {0} ")
       SafeHtml anchor(SafeHtml text);
-
     }
 
-//    static final SimpleCellTemplates cell = GWT.create(SimpleCellTemplates.class);
     static final MultiLinkCellTemplates multiCell = GWT.create(MultiLinkCellTemplates.class);
 
-
     public static List<Column<Peptide, ?>> getSortingColumns(ListSorter<Peptide> sorter) {
-
         List<Column<Peptide, ?>> columns = new ArrayList<Column<Peptide, ?>>();
 
         TextColumn<Peptide> sequenceColumn = new TextColumn<Peptide>() {
@@ -121,7 +111,6 @@ public class VarianceColumnProvider {
             }
         });
 
-
         // Column that shows the assays the peptide has been seen in.
         Column<Peptide, SafeHtml> multiAssayLinkColumn = new Column<Peptide, SafeHtml>(new SafeHtmlCell()) {
            @Override
@@ -151,8 +140,6 @@ public class VarianceColumnProvider {
                 return sb1.toString().compareTo(sb2.toString());
             }
         });
-
-
 
         columns.add(sequenceColumn);
         columns.add(modsColumn);
