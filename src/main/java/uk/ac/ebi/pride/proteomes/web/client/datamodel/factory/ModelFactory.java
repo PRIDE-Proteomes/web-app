@@ -19,10 +19,6 @@ public abstract class ModelFactory {
         AutoBean<PeptideList> peptideList();
         AutoBean<Peptide> peptide();
         AutoBean<ModifiedLocation> modifiedLocation();
-
-        AutoBean<Alignment> alignment();
-        AutoBean<AlignedProtein> alignedProtein();
-        AutoBean<Mismatch> mismatch();
     }
 
     public static<T> T getModelObject(Class<T> tClass, String json) throws

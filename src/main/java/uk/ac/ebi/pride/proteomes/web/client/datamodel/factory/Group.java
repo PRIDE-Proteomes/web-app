@@ -1,6 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.datamodel.factory;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -13,5 +14,5 @@ public interface Group {
     public String getDescription();
     public List<String> getTissues();
     public List<String> getMemberProteins();
-    public Alignment getUniquePeptides();
+    public Map<String, List<String>> getUniquePeptides();
 }
