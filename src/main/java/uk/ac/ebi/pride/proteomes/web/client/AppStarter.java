@@ -17,6 +17,7 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.coverage.CoverageView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataProvider;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
 import uk.ac.ebi.pride.proteomes.web.client.modules.googleanalytics.Reporter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.grouppeptides.GroupPeptidePresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.header.HeaderView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.AppController;
@@ -31,6 +32,7 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequenceView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissuesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.variances.VariancesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower.WhistleBlower;
+import uk.ac.ebi.pride.proteomes.web.client.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +77,7 @@ public class AppStarter implements RunAsyncCallback {
         List<AcceptsOneWidget> placeHolderList = new
                 ArrayList<AcceptsOneWidget>();
 
-        // Startup loggers&reporters
+        // Startup loggers & reporters
         new Reporter(eventBus);
         new WhistleBlower(eventBus);
 
@@ -109,6 +111,9 @@ public class AppStarter implements RunAsyncCallback {
         Presenter peptidePresenter = new PeptidesPresenter(eventBus,
                 peptideView);
 
+        ListView<Pair<String, List<String>>> groupPeptideView = new GridView<Pair<String, List<String>>>("Peptides", "peptide");
+        Presenter groupPeptidePresenter = new GroupPeptidePresenter(eventBus, groupPeptideView);
+
         ListView<Peptide> varianceView =
                 new GridView<Peptide>("Variances",
                         "variance");
@@ -120,6 +125,7 @@ public class AppStarter implements RunAsyncCallback {
         presenterList.add(headerPresenter);
         presenterList.add(tissuePresenter);
         presenterList.add(modPresenter);
+        presenterList.add(groupPeptidePresenter);
         presenterList.add(coveragePresenter);
         presenterList.add(sequencePresenter);
         presenterList.add(peptidePresenter);

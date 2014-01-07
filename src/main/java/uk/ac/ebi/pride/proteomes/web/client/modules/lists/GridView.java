@@ -135,7 +135,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
 
     @Override
     public void setVisible(boolean visible) {
-        frame.setVisible(visible);
+        asWidget().setVisible(visible);
     }
 
     @Override
