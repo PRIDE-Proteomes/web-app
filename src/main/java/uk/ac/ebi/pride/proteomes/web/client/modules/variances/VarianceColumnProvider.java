@@ -1,17 +1,22 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.variances;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Comparator;
+import java.util.Collections;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -19,13 +24,6 @@ import java.util.*;
  *         Time: 14:46
  */
 public class VarianceColumnProvider {
-    public interface MultiLinkCellTemplates extends SafeHtmlTemplates {
-      @Template(" {0} ")
-      SafeHtml anchor(SafeHtml text);
-    }
-
-    static final MultiLinkCellTemplates multiCell = GWT.create(MultiLinkCellTemplates.class);
-
     public static List<Column<Peptide, ?>> getSortingColumns(ListSorter<Peptide> sorter) {
         List<Column<Peptide, ?>> columns = new ArrayList<Column<Peptide, ?>>();
 
@@ -116,12 +114,12 @@ public class VarianceColumnProvider {
            @Override
            public SafeHtml getValue(Peptide obj)
            {
-               SafeHtmlBuilder builder = new SafeHtmlBuilder();
                // create a direct link(s) to PRIDE Archive for the assay(s)
+               FlowPanel panel = new FlowPanel();
                for (String assayId : obj.getAssays()) {
-                   builder.appendHtmlConstant("<a href=\"http://wwwdev.ebi.ac.uk/pride/archive/assays/"+assayId+"\" target=\"_blank\">"+assayId+"</a>&nbsp;");
+                   panel.add(new Anchor(assayId, "http://wwwdev.ebi.ac.uk/pride/archive/assays/" + assayId, "_blank"));
                }
-               return multiCell.anchor(builder.toSafeHtml());
+               return SafeHtmlUtils.fromSafeConstant(panel.toString());
            }
         };
 
