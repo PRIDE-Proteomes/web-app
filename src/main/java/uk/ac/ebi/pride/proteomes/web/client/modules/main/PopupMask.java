@@ -1,11 +1,9 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.main;
 
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
-import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 
 /**
@@ -42,25 +40,19 @@ public class PopupMask extends    PopupPanel
 
     @Override
     public void onResize(ResizeEvent event) {
-        if(this.isShowing())
+        if(isShowing())
             setPosition(getOffsetWidth(), getOffsetHeight());
     }
 
     @Override
     public void setPosition(int offsetWidth, int offsetHeight) {
-        //setPopupPosition(offsetWidth, offsetHeight);
         center();
     }
 
     @Override
     public void onWindowScroll(Window.ScrollEvent event) {
-        if(this.isShowing())
+        if(isShowing())
             setPopupPositionAndShow(this);
-    }
-
-    @Override
-    public void show() {
-        super.show();
     }
 
     public void displayLoadingMessage(){
