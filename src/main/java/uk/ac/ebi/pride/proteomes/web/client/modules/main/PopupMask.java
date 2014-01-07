@@ -32,8 +32,10 @@ public class PopupMask extends    PopupPanel
 
         setGlassStyleName("gwt-PopupBackground");
         setModal(true);
+        setAnimationEnabled(true);
 
         setWidget(loadingWidget);
+        center();
 
         setPopupPositionAndShow(this);
     }
@@ -46,9 +48,8 @@ public class PopupMask extends    PopupPanel
 
     @Override
     public void setPosition(int offsetWidth, int offsetHeight) {
-        int left = (Window.getClientWidth() - offsetWidth) / 3;
-        int top = (Window.getClientHeight() - offsetHeight) / 3;
-        setPopupPosition(left, top);
+        //setPopupPosition(offsetWidth, offsetHeight);
+        center();
     }
 
     @Override
@@ -64,12 +65,12 @@ public class PopupMask extends    PopupPanel
 
     public void displayLoadingMessage(){
         setWidget(loadingWidget);
-        show();
+        setPopupPositionAndShow(this);
     }
 
     public void displayMessage(String message){
         messageWidget.setText(message);
         setWidget(messageWidget);
-        show();
+        setPopupPositionAndShow(this);
     }
 }
