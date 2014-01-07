@@ -47,7 +47,7 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
     @Override
     public void updateProtein(ProteinAdapter protein) {
         if(!viewersCache.containsKey(protein)) {
-            ProteinViewer viewer = new ProteinViewer(950, 90, protein);
+            ProteinViewer viewer = new ProteinViewer(1020, 90, protein);
             bindViewer(viewer);
             viewersCache.put(protein, viewer);
         }
