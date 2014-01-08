@@ -1,11 +1,9 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.main;
 
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
-import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 
 /**
@@ -32,44 +30,39 @@ public class PopupMask extends    PopupPanel
 
         setGlassStyleName("gwt-PopupBackground");
         setModal(true);
+        setAnimationEnabled(true);
 
         setWidget(loadingWidget);
+        center();
 
         setPopupPositionAndShow(this);
     }
 
     @Override
     public void onResize(ResizeEvent event) {
-        if(this.isShowing())
+        if(isShowing())
             setPosition(getOffsetWidth(), getOffsetHeight());
     }
 
     @Override
     public void setPosition(int offsetWidth, int offsetHeight) {
-        int left = (Window.getClientWidth() - offsetWidth) / 3;
-        int top = (Window.getClientHeight() - offsetHeight) / 3;
-        setPopupPosition(left, top);
+        center();
     }
 
     @Override
     public void onWindowScroll(Window.ScrollEvent event) {
-        if(this.isShowing())
+        if(isShowing())
             setPopupPositionAndShow(this);
-    }
-
-    @Override
-    public void show() {
-        super.show();
     }
 
     public void displayLoadingMessage(){
         setWidget(loadingWidget);
-        show();
+        setPopupPositionAndShow(this);
     }
 
     public void displayMessage(String message){
         messageWidget.setText(message);
         setWidget(messageWidget);
-        show();
+        setPopupPositionAndShow(this);
     }
 }
