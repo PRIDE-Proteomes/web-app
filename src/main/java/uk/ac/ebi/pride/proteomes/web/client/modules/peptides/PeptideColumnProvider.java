@@ -39,7 +39,7 @@ public class PeptideColumnProvider {
         TextColumn<PeptideMatch> siteColumn = new TextColumn<PeptideMatch>() {
             @Override
             public String getValue(PeptideMatch object) {
-                return object.getPosition().toString();
+                return object.getPosition() + "-" + (object.getPosition() + object.getSequence().length() - 1);
             }
         };
 
@@ -47,6 +47,9 @@ public class PeptideColumnProvider {
         sorter.setComparator(siteColumn, new Comparator<PeptideMatch>() {
             @Override
             public int compare(PeptideMatch o1, PeptideMatch o2) {
+                if(o1.getPosition().compareTo(o2.getPosition()) == 0) {
+                    return ((Integer) o1.getSequence().length()).compareTo(o2.getSequence().length());
+                }
                 return o1.getPosition().compareTo(o2.getPosition());
             }
         });
@@ -59,7 +62,7 @@ public class PeptideColumnProvider {
                 for(String tissue : object.getTissues()) {
                     sb.append(tissue).append(", ");
                 }
-                return sb.length() == 0 ? "None" : sb.substring(0, sb.length() - 2);
+                return sb.length() == 0 ? "Not Available" : sb.substring(0, sb.length() - 2);
             }
         };
 
@@ -91,7 +94,7 @@ public class PeptideColumnProvider {
                 for(String mod : modSet) {
                     sb.append(mod).append(", ");
                 }
-                return sb.length() == 0 ? "None" : sb.substring(0, sb.length() - 2);
+                return sb.length() == 0 ? "Not Available" : sb.substring(0, sb.length() - 2);
             }
         };
 
@@ -145,7 +148,7 @@ public class PeptideColumnProvider {
 
     public static List<String> getColumnTitles() {
         List<String> titles = new ArrayList<String>();
-        Collections.addAll(titles, "Sequence", "Site", "Modifications",
+        Collections.addAll(titles, "Sequence", "Match", "Modifications",
                                    "Tissues");
         return titles;
     }
