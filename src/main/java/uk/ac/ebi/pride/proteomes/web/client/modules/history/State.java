@@ -26,6 +26,10 @@ final class State {
     static final String sepMaps = "=";
     static final String sepValues = ",";
 
+    static class EmptyState {
+        private static final State INSTANCE = new State();
+    }
+
     /**
      *
      * @param groupIds String representing several groups,
@@ -101,6 +105,17 @@ final class State {
         selectedVarianceIds = varianceIds.isEmpty() ? new String[0] : varianceIds.split(sepValues);
         selectedModificationIds = modificationIds.isEmpty() ? new String[0] : modificationIds.split(sepValues);
         selectedTissueIds = tissueIds.isEmpty() ? new String[0] : tissueIds.split(sepValues);
+    }
+
+    private State() {
+        selectedGroupIds = new String[0];
+        selectedProteinIds = new String[0];
+        selectedRegionIds = new String[0];
+        selectedPeptideIds = new String[0];
+        selectedVarianceIds = new String[0];
+        selectedModificationIds = new String[0];
+        selectedTissueIds = new String[0];
+        historyToken = "";
     }
 
     /**
@@ -301,5 +316,9 @@ final class State {
 
         return new State(groupIds, proteinIds, newRegionIds, newPeptideIds,
                          newVariancesIds, newModIds, newTissueIds);
+    }
+
+    public static State getInvalidState() {
+        return EmptyState.INSTANCE;
     }
 }

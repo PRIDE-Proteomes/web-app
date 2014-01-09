@@ -100,6 +100,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 if(freshState.getHistoryToken().equals("")) {
                     throw new InconsistentStateException();
                 }
+                requestData(freshState);
             }
             catch(InconsistentStateException e) {
                 // we tried to create an inconsistent state, that's bad,
@@ -110,9 +111,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                         "address contact the PRIDE team about the error and " +
                         "explained them what you were doing before this " +
                         "message", event.getValue());
-                return;
             }
-            requestData(freshState);
         }
     }
 
@@ -165,7 +164,12 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             stateQueue.remove(state);
         }
 
-        ErrorOnUpdateEvent.fire(this, "There was an error retrieving data:\n" + message);
+        // We have to assign a new state, different from the current one,
+        // otherwise when pressing the back button won't work.
+        appState = State.getInvalidState();
+
+        ErrorOnUpdateEvent.fire(this, "There was an error retrieving the data:\n"
+                                      + message);
     }
 
     private void requestData(State state) {
@@ -456,9 +460,8 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         }
 
         // We only update the url if the new history token is different from
-        // the last one and that one
-        if(!newState.getHistoryToken().equals(History.getToken()) &&
-            History.getToken().equals(appState.getHistoryToken())) {
+        // the last one.
+        if(!newState.getHistoryToken().equals(History.getToken())) {
             History.newItem(newState.getHistoryToken(), false);
         }
 
