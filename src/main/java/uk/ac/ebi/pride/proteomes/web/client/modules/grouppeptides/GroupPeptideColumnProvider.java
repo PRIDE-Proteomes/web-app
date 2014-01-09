@@ -56,7 +56,27 @@ public class GroupPeptideColumnProvider {
             }
         };
 
-        proteinsColumn.setSortable(false);
+        proteinsColumn.setSortable(true);
+        sorter.setComparator(proteinsColumn, new Comparator<Pair<String, List<String>>>() {
+            @Override
+            public int compare(Pair<String, List<String>> o1, Pair<String, List<String>> o2) {
+                Integer size1 = o1.getB().size();
+                Integer size2 = o2.getB().size();
+                int result = size1.compareTo(size2);
+                if (result == 0) {
+                    String accs1 = "";
+                    for (String s : o1.getB()) {
+                        accs1 += s;
+                    }
+                    String accs2 = "";
+                    for (String s : o2.getB()) {
+                        accs2 += s;
+                    }
+                    result = accs1.compareTo(accs2);
+                }
+                return result;
+            }
+        });
 
         columns.add(sequenceColumn);
         columns.add(proteinsColumn);
