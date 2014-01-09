@@ -148,7 +148,7 @@ public class PeptideColumnProvider {
 
     public static List<String> getColumnTitles() {
         List<String> titles = new ArrayList<String>();
-        Collections.addAll(titles, "Sequence", "Match", "Modifications",
+        Collections.addAll(titles, "Sequence", "Region", "Modifications",
                                    "Tissues");
         return titles;
     }
