@@ -65,7 +65,7 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
         List<Protein> proteins = event.getProteins();
 
         if(!groupView) {
-            getView().updateTitle("Protein " + proteins.get(0).getAccession());
+            getView().updateTitle(proteins.get(0).getAccession());
             getView().updateDescription(proteins.get(0).getDescription());
             getView().clearProperties();
         }
