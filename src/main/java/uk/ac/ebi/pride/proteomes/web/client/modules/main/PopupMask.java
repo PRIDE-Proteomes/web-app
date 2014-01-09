@@ -1,7 +1,10 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.main;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
@@ -17,24 +20,41 @@ public class PopupMask extends    PopupPanel
                                   ResizeHandler,
                                   Window.ScrollHandler {
 
-    private Label messageWidget;
+    private Label messageLabel;
+    private VerticalPanel messageWidget;
     private Widget loadingWidget;
 
     public PopupMask() {
         super(false);
 
-        messageWidget = new Label("");
+        messageLabel = new Label("");
+        Button backButton = new Button("Back");
+        backButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                History.back();
+            }
+        });
+
+        messageWidget = new VerticalPanel();
+        messageWidget.add(messageLabel);
+        messageWidget.add(backButton);
+        messageWidget.setCellHorizontalAlignment(backButton, HasHorizontalAlignment.ALIGN_CENTER);
+        messageWidget.setStyleName("gwt-Popup");
+
         loadingWidget = ModuleContainer.getLoadingPanel();
 
-        setGlassEnabled(true);
+        setStyleName("gwt-Popup");
 
-        setGlassStyleName("gwt-PopupBackground");
+        setGlassEnabled(true);
+        setGlassStyleName("gwt-PopupGlass");
+
         setModal(true);
         setAnimationEnabled(true);
 
         setWidget(loadingWidget);
-        center();
 
+        center();
         setPopupPositionAndShow(this);
     }
 
@@ -61,7 +81,7 @@ public class PopupMask extends    PopupPanel
     }
 
     public void displayMessage(String message){
-        messageWidget.setText(message);
+        messageLabel.setText(message);
         setWidget(messageWidget);
         setPopupPositionAndShow(this);
     }

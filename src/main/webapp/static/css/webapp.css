@@ -27,9 +27,14 @@ th, td{
     cursor: pointer;
 }
 
-.gwt-PopupBackground {
-    font-size: larger;
-    color: white;
+.gwt-PopupGlass {
     background: rgba(0, 0, 0, 0.5);
     z-index: 100;
+}
+
+.gwt-Popup {
+    font-size: larger;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 1.0);
+    z-index: 101;
 }
