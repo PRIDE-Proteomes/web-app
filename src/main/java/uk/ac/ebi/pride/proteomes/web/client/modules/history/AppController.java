@@ -7,10 +7,10 @@ import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.History;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.*;
-import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.GroupRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.PeptideRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.InvalidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
@@ -74,7 +74,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
     }
 
     /**
-     * This function gets called whenever the browser's url gets changed
+     * This function gets called whenever the browser's url gets changed.
      * @param event the event that carries the new URL
      */
     @Override
@@ -137,8 +137,9 @@ public class AppController implements HasHandlers, DataServer.DataClient,
     }
 
     @Override
-    public void onRetrievalError(String message) {
-        ErrorOnUpdateEvent.fire(this, message);
+    public void onRetrievalError(String cause, String message) {
+        ErrorOnUpdateEvent.fire(this, "There was an error retrieving data\n" + message);
+        //we have to cleanup the request that caused the error, we need not only the message, but what caused it.
     }
 
     private void requestData(State state) {

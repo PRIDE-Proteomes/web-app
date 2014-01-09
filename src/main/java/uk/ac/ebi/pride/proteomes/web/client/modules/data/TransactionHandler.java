@@ -1,7 +1,5 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
-import com.google.gwt.http.client.RequestCallback;
-
 /**
  * There are two interfaces, the retriever and the handler.
  * The retriever is the ones that actually make the http request to the
@@ -20,11 +18,11 @@ import com.google.gwt.http.client.RequestCallback;
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  */
 public interface TransactionHandler {
-    public interface DataRetriever extends RequestCallback {
+    public interface DataRetriever {
         public void retrieveData(String query);
         public void addHandler(TransactionHandler handler);
     }
 
-    void onDataRetrievalError(Throwable exception);
+    void onDataRetrievalError(Throwable exception, String cause);
     void onDataRetrieval(Transaction transaction);
 }

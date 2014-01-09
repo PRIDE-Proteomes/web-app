@@ -1,7 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 
@@ -24,7 +23,7 @@ public interface DataServer {
         public void onProteinsRetrieved(Collection<Protein> proteins);
         public void onPeptideVarianceListsRetrieved(Collection<PeptideList> peptides);
 
-        public void onRetrievalError(String message);
+        public void onRetrievalError(String cause, String message);
     }
 
     public void bind(DataClient client);

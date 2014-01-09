@@ -7,7 +7,10 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.GroupRetriev
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.PeptideVarianceRetriever;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.ProteinRetriever;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class is the one responsible of retrieving data using retrievers and
@@ -50,8 +53,8 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public void onDataRetrievalError(Throwable exception) {
-        client.onRetrievalError(exception.getMessage());
+    public void onDataRetrievalError(Throwable exception, String cause) {
+        client.onRetrievalError(cause, exception.getMessage());
     }
 
     @Override
@@ -98,12 +101,12 @@ public class DataProvider implements DataServer, TransactionHandler {
             }
             else {
                 onDataRetrievalError(new Exception("Internal Error, " +
-                    "the developers need to update " + this.getClass().getName()));
+                    "the developers need to update " + this.getClass().getName()), "");
             }
         }
         else {
             onDataRetrievalError(new Exception("Internal Error, " +
-                    "the developers need to update " + this.getClass().getName()));
+                    "the developers need to update " + this.getClass().getName()), "");
         }
     }
 
