@@ -13,7 +13,9 @@ import uk.ac.ebi.pride.widgets.client.protein.client.ProteinViewer;
 import uk.ac.ebi.pride.widgets.client.protein.events.*;
 import uk.ac.ebi.pride.widgets.client.protein.handlers.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>

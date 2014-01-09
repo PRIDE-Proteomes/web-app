@@ -1,6 +1,8 @@
 package uk.ac.ebi.pride.proteomes.web.client.utils.factories;
 
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>

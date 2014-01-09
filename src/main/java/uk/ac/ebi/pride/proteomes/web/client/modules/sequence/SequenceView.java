@@ -17,7 +17,9 @@ import uk.ac.ebi.pride.widgets.client.sequence.handlers.ProteinRegionSelectedHan
 import uk.ac.ebi.pride.widgets.client.sequence.type.Pride;
 import uk.ac.ebi.pride.widgets.client.sequence.type.SequenceType;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>

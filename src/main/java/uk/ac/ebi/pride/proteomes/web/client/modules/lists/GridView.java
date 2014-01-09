@@ -15,7 +15,9 @@ import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
