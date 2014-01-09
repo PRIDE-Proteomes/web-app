@@ -60,6 +60,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         catch(InconsistentStateException e) {
             // we tried to create an inconsistent state, that's bad,
             // we should act upon it. (show a popup with an error?)
+            appState = State.getInvalidState();
             InvalidStateEvent.fire(this, "The address cannot be " +
                     "displayed. Please check that is is correct and " +
                     "change it, or go back. If you didn't type the " +
@@ -84,12 +85,13 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             try {
                 appState = State.tokenize(event.getValue());
             } catch (InconsistentStateException e){
+                appState = State.getInvalidState();
                 InvalidStateEvent.fire(this, "Application Error, " +
                                              "please contact the PRIDE team.",
                                        "Empty State");
                 return;
             }
-
+            appState = State.getInvalidState();
             EmptyViewEvent.fire(this, "Please, select a protein or group of " +
                                       "proteins to show its data.");
         }
@@ -105,6 +107,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             catch(InconsistentStateException e) {
                 // we tried to create an inconsistent state, that's bad,
                 // we should act upon it. (show a popup with an error?)
+                appState = State.getInvalidState();
                 InvalidStateEvent.fire(this, "The address cannot be " +
                         "displayed. Please check that is is correct and " +
                         "change it, or go back. If you didn't type the " +
@@ -265,6 +268,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             goTo(revisePeptideFilters(stateQueue.peek()));
         }
         catch(InconsistentStateException e) {
+            appState = State.getInvalidState();
             InvalidStateEvent.fire(this, "The address cannot be " +
                     "displayed. Please check that is is correct and " +
                     "change it, or go back. If you didn't type the " +
@@ -479,8 +483,10 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 RegionUpdateEvent.fire(this, RegionUtils.tokenize(newState.getSelectedRegions()));
             } catch (IllegalRegionValueException e) {
                 // this should never happen (we checked before!)
+                appState = State.getInvalidState();
                 ErrorOnUpdateEvent.fire(this, "Application Error, please " +
                                               "contact the PRIDE team.");
+                return;
             }
         }
         if(!Arrays.equals(newState.getSelectedPeptides(),
