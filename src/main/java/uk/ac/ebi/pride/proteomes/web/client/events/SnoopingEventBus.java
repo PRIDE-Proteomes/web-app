@@ -3,6 +3,7 @@ package uk.ac.ebi.pride.proteomes.web.client.events;
 import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.SimpleEventBus;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
+import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 
 
 /**
@@ -26,7 +27,7 @@ public class SnoopingEventBus extends SimpleEventBus {
     @Override
     public void fireEvent(Event<?> event) {
         if(Console.VERBOSE){
-            String evName = getSimpleName(event.getClass().toString());
+            String evName = StringUtils.getShortName(event.getClass());
 
             Console.info("(Event Bus):  " + getIndentation() + evName);
         }
@@ -39,8 +40,8 @@ public class SnoopingEventBus extends SimpleEventBus {
     @Override
     public void fireEventFromSource(Event<?> event, Object source) {
         if(Console.VERBOSE) {
-            String clName = getSimpleName(event.getSource().getClass().toString());
-            String evName = getSimpleName(event.getClass().toString());
+            String clName = StringUtils.getShortName(event.getSource().getClass());
+            String evName = StringUtils.getShortName(event.getClass());
 
             Console.info("(Event Bus):  " + getIndentation() + evName + " <- " + clName);
         }
@@ -48,9 +49,5 @@ public class SnoopingEventBus extends SimpleEventBus {
         depth++;
         super.fireEventFromSource(event, source);
         depth--;
-    }
-
-    private static String getSimpleName(String completeName) {
-        return completeName.substring(completeName.lastIndexOf(".") + 1);
     }
 }

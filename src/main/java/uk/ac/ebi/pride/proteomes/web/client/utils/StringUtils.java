@@ -49,4 +49,8 @@ public class StringUtils {
             return o.toString();
         }
     }
+
+    public static String getShortName(Class cl) {
+        return cl.getName().substring(cl.getName().lastIndexOf(".") + 1);
+    }
 }

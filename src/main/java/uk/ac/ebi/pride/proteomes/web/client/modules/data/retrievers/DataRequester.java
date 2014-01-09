@@ -5,6 +5,7 @@ import uk.ac.ebi.pride.proteomes.web.client.exceptions.InvalidJSONException;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.UnacceptableResponseException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.Transaction;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.TransactionHandler;
+import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,14 +38,12 @@ public class DataRequester implements RequestCallback {
     @Override
     public void onResponseReceived(Request request, Response response) {
         if(response == null) {
-            onDataRetrievalError(new Exception("Error: Could not contact the " +
-                    "server."));
-            return;
-        } else if(!response.getStatusText().equals("OK")) {
+            onDataRetrievalError(new Exception("Error: Could not contact the server."));
+        } else if(response.getStatusText().equals("OK")) {
+            processResponse(response.getText());
+        } else {
             onDataRetrievalError(new UnacceptableResponseException());
-            return;
         }
-        processResponse(response.getText());
     }
 
     @Override
@@ -57,14 +56,18 @@ public class DataRequester implements RequestCallback {
         try {
             trans = new Transaction(response, responseType);
             onDataRetrieval(trans);
-
         } catch(InvalidJSONException e) {
-            onDataRetrievalError(e);
+            if(response.equals("")) {
+
+                onDataRetrievalError(new InvalidJSONException("The requested " + StringUtils.getShortName(responseType) + " isn't in the database", e));
+            } else {
+                onDataRetrievalError(e);
+            }
         }
     }
 
     private void onDataRetrievalError(Throwable e) {
-        String cause = responseType.getName().substring(responseType.getName().lastIndexOf(".") + 1) + " " + id;
+        String cause = StringUtils.getShortName(responseType) + " " + id;
         for(TransactionHandler handler : handlers) {
             handler.onDataRetrievalError(e, cause);
         }

@@ -7,6 +7,7 @@ import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEven
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ErrorOnUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
+import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -18,7 +19,6 @@ public class WhistleBlower implements StateChangingActionEvent.Handler,
                                       ValidStateEvent.Handler,
                                       InvalidStateEvent.Handler
 {
-
     private EventBus eventBus = null;
 
     public WhistleBlower(EventBus eventBus) {
@@ -33,12 +33,8 @@ public class WhistleBlower implements StateChangingActionEvent.Handler,
     @Override
     public void onStateChangingActionEvent(StateChangingActionEvent event) {
         if(Console.VERBOSE) {
-            String clName = event.getSource().getClass().toString();
-            clName = clName.substring(clName.lastIndexOf(".") + 1);
-
-            String evName = event.getClass().toString();
-            evName = evName.substring(evName.lastIndexOf(".") + 1);
-
+            String clName = StringUtils.getShortName(event.getSource().getClass());
+            String evName = StringUtils.getShortName(event.getClass());
             String vType = event.getChanger().toString();
 
             Console.info("(Whistler):   " + getIndentation() + evName +
@@ -49,11 +45,8 @@ public class WhistleBlower implements StateChangingActionEvent.Handler,
     @Override
     public void onUpdateErrorEvent(ErrorOnUpdateEvent event) {
         if(Console.VERBOSE) {
-            String clName = event.getSource().getClass().toString();
-            clName = clName.substring(clName.lastIndexOf(".") + 1);
-
-            String evName = event.getClass().toString();
-            evName = evName.substring(evName.lastIndexOf(".") + 1);
+            String clName = StringUtils.getShortName(event.getSource().getClass());
+            String evName = StringUtils.getShortName(event.getClass());
 
             Console.info("(Whistler):   " + getIndentation() + evName +
                     "(\"" + event.getMessage() + "\")" + " <- " + clName);
@@ -63,12 +56,8 @@ public class WhistleBlower implements StateChangingActionEvent.Handler,
     @Override
     public void onValidStateEvent(ValidStateEvent event) {
         if(Console.VERBOSE) {
-            String clName = event.getSource().getClass().toString();
-            clName = clName.substring(clName.lastIndexOf(".") + 1);
-
-            String evName = event.getClass().toString();
-            evName = evName.substring(evName.lastIndexOf(".") + 1);
-
+            String clName = StringUtils.getShortName(event.getSource().getClass());
+            String evName = StringUtils.getShortName(event.getClass());
             String vType = "";
             switch(event.getViewType()){
                 case Group:
@@ -87,12 +76,8 @@ public class WhistleBlower implements StateChangingActionEvent.Handler,
     @Override
     public void onInvalidStateEvent(InvalidStateEvent event) {
         if(Console.VERBOSE) {
-            String clName = event.getSource().getClass().toString();
-            clName = clName.substring(clName.lastIndexOf(".") + 1);
-
-            String evName = event.getClass().toString();
-            evName = evName.substring(evName.lastIndexOf(".") + 1);
-
+            String clName = StringUtils.getShortName(event.getSource().getClass());
+            String evName = StringUtils.getShortName(event.getClass());
             String vType = event.getState();
 
             Console.info("(Whistler): " + getIndentation() + evName +
