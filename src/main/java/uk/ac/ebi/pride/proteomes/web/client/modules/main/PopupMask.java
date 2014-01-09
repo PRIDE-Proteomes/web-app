@@ -4,6 +4,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
@@ -20,14 +21,14 @@ public class PopupMask extends    PopupPanel
                                   ResizeHandler,
                                   Window.ScrollHandler {
 
-    private Label messageLabel;
+    private InlineHTML messageLabel;
     private VerticalPanel messageWidget;
     private Widget loadingWidget;
 
     public PopupMask() {
         super(false);
 
-        messageLabel = new Label("");
+        messageLabel = new InlineHTML("");
         Button backButton = new Button("Back");
         backButton.addClickHandler(new ClickHandler() {
             @Override
@@ -81,7 +82,7 @@ public class PopupMask extends    PopupPanel
     }
 
     public void displayMessage(String message){
-        messageLabel.setText(message);
+        messageLabel.setHTML(new SafeHtmlBuilder().appendEscapedLines(message).toSafeHtml());
         setWidget(messageWidget);
         setPopupPositionAndShow(this);
     }

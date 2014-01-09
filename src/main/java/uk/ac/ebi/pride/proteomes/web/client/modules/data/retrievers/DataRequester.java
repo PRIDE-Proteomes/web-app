@@ -64,8 +64,9 @@ public class DataRequester implements RequestCallback {
     }
 
     private void onDataRetrievalError(Throwable e) {
+        String cause = responseType.getName().substring(responseType.getName().lastIndexOf(".") + 1) + " " + id;
         for(TransactionHandler handler : handlers) {
-            handler.onDataRetrievalError(e, id);
+            handler.onDataRetrievalError(e, cause);
         }
     }
 

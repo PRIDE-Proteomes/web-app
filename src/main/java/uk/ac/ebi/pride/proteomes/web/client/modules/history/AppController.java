@@ -138,8 +138,34 @@ public class AppController implements HasHandlers, DataServer.DataClient,
 
     @Override
     public void onRetrievalError(String cause, String message) {
-        ErrorOnUpdateEvent.fire(this, "There was an error retrieving data\n" + message);
         //we have to cleanup the request that caused the error, we need not only the message, but what caused it.
+        // todo This is anything but type safe, come up with a better method.
+
+        Queue<State> statesToRemove = new LinkedList<State>();
+
+        for(State state : stateQueue) {
+            if(cause.split(" ")[0].equals("Protein")) {
+                if(Arrays.asList(state.getSelectedProteins()).contains(cause.split(" ")[1])) {
+                    statesToRemove.add(state);
+                }
+            }
+            else if(cause.split(" ")[0].equals("Group")) {
+                if(Arrays.asList(state.getSelectedGroups()).contains(cause.split(" ")[1])) {
+                    statesToRemove.add(state);
+                }
+            }
+            else if(cause.split(" ")[0].equals("PeptideList")) {
+                if(Arrays.asList(state.getSelectedPeptides()).contains(cause.split(" ")[1])) {
+                    statesToRemove.add(state);
+                }
+            }
+        }
+
+        for(State state : statesToRemove) {
+            stateQueue.remove(state);
+        }
+
+        ErrorOnUpdateEvent.fire(this, "There was an error retrieving data:\n" + message);
     }
 
     private void requestData(State state) {
