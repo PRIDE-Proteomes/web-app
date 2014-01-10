@@ -44,6 +44,9 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
         outerBox.setWidth("100%");
         outerBox.setContent(panel);
         outerBox.setOpen(true);
+
+        //The duration of the initial animation of the coverage widget
+        ProteinViewer.setAnimationDuration(1000);
     }
 
     @Override
