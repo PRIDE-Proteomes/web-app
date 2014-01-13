@@ -374,7 +374,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
     }
 
     /**
-     *  This method checks he selected peptides are filtered out by some
+     *  This method checks the selected peptides are filtered out by some
      *  filters and removes said filters to achieve a consistent state.
      *  This is done because not all modules use filters before displaying
      *  the peptides and can select them. This frees these modules from
@@ -390,28 +390,29 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         }
 
         StateChanger sc = new StateChanger();
-        List<String> validTissues = new ArrayList<String>();
-        List<String> validModifications = new ArrayList<String>();
+        List<String> invalidTissues = new ArrayList<String>();
+        List<String> validTissues;
+        List<String> invalidModifications = new ArrayList<String>();
+        List<String> validModifications;
         boolean contained;
 
-        for(String tissue : uncheckedState.getSelectedTissues()) {
+        for(PeptideList peptideVariances : server.getPeptideVarianceLists(uncheckedState.getSelectedPeptides())) {
             contained = false;
-            for(PeptideList peptideVariances :
-                    server.getPeptideVarianceLists(uncheckedState.getSelectedPeptides())) {
+            for(String tissue : uncheckedState.getSelectedTissues()) {
                 if(peptideVariances.getPeptideList().get(0).getTissues().contains(tissue)) {
                     contained = true;
                     break;
                 }
             }
-            if(contained) {
-                validTissues.add(tissue);
+            if(!contained) {
+                invalidTissues.addAll(Arrays.asList(uncheckedState.getSelectedTissues()));
+                break;
             }
         }
 
-        for(String mod : uncheckedState.getSelectedModifications()) {
+        for(PeptideList peptideVariances : server.getPeptideVarianceLists(uncheckedState.getSelectedPeptides())) {
             contained = false;
-            for(PeptideList peptideVariances :
-                    server.getPeptideVarianceLists(uncheckedState.getSelectedPeptides())) {
+            for(String mod : uncheckedState.getSelectedModifications()) {
                 for(ModifiedLocation mLoc :
                         peptideVariances.getPeptideList().get(0).getModifiedLocations()) {
                     if(mLoc.getModification().equals(mod)) {
@@ -423,13 +424,19 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                     break;
                 }
             }
-            if(contained) {
-                validModifications.add(mod);
+            if(!contained) {
+                invalidModifications.addAll(Arrays.asList(uncheckedState.getSelectedModifications()));
+                break;
             }
         }
+
+        validTissues = new ArrayList<String>(Arrays.asList(uncheckedState.getSelectedTissues()));
+        validTissues.removeAll(invalidTissues);
         if(validTissues.size() < uncheckedState.getSelectedTissues().length) {
             sc.addTissueChange(validTissues);
         }
+        validModifications = new ArrayList<String>(Arrays.asList(uncheckedState.getSelectedModifications()));
+        validModifications.removeAll(invalidModifications);
         if(validModifications.size() < uncheckedState.getSelectedModifications().length) {
             sc.addModificationChange(validModifications);
         }
