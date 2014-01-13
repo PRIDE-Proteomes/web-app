@@ -4,6 +4,8 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.MultiSelectionModel;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
@@ -41,8 +43,9 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
             ListSorter<Multiset.Entry<String>>(new ArrayList<Multiset.Entry<String>>());
 
     private boolean groups;
-    private List<Multiset.Entry<String>> selectedModifications = new ArrayList<Multiset.Entry<String>>();
-    private List<Peptide> selectedPeptides = Collections.emptyList();
+    private boolean selectionEventsDisabled = false;
+    private Collection<Multiset.Entry<String>> selectedModifications = Collections.emptyList();
+    private Collection<Peptide> selectedPeptides = Collections.emptyList();
 
     public ModificationsPresenter(EventBus eventBus, ListView<Multiset.Entry<String>> view) {
         super(eventBus, view);
@@ -57,6 +60,22 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
         view.asWidget().setVisible(false);
         view.hideContent();
 
+        final MultiSelectionModel<Multiset.Entry<String>> selectionModel = new
+                MultiSelectionModel<Multiset.Entry<String>>();
+
+        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                if(!selectionEventsDisabled) {
+                    for(ListUiHandler<Multiset.Entry<String>> handler : getView().getUiHandlers()) {
+                        handler.onSelectionChanged(selectionModel.getSelectedSet());
+                    }
+                }
+            }
+        });
+
+        view.setSelectionModel(selectionModel);
+        view.setKeyboardSelectionPolicy(ModificationColumnProvider.getKeyboardSelectionPolicy());
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
@@ -109,6 +128,10 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
 
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
+        for(Multiset.Entry<String> mod : selectedModifications) {
+            deselectItem(mod);
+        }
+
         selectedModifications = new ArrayList<Multiset.Entry<String>>();
         for(String item : event.getModifications()) {
             for(Multiset.Entry<String> entry : dataProvider.getList()) {
@@ -135,6 +158,8 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
         } else if(items.contains(null)) {
             items = Collections.emptyList();
         }
+
+        selectedModifications = items;
 
         List<String> selection = new ArrayList<String>();
         for(Multiset.Entry<String> item : items) {
@@ -176,17 +201,22 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
 
         setList(new ArrayList<Multiset.Entry<String>>(mods));
 
+        selectedModifications.retainAll(mods);
         for(Multiset.Entry<String> tissue : selectedModifications) {
             selectItem(tissue);
         }
     }
 
     private void selectItem(Multiset.Entry<String> mod) {
+        selectionEventsDisabled = true;
         getView().selectItemOn(dataProvider.getList().indexOf(mod));
+        selectionEventsDisabled = false;
     }
 
     private void deselectItem(Multiset.Entry<String> tissue) {
+        selectionEventsDisabled = true;
         getView().deselectItemOn(dataProvider.getList().indexOf(tissue));
+        selectionEventsDisabled = false;
     }
 
     /**

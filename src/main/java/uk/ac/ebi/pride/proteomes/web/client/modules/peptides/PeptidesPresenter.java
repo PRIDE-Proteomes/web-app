@@ -1,7 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.peptides;
 
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.*;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
@@ -49,6 +49,8 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
     private List<String> currentModifications = Collections.emptyList();
     private List<String> selectedVariancesIDs = Collections.emptyList();
 
+    private boolean selectionEventsDisabled = false;
+
     public PeptidesPresenter(EventBus eventBus, ListView<PeptideMatch> view) {
         super(eventBus, view);
         List<Column<PeptideMatch, ?>> columns = PeptideColumnProvider
@@ -62,6 +64,25 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
+
+        // We define how are the items selected here
+        final SingleSelectionModel<PeptideMatch> selectionModel = new
+                SingleSelectionModel<PeptideMatch>();
+        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                if(!selectionEventsDisabled) {
+                    Set<PeptideMatch> selection = new HashSet<PeptideMatch>();
+                    selection.add(selectionModel.getSelectedObject());
+                    for(ListUiHandler<PeptideMatch> handler : getView().getUiHandlers()) {
+                        handler.onSelectionChanged(selection);
+                    }
+                }
+            }
+        });
+
+        view.setSelectionModel(selectionModel);
+        view.setKeyboardSelectionPolicy(PeptideColumnProvider.getKeyboardSelectionPolicy());
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
@@ -109,11 +130,6 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
     @Override
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
-        // we deselect all the peptides, we can select them again.
-        for(Peptide peptide : selectedPeptidesMatches) {
-            deselectItem(peptide);
-        }
-
         // we change the peptide list
         if(event.getRegions().size() == 0) {
             currentRegion = Region.emptyRegion();
@@ -125,10 +141,6 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
                 currentTissues, currentModifications));
-
-        // we reselect the peptides, this is because the selected peptides
-        // might not change when reselecting the region.
-        selectPeptides();
     }
 
     @Override
@@ -254,6 +266,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
         setList(peptideList);
 
+        selectedPeptidesMatches.retainAll(peptideList);
         for(Peptide peptide : selectedPeptidesMatches) {
             selectItem(peptide);
         }
@@ -266,7 +279,9 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
                 (), peptide.getSequence());
 
         if(peptidePosition > -1) {
+            selectionEventsDisabled = true;
             getView().selectItemOn(peptidePosition);
+            selectionEventsDisabled = false;
         }
     }
 
@@ -277,7 +292,9 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
                 (), peptide.getSequence());
 
         if(peptidePosition > -1) {
+            selectionEventsDisabled = true;
             getView().deselectItemOn(peptidePosition);
+            selectionEventsDisabled = false;
         }
     }
 

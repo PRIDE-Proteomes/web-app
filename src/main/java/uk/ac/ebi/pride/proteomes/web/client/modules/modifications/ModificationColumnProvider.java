@@ -2,6 +2,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.modifications;
 
 import com.google.common.collect.Multiset;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 
@@ -65,5 +66,9 @@ public class ModificationColumnProvider {
         List<String> widths = new ArrayList<String>();
         Collections.addAll(widths, "70%", "30%");
         return widths;
+    }
+
+    public static HasKeyboardSelectionPolicy.KeyboardSelectionPolicy getKeyboardSelectionPolicy() {
+        return HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.ENABLED;
     }
 }

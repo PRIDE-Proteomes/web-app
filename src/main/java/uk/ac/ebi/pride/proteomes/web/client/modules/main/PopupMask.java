@@ -40,7 +40,6 @@ public class PopupMask extends    PopupPanel
         messageWidget = new VerticalPanel();
         messageWidget.add(messageLabel);
         messageWidget.add(backButton);
-        messageWidget.setCellHorizontalAlignment(backButton, HasHorizontalAlignment.ALIGN_CENTER);
         messageWidget.setStyleName("gwt-Popup");
 
         loadingWidget = ModuleContainer.getLoadingPanel();

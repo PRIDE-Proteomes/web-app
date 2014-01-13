@@ -1,6 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.peptides;
 
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
@@ -157,5 +158,9 @@ public class PeptideColumnProvider {
         List<String> widths = new ArrayList<String>();
         Collections.addAll(widths, "30%", "10%", "30%", "30%");
         return widths;
+    }
+
+    public static HasKeyboardSelectionPolicy.KeyboardSelectionPolicy getKeyboardSelectionPolicy() {
+        return HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION;
     }
 }

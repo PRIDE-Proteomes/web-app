@@ -3,6 +3,8 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.variances;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.EmptyPeptideList;
@@ -39,6 +41,7 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
     private boolean groups = true;
     private PeptideList currentPeptide;
     private Collection<Peptide> selectedVariances = Collections.emptyList();
+    private boolean selectionEventsDisabled = false;
 
     public VariancesPresenter(EventBus eventBus, ListView<Peptide> view) {
         super(eventBus, view);
@@ -53,6 +56,24 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
+
+        // We define how are the items selected here
+        final SingleSelectionModel<Peptide> selectionModel = new
+                SingleSelectionModel<Peptide>();
+        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            public void onSelectionChange(SelectionChangeEvent event) {
+                if(!selectionEventsDisabled) {
+                    Set<Peptide> selection = new HashSet<Peptide>();
+                    selection.add(selectionModel.getSelectedObject());
+                    for(ListUiHandler<Peptide> handler : getView().getUiHandlers()) {
+                        handler.onSelectionChanged(selection);
+                    }
+                }
+            }
+        });
+
+        view.setSelectionModel(selectionModel);
+        view.setKeyboardSelectionPolicy(VarianceColumnProvider.getKeyboardSelectionPolicy());
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
@@ -88,6 +109,7 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
                 currentPeptide = new EmptyPeptideList();
             }
             updateList(currentPeptide.getPeptideList());
+            selectedVariances = new ArrayList<Peptide>();
             getView().loadList();
         }
     }
@@ -152,6 +174,7 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
 
         setList(peptideList);
 
+        selectedVariances.retainAll(peptideList);
         for(Peptide peptide : selectedVariances) {
             selectItem(peptide);
         }
@@ -173,7 +196,9 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
         int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(),
                 peptide.getId());
         if(peptidePosition > -1) {
+            selectionEventsDisabled = true;
             getView().deselectItemOn(peptidePosition);
+            selectionEventsDisabled = false;
         }
     }
 

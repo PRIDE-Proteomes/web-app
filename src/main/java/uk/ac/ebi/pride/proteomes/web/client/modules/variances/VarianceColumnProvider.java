@@ -4,6 +4,7 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -156,5 +157,9 @@ public class VarianceColumnProvider {
         List<String> widths = new ArrayList<String>();
         Collections.addAll(widths, "25%", "25%", "25%", "25%");
         return widths;
+    }
+
+    public static HasKeyboardSelectionPolicy.KeyboardSelectionPolicy getKeyboardSelectionPolicy() {
+        return HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.ENABLED;
     }
 }

@@ -1,7 +1,10 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.lists;
 
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
+import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SelectionModel;
 import uk.ac.ebi.pride.proteomes.web.client.modules.HasUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.modules.View;
 
@@ -31,4 +34,9 @@ public interface ListView<T> extends View, HasUiHandlers<ListUiHandler<T>> {
     void addDataProvider(ListDataProvider<T> dataProvider);
     void addColumns(List<Column<T, ?>> columns, List<String> titles, List<String> widths);
     void addColumnSortHandler(ListSorter<T> sorter);
+
+    // Used to manage the selection
+    void setSelectionModel(SelectionModel<? super T> selectionModel);
+    void setKeyboardSelectionHandler(CellPreviewEvent.Handler<T> keyboardSelectionReg);
+    void setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy policy);
 }

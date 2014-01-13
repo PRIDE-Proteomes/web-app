@@ -15,9 +15,7 @@ import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -25,30 +23,47 @@ import java.util.Set;
  *         Time: 14:27
  */
 public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
-                         implements ListView<T>, RowCountChangeEvent.Handler,
-                                    OpenHandler<DisclosurePanel> {
+                         implements ListView<T>,
+                                    RowCountChangeEvent.Handler,
+                                    OpenHandler<DisclosurePanel>,
+                                    HasKeyboardSelectionPolicy {
 
     private DataGrid<T> grid;
     private ModuleContainer frame;
 
     private String baseType;
-    private boolean selectionEventsDisabled = false;
+
+    /* This selection manager allows the user to deselect a column just by
+       clicking it, instead of having to use the ctrl modifier.
+     */
+    DefaultSelectionEventManager<T> selectionManager =
+            DefaultSelectionEventManager.createCustomManager(new DefaultSelectionEventManager.EventTranslator<T>(){
+        @Override
+        public boolean clearCurrentSelection(CellPreviewEvent<T> event) {
+            return false;
+        }
+        @Override
+        public DefaultSelectionEventManager.SelectAction translateSelectionEvent(CellPreviewEvent<T> event) {
+            return DefaultSelectionEventManager.SelectAction.TOGGLE;
+        }
+    });
 
     public GridView(String title, String typeName) {
+        this(title, typeName, false);
+    }
+
+    public GridView(String title, String typeName, boolean skipRowHoverStyleUpdate) {
         frame = ModuleContainerFactory.getModuleContainer(title);
         grid = new DataGrid<T>();
         baseType = typeName;
 
         grid.addRowCountChangeHandler(this);
-
-        grid.setSelectionModel(getSelectionModel());
-        grid.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.ENABLED);
-
         grid.setEmptyTableWidget(new Label("No " +
                 baseType + "s match the selection."));
 
         grid.setWidth("99%");
         grid.setHeight("150px");
+        grid.setSkipRowHoverCheck(skipRowHoverStyleUpdate);
 
         // This allows for the data grid to show up to 4096 peptides in the
         // view, there should be a way to allow the view to adjust for any
@@ -60,6 +75,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
 
         frame.addOpenHandler(this);
     }
+
     @Override
     public void selectItemOn(int row) {
         if(row >= 0 && row < grid.getRowCount()) {
@@ -72,9 +88,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
     @Override
     public void deselectItemOn(int row) {
         if(row >= 0 && row < grid.getRowCount()) {
-            selectionEventsDisabled = true;
             grid.getSelectionModel().setSelected(grid.getVisibleItem(row), false);
-            selectionEventsDisabled = false;
             frame.clearPrimaryMessage();
         }
     }
@@ -150,32 +164,33 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
         updateItemCount(event.getNewRowCount());
     }
 
-    private void updateItemCount(int number) {
-        frame.setSecondaryMessage(StringUtils.getCount(baseType, number));
-    }
-
-    private SelectionModel<T> getSelectionModel() {
-        final SingleSelectionModel<T> selectionModel = new
-                SingleSelectionModel<T>();
-        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-            public void onSelectionChange(SelectionChangeEvent event) {
-                if(!selectionEventsDisabled) {
-                    Set<T> selection = new HashSet<T>();
-                    selection.add(selectionModel.getSelectedObject());
-                    for(ListUiHandler<T> handler : getUiHandlers()) {
-                        handler.onSelectionChanged(selection);
-                    }
-                }
-                else {
-                    selectionEventsDisabled = false;
-                }
-            }
-        });
-        return selectionModel;
-    }
-
     @Override
     public void onOpen(OpenEvent<DisclosurePanel> event) {
         grid.redraw();
+    }
+
+    @Override
+    public void setSelectionModel(SelectionModel<? super T> selectionModel) {
+        grid.setSelectionModel(selectionModel, selectionManager);
+    }
+
+    @Override
+    public void setKeyboardSelectionHandler(CellPreviewEvent.Handler<T> keyboardSelectionReg) {
+        grid.setKeyboardSelectionHandler(keyboardSelectionReg);
+    }
+
+
+    @Override
+    public KeyboardSelectionPolicy getKeyboardSelectionPolicy() {
+        return grid.getKeyboardSelectionPolicy();
+    }
+
+    @Override
+    public void setKeyboardSelectionPolicy(KeyboardSelectionPolicy policy) {
+        grid.setKeyboardSelectionPolicy(policy);
+    }
+
+    private void updateItemCount(int number) {
+        frame.setSecondaryMessage(StringUtils.getCount(baseType, number));
     }
 }

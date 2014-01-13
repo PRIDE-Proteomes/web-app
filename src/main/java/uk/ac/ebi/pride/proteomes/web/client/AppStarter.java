@@ -111,7 +111,7 @@ public class AppStarter implements RunAsyncCallback {
         Presenter peptidePresenter = new PeptidesPresenter(eventBus,
                 peptideView);
 
-        ListView<Pair<String, List<String>>> groupPeptideView = new GridView<Pair<String, List<String>>>("Peptides", "peptide");
+        ListView<Pair<String, List<String>>> groupPeptideView = new GridView<Pair<String, List<String>>>("Peptides", "peptide", true);
         Presenter groupPeptidePresenter = new GroupPeptidePresenter(eventBus, groupPeptideView);
 
         ListView<Peptide> varianceView =

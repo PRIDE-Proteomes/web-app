@@ -1,6 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.tissues;
 
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 
@@ -48,5 +49,9 @@ public class TissueColumnProvider {
         List<String> widths = new ArrayList<String>();
         Collections.addAll(widths, "100%");
         return widths;
+    }
+
+    public static HasKeyboardSelectionPolicy.KeyboardSelectionPolicy getKeyboardSelectionPolicy() {
+        return HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.ENABLED;
     }
 }

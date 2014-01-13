@@ -2,6 +2,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.grouppeptides;
 
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.NoSelectionModel;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.GroupUpdateEvent;
@@ -42,6 +43,11 @@ public class GroupPeptidePresenter extends Presenter<ListView<Pair<String, List<
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
         view.asWidget().setVisible(false);
+
+        final NoSelectionModel<Pair<String, List<String>>> selectionModel = new
+                NoSelectionModel<Pair<String, List<String>>>();
+        view.setSelectionModel(selectionModel);
+        view.setKeyboardSelectionPolicy(GroupPeptideColumnProvider.getKeyboardSelectionPolicy());
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(GroupUpdateEvent.getType(), this);

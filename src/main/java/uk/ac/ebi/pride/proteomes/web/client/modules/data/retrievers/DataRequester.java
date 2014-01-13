@@ -59,7 +59,9 @@ public class DataRequester implements RequestCallback {
         } catch(InvalidJSONException e) {
             if(response.equals("")) {
 
-                onDataRetrievalError(new InvalidJSONException("The requested " + StringUtils.getShortName(responseType) + " isn't in the database", e));
+                onDataRetrievalError(new InvalidJSONException("The requested "
+                        + StringUtils.getShortName(responseType)
+                        + " isn't in the database", e));
             } else {
                 onDataRetrievalError(e);
             }

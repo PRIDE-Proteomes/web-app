@@ -2,6 +2,8 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.tissues;
 
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.MultiSelectionModel;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
@@ -40,8 +42,9 @@ public class TissuesPresenter extends Presenter<ListView<String>>
                                         ListSorter<String>(new ArrayList<String>());
 
     private boolean groups = true;
-    private List<String> selectedTissues = Collections.emptyList();
-    private List<Peptide> selectedPeptides = Collections.emptyList();
+    private Collection<String> selectedTissues = Collections.emptyList();
+    private Collection<Peptide> selectedPeptides = Collections.emptyList();
+    private boolean selectionEventsDisabled = false;
 
     public TissuesPresenter(EventBus eventBus, ListView<String> view) {
         super(eventBus, view);
@@ -56,6 +59,22 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
         view.hideContent();
+
+        final MultiSelectionModel<String> selectionModel = new
+                MultiSelectionModel<String>();
+        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                if(!selectionEventsDisabled) {
+                    for(ListUiHandler<String> handler : getView().getUiHandlers()) {
+                        handler.onSelectionChanged(selectionModel.getSelectedSet());
+                    }
+                }
+            }
+        });
+
+        view.setSelectionModel(selectionModel);
+        view.setKeyboardSelectionPolicy(TissueColumnProvider.getKeyboardSelectionPolicy());
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
@@ -106,6 +125,10 @@ public class TissuesPresenter extends Presenter<ListView<String>>
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
+        for(String tissue : selectedTissues) {
+            deselectItem(tissue);
+        }
+
         selectedTissues = new ArrayList<String>();
         for(String item : event.getTissues()) {
             selectItem(item);
@@ -128,6 +151,8 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         } else if(items.contains(null)) {
             items = Collections.emptyList();
         }
+
+        selectedTissues = items;
 
         filteredPeptides = new ArrayList<String>();
         for(Peptide pep : selectedPeptides) {
@@ -160,17 +185,22 @@ public class TissuesPresenter extends Presenter<ListView<String>>
 
         setList(tissues);
 
+        selectedTissues.retainAll(tissues);
         for(String tissue : selectedTissues) {
             selectItem(tissue);
         }
     }
 
     private void selectItem(String tissue) {
+        selectionEventsDisabled = true;
         getView().selectItemOn(dataProvider.getList().indexOf(tissue));
+        selectionEventsDisabled = false;
     }
 
     private void deselectItem(String tissue) {
+        selectionEventsDisabled = true;
         getView().deselectItemOn(dataProvider.getList().indexOf(tissue));
+        selectionEventsDisabled = false;
     }
 
     /**
