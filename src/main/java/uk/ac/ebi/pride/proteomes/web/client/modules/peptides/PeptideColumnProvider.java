@@ -161,6 +161,6 @@ public class PeptideColumnProvider {
     }
 
     public static HasKeyboardSelectionPolicy.KeyboardSelectionPolicy getKeyboardSelectionPolicy() {
-        return HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION;
+        return HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.ENABLED;
     }
 }
