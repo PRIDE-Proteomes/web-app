@@ -1,7 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.variances;
 
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -51,6 +50,7 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
         List<String> columnTitles = VarianceColumnProvider.getColumnTitles();
         List<String> columnWidths = VarianceColumnProvider.getColumnWidths();
 
+        dataSorter.setList(dataProvider.getList());
         view.addDataProvider(dataProvider);
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
@@ -78,11 +78,6 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(VarianceUpdateEvent.getType(), this);
-    }
-
-    @Override
-    public void bindToContainer(AcceptsOneWidget container) {
-        getView().bindToContainer(container);
     }
 
     @Override
@@ -186,7 +181,9 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
         int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(),
                 peptide.getId());
         if(peptidePosition > -1) {
+            selectionEventsDisabled = true;
             getView().selectItemOn(peptidePosition);
+            selectionEventsDisabled = false;
         }
     }
 

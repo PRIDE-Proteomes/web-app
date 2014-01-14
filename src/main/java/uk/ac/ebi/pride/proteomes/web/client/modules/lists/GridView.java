@@ -1,5 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.lists;
 
+import com.google.gwt.dom.client.BrowserEvents;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.user.cellview.client.Column;
@@ -44,7 +46,13 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
         }
         @Override
         public DefaultSelectionEventManager.SelectAction translateSelectionEvent(CellPreviewEvent<T> event) {
-            return DefaultSelectionEventManager.SelectAction.TOGGLE;
+            NativeEvent nativeEvent = event.getNativeEvent();
+            if(BrowserEvents.CLICK.equals(nativeEvent.getType())) {
+                return DefaultSelectionEventManager.SelectAction.TOGGLE;
+            }
+            else {
+                return DefaultSelectionEventManager.SelectAction.DEFAULT;
+            }
         }
     });
 
