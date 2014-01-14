@@ -53,12 +53,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public void onDataRetrievalError(Throwable exception, String cause) {
-        client.onRetrievalError(cause, exception.getMessage());
-    }
-
-    @Override
-    public void onDataRetrieval(Transaction transaction) {
+    public void onTransactionFinished(Transaction transaction) {
         if(transaction.getResponse() instanceof Group) {
             Group group = (Group) transaction.getResponse();
             groupCache.put(group.getId(), group);
@@ -87,26 +82,33 @@ public class DataProvider implements DataServer, TransactionHandler {
         }
         else if(transaction.getResponse() instanceof PeptideList) {
             PeptideList variances = (PeptideList) transaction.getResponse();
+            String sequence;
+
             if(variances.getPeptideList().size() > 0) {
-                String sequence = variances.getPeptideList().get(0).getSequence();
-                peptideVarianceCache.put(sequence, variances);
-
-                for(Map<String, Boolean> batchRequest : peptideVarianceRequests) {
-                    if(batchRequest.containsKey(sequence)) {
-                        batchRequest.put(sequence, true);
-                    }
-                }
-
-                dispatchPeptideVariances();
+                sequence = variances.getPeptideList().get(0).getSequence();
             }
             else {
-                onDataRetrievalError(new Exception("Internal Error, " +
-                    "the developers need to update " + this.getClass().getName()), "");
+                // If the list is empty then we can use the identifier we used
+                // to request the peptide list
+                sequence = transaction.getRequestedName();
             }
+
+            peptideVarianceCache.put(sequence, variances);
+
+            for(Map<String, Boolean> batchRequest : peptideVarianceRequests) {
+                if(batchRequest.containsKey(sequence)) {
+                    batchRequest.put(sequence, true);
+                }
+            }
+
+            dispatchPeptideVariances();
+        }
+        else if(transaction.getResponse() instanceof ErroneousResult) {
+            onErroneousResult(((ErroneousResult) transaction.getResponse()));
         }
         else {
-            onDataRetrievalError(new Exception("Internal Error, " +
-                    "the developers need to update " + this.getClass().getName()), "");
+            onErroneousResult(new GenericErroneousResult(transaction.getResponse(),
+                                                         transaction.getRequestedName()));
         }
     }
 
@@ -216,6 +218,10 @@ public class DataProvider implements DataServer, TransactionHandler {
     @Override
     public PeptideList getPeptideVarianceList(String sequence) {
         return peptideVarianceCache.get(sequence);
+    }
+
+    private void onErroneousResult(ErroneousResult error) {
+        client.onRetrievalError(error);
     }
 
     private void dispatchGroups() {

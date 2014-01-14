@@ -23,7 +23,12 @@ public interface DataServer {
         public void onProteinsRetrieved(Collection<Protein> proteins);
         public void onPeptideVarianceListsRetrieved(Collection<PeptideList> peptides);
 
-        public void onRetrievalError(String cause, String message);
+        public void onRetrievalError(ErroneousResult invalidResponse);
+    }
+    public interface ErroneousResult {
+        public Class getRequestedType();
+        public String getRequestedIdentifier();
+        public String getErrorDescription();
     }
 
     public void bind(DataClient client);

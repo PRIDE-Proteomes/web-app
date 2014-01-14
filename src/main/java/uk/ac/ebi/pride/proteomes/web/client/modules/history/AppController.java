@@ -20,6 +20,7 @@ import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateExceptio
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
 import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 import uk.ac.ebi.pride.proteomes.web.client.utils.RegionUtils;
+import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 
 import java.util.*;
 
@@ -139,29 +140,44 @@ public class AppController implements HasHandlers, DataServer.DataClient,
     }
 
     @Override
-    public void onRetrievalError(String cause, String message) {
-        //we have to cleanup the request that caused the error, we need not only the message, but what caused it.
-        // todo This is anything but type safe, come up with a better method.
+    public void onRetrievalError(DataServer.ErroneousResult erroneousResult) {
+        //we have to cleanup the request that caused the error, we need not
+        // only the message, but what caused it.
 
         Queue<State> statesToRemove = new LinkedList<State>();
 
-        for(State state : stateQueue) {
-            if(cause.split(" ")[0].equals("Protein")) {
-                if(Arrays.asList(state.getSelectedProteins()).contains(cause.split(" ")[1])) {
-                    statesToRemove.add(state);
-                }
-            }
-            else if(cause.split(" ")[0].equals("Group")) {
-                if(Arrays.asList(state.getSelectedGroups()).contains(cause.split(" ")[1])) {
-                    statesToRemove.add(state);
-                }
-            }
-            else if(cause.split(" ")[0].equals("PeptideList")) {
-                if(Arrays.asList(state.getSelectedPeptides()).contains(cause.split(" ")[1])) {
+        if(erroneousResult.getRequestedType() == Protein.class) {
+            for(State state : stateQueue) {
+                if(Arrays.asList(state.getSelectedProteins()).contains(
+                        erroneousResult.getRequestedIdentifier())) {
                     statesToRemove.add(state);
                 }
             }
         }
+        else if(erroneousResult.getRequestedType() == Group.class) {
+            for(State state : stateQueue) {
+                if(Arrays.asList(state.getSelectedGroups()).contains(
+                        erroneousResult.getRequestedIdentifier())) {
+                    statesToRemove.add(state);
+                }
+            }
+        }
+        else if(erroneousResult.getRequestedType() == PeptideList.class) {
+            for(State state : stateQueue) {
+                if(Arrays.asList(state.getSelectedPeptides()).contains(
+                        erroneousResult.getRequestedIdentifier())) {
+                    statesToRemove.add(state);
+                }
+            }
+        }
+        else {
+            appState = State.getInvalidState();
+            ErrorOnUpdateEvent.fire(this, "There was an error retrieving a "
+                    + StringUtils.getShortName(erroneousResult.getRequestedType())
+                    + ":\n" + erroneousResult.getErrorDescription());
+            return;
+        }
+
 
         for(State state : statesToRemove) {
             stateQueue.remove(state);
@@ -171,8 +187,9 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         // otherwise when pressing the back button won't work.
         appState = State.getInvalidState();
 
-        ErrorOnUpdateEvent.fire(this, "There was an error retrieving the data:\n"
-                                      + message);
+        ErrorOnUpdateEvent.fire(this, "There was an error retrieving a "
+                + StringUtils.getShortName(erroneousResult.getRequestedType())
+                + ":\n" + erroneousResult.getErrorDescription());
     }
 
     private void requestData(State state) {

@@ -1,11 +1,9 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers;
 
 import com.google.gwt.http.client.*;
-import uk.ac.ebi.pride.proteomes.web.client.exceptions.InvalidJSONException;
-import uk.ac.ebi.pride.proteomes.web.client.exceptions.UnacceptableResponseException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.Transaction;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.TransactionHandler;
-import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
+import uk.ac.ebi.pride.proteomes.web.client.modules.data.UnacceptableResponse;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,53 +29,41 @@ public class DataRequester implements RequestCallback {
         try {
             builder.sendRequest(null, this);
         } catch(RequestException e) {
-            onDataRetrievalError(e);
+            onInvalidResponse(new UnacceptableResponse(0, "", e.getMessage(), responseType, id));
         }
     }
 
     @Override
     public void onResponseReceived(Request request, Response response) {
         if(response == null) {
-            onDataRetrievalError(new Exception("Error: Could not contact the server."));
+            onInvalidResponse(new UnacceptableResponse(0, "", "Could not contact the server.", responseType, id));
         } else if(response.getStatusText().equals("OK")) {
-            processResponse(response.getText());
+            onValidResponse(response);
         } else {
-            onDataRetrievalError(new UnacceptableResponseException());
+            onInvalidResponse(new UnacceptableResponse(response.getStatusCode(),
+                                                       response.getStatusText(),
+                                                       "The Server couldn't fulfill the request.",
+                                                       responseType,
+                                                       id));
         }
     }
 
     @Override
     public void onError(Request request, Throwable exception) {
-        onDataRetrievalError(exception);
+        onInvalidResponse(new UnacceptableResponse(0, "", exception.getMessage(), responseType, id));
     }
 
-    private void processResponse(String response) {
-        Transaction trans;
-        try {
-            trans = new Transaction(response, responseType);
-            onDataRetrieval(trans);
-        } catch(InvalidJSONException e) {
-            if(response.equals("")) {
-
-                onDataRetrievalError(new InvalidJSONException("The requested "
-                        + StringUtils.getShortName(responseType)
-                        + " isn't in the database", e));
-            } else {
-                onDataRetrievalError(e);
-            }
-        }
+    private void onValidResponse(Response response) {
+        onTransactionDone(new Transaction(response, id, responseType));
     }
 
-    private void onDataRetrievalError(Throwable e) {
-        String cause = StringUtils.getShortName(responseType) + " " + id;
+    private void onInvalidResponse(UnacceptableResponse r) {
+        onTransactionDone(new Transaction(r, id, responseType));
+    }
+
+    private void onTransactionDone(Transaction transaction) {
         for(TransactionHandler handler : handlers) {
-            handler.onDataRetrievalError(e, cause);
-        }
-    }
-
-    private void onDataRetrieval(Transaction transaction) {
-        for(TransactionHandler handler : handlers) {
-            handler.onDataRetrieval(transaction);
+            handler.onTransactionFinished(transaction);
         }
     }
 }

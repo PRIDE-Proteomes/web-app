@@ -23,6 +23,5 @@ public interface TransactionHandler {
         public void addHandler(TransactionHandler handler);
     }
 
-    void onDataRetrievalError(Throwable exception, String cause);
-    void onDataRetrieval(Transaction transaction);
+    void onTransactionFinished(Transaction transaction);
 }
