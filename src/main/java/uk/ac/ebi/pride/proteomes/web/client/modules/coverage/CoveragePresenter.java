@@ -263,15 +263,18 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
 
             regions.add(region.toString());
 
+            peptides = new HashSet<String>();
             if(!region.isEmpty()) {
-                peptides = new HashSet<String>();
                 for(PeptideMatch peptide : currentPeptides) {
                     if(PeptideUtils.inRange(peptide, start, end)) {
                         peptides.add(peptide.getSequence());
                     }
                 }
-                changer.addPeptideChange(peptides);
             }
+            // if the region is empty then an empty set will get sent, we reset
+            // the peptide selection.
+            changer.addPeptideChange(peptides);
+
         } catch (IllegalRegionValueException e) {
             action = new UserAction(UserAction.Type.region,
                     "Drag Coverage Reset");
@@ -302,6 +305,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         } catch (IllegalRegionValueException e) {
             regions.add(Region.emptyRegion());
         } finally {
+            // update peptides, send peptide event
             RegionUpdateEvent.fire(this, regions);
         }
     }
