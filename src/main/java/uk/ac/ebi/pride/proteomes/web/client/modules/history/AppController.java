@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.history;
 
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -32,6 +33,9 @@ import java.util.*;
 public class AppController implements HasHandlers, DataServer.DataClient,
                                       ValueChangeHandler<String>,
                                       StateChangingActionEvent.Handler {
+
+    private static String defaultPageTitle = "EMBL-EBI PRIDE Proteomes";
+
     private final EventBus eventBus;
     private final DataServer server;
     private State appState;
@@ -86,6 +90,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             try {
                 appState = State.tokenize(event.getValue());
             } catch (InconsistentStateException e){
+                Document.get().setTitle(defaultPageTitle);
                 appState = State.getInvalidState();
                 InvalidStateEvent.fire(this, "Application Error, " +
                                              "please contact the PRIDE team.",
@@ -93,6 +98,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 return;
             }
             appState = State.getInvalidState();
+            Document.get().setTitle(defaultPageTitle);
             EmptyViewEvent.fire(this, "Please, select a protein or group of " +
                                       "proteins to show its data.");
         }
@@ -108,6 +114,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             catch(InconsistentStateException e) {
                 // we tried to create an inconsistent state, that's bad,
                 // we should act upon it. (show a popup with an error?)
+                Document.get().setTitle(defaultPageTitle);
                 appState = State.getInvalidState();
                 InvalidStateEvent.fire(this, "The address cannot be " +
                         "displayed. Please check that is is correct and " +
@@ -171,6 +178,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             }
         }
         else {
+            Document.get().setTitle(defaultPageTitle);
             appState = State.getInvalidState();
             ErrorOnUpdateEvent.fire(this, "There was an error retrieving a "
                     + StringUtils.getShortName(erroneousResult.getRequestedType())
@@ -185,6 +193,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
 
         // We have to assign a new state, different from the current one,
         // otherwise when pressing the back button won't work.
+        Document.get().setTitle(defaultPageTitle);
         appState = State.getInvalidState();
 
         ErrorOnUpdateEvent.fire(this, "There was an error retrieving a "
@@ -285,6 +294,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             goTo(revisePeptideFilters(stateQueue.peek()));
         }
         catch(InconsistentStateException e) {
+            Document.get().setTitle(defaultPageTitle);
             appState = State.getInvalidState();
             InvalidStateEvent.fire(this, "The address cannot be " +
                     "displayed. Please check that is is correct and " +
@@ -475,17 +485,22 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         // we assume the code here when it gets interrupted it cannot be
         // executed again, otherwise we might run into data inconsistencies
         // (the caller should guarantee this, like processStateQueue() does)
+        String title = "";
 
         if(newState.getSelectedGroups().length > 0) {
             ValidStateEvent.fire(this, ValidStateEvent.ViewType.Group);
+            title += "Group " + newState.getSelectedGroups()[0];
         }
         else if(newState.getSelectedProteins().length > 0) {
             ValidStateEvent.fire(this, ValidStateEvent.ViewType.Protein);
+            title += "Protein " + newState.getSelectedProteins()[0];
         }
         else {
             //we get an empty view, we don't do anything to update the view.
+            Document.get().setTitle(defaultPageTitle);
             return;
         }
+        Document.get().setTitle(title + " // " + defaultPageTitle);
 
         // We only update the url if the new history token is different from
         // the last one.
