@@ -69,7 +69,6 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     private PeptideList currentPeptides = new EmptyPeptideList();
     private List<PeptideMatch> currentPeptideMatches = Collections.emptyList();
     private Collection<String> selectedVarianceIDs = Collections.emptyList();
-    private String currentModification = "";
 
     //Needed to maintain temporary state while doing a selection
     private List<PeptideMatch> tempPeptides = Collections.emptyList();
@@ -204,7 +203,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
         if(event.getModifications().length > 0) {
-            currentModification = event.getModifications()[0];
+            String currentModification = event.getModifications()[0];
             try {
                 int position = Integer.parseInt(currentModification);
 
@@ -216,7 +215,6 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         }
         else {
             getView().resetModificationHighlight();
-            currentModification = null;
         }
     }
 

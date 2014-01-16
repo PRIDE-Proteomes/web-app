@@ -38,7 +38,6 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
                                        ListSorter<Peptide>(new ArrayList<Peptide>());
 
     private boolean groups = true;
-    private PeptideList currentPeptide;
     private Collection<Peptide> selectedVariances = Collections.emptyList();
     private boolean selectionEventsDisabled = false;
 
@@ -96,6 +95,7 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
         if(!groups) {
+            PeptideList currentPeptide;
             if(event.getPeptides().size() > 0) {
                 currentPeptide = event.getPeptides().get(0);
                 getView().showContent();
