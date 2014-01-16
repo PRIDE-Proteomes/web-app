@@ -75,12 +75,12 @@ public class PeptideUtils {
      * @return A list of items that where already contained in the original
      * list
      */
-    public static List<Peptide> filterPeptidesWithoutModification
-    (List<Peptide> peptides, String modification) {
+    public static List<Peptide> filterPeptidesWithoutAnyModifications
+    (List<? extends Peptide> peptides, String modification) {
         List<Peptide> filteredList;
 
         if(modification.isEmpty()) {
-            return peptides;
+            return (List<Peptide>) peptides;
         }
 
         filteredList = new ArrayList<Peptide>();
@@ -161,12 +161,27 @@ public class PeptideUtils {
         return index;
     }
 
+    /**
+     * This function determines whether the peptide match is "inside" a region,
+     * which in practise means whether it's region intersects between the region
+     * defined by start and end
+     * @param peptide The peptide match that needs to be checkd
+     * @param start the start point of the region
+     * @param end the end point of the region
+     * @return whether the region defined by peptide and start + end intersect
+     */
     public static boolean inRange(PeptideMatch peptide, int start, int end) {
         if(start == end && start == 0) {
             return true;
         }
-        return peptide.getPosition() >= start &&
-               peptide.getSequence().length() + peptide.getPosition() - 1 <= end;
+        if(end < start) {
+            return false;
+        }
+
+        int pepStart = peptide.getPosition();
+        int pepEnd = peptide.getSequence().length() + peptide.getPosition() - 1;
+
+        return end > pepStart && start < pepEnd;
     }
 
     public static Collection<Peptide> getFirstOfEach(List<PeptideList> peptidesLists) {
@@ -266,7 +281,7 @@ public class PeptideUtils {
                                 tList, mList).isEmpty()) {
                             return true;
                         }
-                    } catch (IllegalRegionValueException e) {
+                    } catch (IllegalRegionValueException ignored) {
                     }
                 }
             }
