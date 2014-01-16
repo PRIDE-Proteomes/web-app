@@ -83,4 +83,18 @@ public class Region {
     public boolean isEmpty() {
         return false;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == this) {
+            return true;
+        }
+        if(o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+
+        Region other = (Region) o;
+
+        return this.getStart() == other.getStart() && this.getEnd() == other.getEnd();
+    }
 }

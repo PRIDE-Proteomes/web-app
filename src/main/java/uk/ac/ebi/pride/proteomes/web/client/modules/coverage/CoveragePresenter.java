@@ -2,11 +2,13 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.coverage;
 
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.EmptyPeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
@@ -43,6 +45,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                                           PeptideUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler,
                                           VarianceUpdateEvent.Handler {
+
     public interface ThisView extends View, HasUiHandlers<CoverageUiHandler> {
         public void updateProtein(ProteinAdapter protein);
         public void updateRegionSelection(int start, int end);
@@ -59,9 +62,17 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     private boolean justHighlighted = false;
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
-    private List<PeptideMatch> currentPeptides = Collections.emptyList();
+
+    //We need to keep both peptide lists updated to be able to send the matches
+    // to the widget and send the peptides to the eventBus when
+    // we drag the area highlight without affecting the url
+    private PeptideList currentPeptides = new EmptyPeptideList();
+    private List<PeptideMatch> currentPeptideMatches = Collections.emptyList();
     private Collection<String> selectedVarianceIDs = Collections.emptyList();
     private String currentModification = "";
+
+    //Needed to maintain temporary state while doing a selection
+    private List<PeptideMatch> tempPeptides = Collections.emptyList();
 
     public CoveragePresenter(EventBus eventBus, ThisView view) {
         super(eventBus, view);
@@ -130,9 +141,9 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         // Apparently when the region gets modified the peptide selection
         // gets reset, we must set it again manually.
 
-        if(!currentPeptides.isEmpty()) {
+        if(!currentPeptideMatches.isEmpty()) {
             selectionAdapters = new ArrayList<PeptideAdapter>();
-            for(PeptideMatch match : currentPeptides) {
+            for(PeptideMatch match : currentPeptideMatches) {
                 selectionAdapters.add(new PeptideAdapter(match));
             }
             getView().updatePeptideSelection(selectionAdapters);
@@ -152,7 +163,11 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         List<PeptideMatch> selection;
         List<Peptide> eventPeptides;
 
-        if(event.getPeptides().size() > 0 && event.getPeptides().size() > 0) {
+        if(event.getSource() == this) {
+            return;
+        }
+
+        if(event.getPeptides().size() > 0) {
             selectionAdapters = new ArrayList<PeptideAdapter>();
             selection = new ArrayList<PeptideMatch>();
 
@@ -163,12 +178,16 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                     selection.add(match);
                 }
             }
-            currentPeptides = selection;
+            currentPeptides = event.getPeptides().get(0);
+            currentPeptideMatches = selection;
+            tempPeptides = selection;
             getView().updatePeptideSelection(selectionAdapters);
         }
         else {
             getView().resetPeptideSelection();
-            currentPeptides = Collections.emptyList();
+            currentPeptides = new EmptyPeptideList();
+            currentPeptideMatches = Collections.emptyList();
+            tempPeptides = Collections.emptyList();
         }
     }
 
@@ -215,7 +234,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             changer.addRegionChange(region);
 
             peptides = new HashSet<String>();
-            for(PeptideMatch peptide : currentPeptides) {
+            for(PeptideMatch peptide : currentPeptideMatches) {
                 if(PeptideUtils.inRange(peptide, event.getStart(),
                         event.getStart() + event.getLength() - 1)) {
                     peptides.add(peptide.getSequence());
@@ -264,8 +283,8 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             regions.add(region.toString());
 
             peptides = new HashSet<String>();
-            if(!region.isEmpty()) {
-                for(PeptideMatch peptide : currentPeptides) {
+            if(!region.isEmpty() && !region.equals(currentRegion)) {
+                for(PeptideMatch peptide : currentPeptideMatches) {
                     if(PeptideUtils.inRange(peptide, start, end)) {
                         peptides.add(peptide.getSequence());
                     }
@@ -305,8 +324,32 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         } catch (IllegalRegionValueException e) {
             regions.add(Region.emptyRegion());
         } finally {
-            // update peptides, send peptide event
             RegionUpdateEvent.fire(this, regions);
+
+            // We have to send an update list of peptides that are selected with
+            // the new list otherwise other widget might get desyncronized,
+            // that's not good.
+
+            //Check if the region changes the number of peptides selected
+            if(tempPeptides.size() !=
+                    PeptideUtils.filterPeptideMatchesNotIn(currentPeptideMatches, start, end).size()) {
+                tempPeptides = PeptideUtils.filterPeptideMatchesNotIn(currentPeptideMatches, start, end);
+
+                // We have to do dirty things to able to give the peptide list to the
+                // other widgets :D
+                List<PeptideList> peptideLists = new ArrayList<PeptideList>();
+
+                if(tempPeptides.size() > 0) {
+                    peptideLists.add(currentPeptides);
+                }
+
+                PeptideUpdateEvent.fire(this, peptideLists);
+
+                // We should restore the variance IDs too in case they need to be reselected
+                if(tempPeptides.size() == currentPeptideMatches.size()) {
+                    VarianceUpdateEvent.fire(this, selectedVarianceIDs.toArray(new String[selectedVarianceIDs.size()]));
+                }
+            }
         }
     }
 
