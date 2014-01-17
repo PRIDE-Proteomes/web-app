@@ -37,13 +37,13 @@ public interface DataServer {
     public boolean isProteinCached(String accession);
     public boolean isPeptideCached(String sequence);
 
-    public void requestGroups(String[] ids);
-    public void requestProteins(String[] accessions);
-    public void requestPeptideVariances(String[] sequences);
+    public void requestGroups(List<String> ids);
+    public void requestProteins(List<String> accessions);
+    public void requestPeptideVariances(List<String> sequences);
 
-    public List<Group> getGroups(String[] ids);
-    public List<Protein> getProteins(String[] accessions);
-    public List<PeptideList> getPeptideVarianceLists(String[] sequences);
+    public List<Group> getGroups(List<String> ids);
+    public List<Protein> getProteins(List<String> accessions);
+    public List<PeptideList> getPeptideVarianceLists(List<String> sequences);
 
     public Group getGroup(String ids);
     public Protein getProtein(String accessions);

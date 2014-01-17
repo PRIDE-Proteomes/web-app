@@ -4,6 +4,8 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 
+import java.util.List;
+
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  *         Date: 04/11/13
@@ -16,20 +18,20 @@ public class TissueUpdateEvent extends GwtEvent<TissueUpdateEvent.Handler> {
 
     private static final Type<Handler> TYPE = new Type<Handler>();
 
-    private String[] tissues;
+    private List<String> tissues;
 
-    public TissueUpdateEvent(String[] tissues, HasHandlers source) {
+    public TissueUpdateEvent(List<String> tissues, HasHandlers source) {
         super();
         this.tissues = tissues;
         setSource(source);
     }
 
-    public static void fire(HasHandlers source, String[] tissues) {
+    public static void fire(HasHandlers source, List<String> tissues) {
         TissueUpdateEvent eventInstance = new TissueUpdateEvent(tissues, source);
         source.fireEvent(eventInstance);
     }
 
-    public String[] getTissues() {
+    public List<String> getTissues() {
         return tissues;
     }
 

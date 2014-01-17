@@ -170,7 +170,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
     @Override
     public void onVarianceUpdateEvent(VarianceUpdateEvent event) {
-        selectedVariancesIDs = Arrays.asList(event.getVarianceIDs());
+        selectedVariancesIDs = event.getVarianceIDs();
     }
 
     @Override

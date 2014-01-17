@@ -5,6 +5,8 @@ import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateExceptio
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -12,19 +14,20 @@ import java.util.Collection;
  *         Time: 10:42
  */
 final class State {
-    private  final String[] selectedGroupIds;
-    private  final String[] selectedProteinIds;
-    private  final String[] selectedRegionIds;
-    private  final String[] selectedPeptideIds;
-    private  final String[] selectedVarianceIds;
-    private  final String[] selectedModificationIds;
-    private  final String[] selectedTissueIds;
+    private  final List<String> selectedGroupIds;
+    private  final List<String> selectedProteinIds;
+    private  final List<String> selectedRegionIds;
+    private  final List<String> selectedPeptideIds;
+    private  final List<String> selectedVarianceIds;
+    private  final List<String> selectedModificationIds;
+    private  final List<String> selectedTissueIds;
 
     private final String historyToken;
 
     static final String sepTypes = "&";
     static final String sepMaps = "=";
     static final String sepValues = ",";
+    static final String sepFields = "+";
 
     static class EmptyState {
         private static final State INSTANCE = new State();
@@ -98,23 +101,23 @@ final class State {
         // We split the strings into arrays or use an empty array if they're
         // empty.
 
-        selectedGroupIds = groupIds.isEmpty() ? new String[0] : groupIds.split(sepValues);
-        selectedProteinIds = proteinIds.isEmpty() ? new String[0] : proteinIds.split(sepValues);
-        selectedRegionIds = regionIds.isEmpty() ? new String[0] : regionIds.split(sepValues);
-        selectedPeptideIds = peptideIds.isEmpty() ? new String[0] : peptideIds.split(sepValues);
-        selectedVarianceIds = varianceIds.isEmpty() ? new String[0] : varianceIds.split(sepValues);
-        selectedModificationIds = modificationIds.isEmpty() ? new String[0] : modificationIds.split(sepValues);
-        selectedTissueIds = tissueIds.isEmpty() ? new String[0] : tissueIds.split(sepValues);
+        selectedGroupIds = groupIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(groupIds.split(sepValues));
+        selectedProteinIds = proteinIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(proteinIds.split(sepValues));
+        selectedRegionIds = regionIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(regionIds.split(sepValues));
+        selectedPeptideIds = peptideIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(peptideIds.split(sepValues));
+        selectedVarianceIds = varianceIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(varianceIds.split(sepValues));
+        selectedModificationIds = modificationIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(modificationIds.split(sepValues));
+        selectedTissueIds = tissueIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(tissueIds.split(sepValues));
     }
 
     private State() {
-        selectedGroupIds = new String[0];
-        selectedProteinIds = new String[0];
-        selectedRegionIds = new String[0];
-        selectedPeptideIds = new String[0];
-        selectedVarianceIds = new String[0];
-        selectedModificationIds = new String[0];
-        selectedTissueIds = new String[0];
+        selectedGroupIds = Collections.emptyList();
+        selectedProteinIds = Collections.emptyList();
+        selectedRegionIds = Collections.emptyList();
+        selectedPeptideIds = Collections.emptyList();
+        selectedVarianceIds = Collections.emptyList();
+        selectedModificationIds = Collections.emptyList();
+        selectedTissueIds = Collections.emptyList();
         historyToken = "";
     }
 
@@ -171,31 +174,31 @@ final class State {
                 varianceIds, modificationIds, tissueIds);
     }
 
-    public String[] getSelectedGroups() {
+    public List<String> getSelectedGroups() {
         return selectedGroupIds;
     }
 
-    public String[] getSelectedProteins() {
+    public List<String> getSelectedProteins() {
         return selectedProteinIds;
     }
 
-    public String[] getSelectedRegions() {
+    public List<String> getSelectedRegions() {
         return selectedRegionIds;
     }
 
-    public String[] getSelectedPeptides() {
+    public List<String> getSelectedPeptides() {
         return selectedPeptideIds;
     }
 
-    public String[] getSelectedVariances() {
+    public List<String> getSelectedVariances() {
         return selectedVarianceIds;
     }
 
-    public String[] getSelectedModifications() {
+    public List<String> getSelectedModifications() {
         return selectedModificationIds;
     }
 
-    public String[] getSelectedTissues() {
+    public List<String> getSelectedTissues() {
         return selectedTissueIds;
     }
 
@@ -209,21 +212,6 @@ final class State {
      * @return section of URL that represents the collection
      */
     static String getToken(Collection<String> ids) {
-        StringBuilder builder = new StringBuilder();
-        for(String id : ids) {
-            builder.append(id);
-            builder.append(sepValues);
-        }
-        return builder.substring(0, builder.length() == 0 ? builder.length():
-                                                            builder.length() - 1);
-    }
-
-    /**
-     * Used to produce a URL token from an array of identifiers.
-     * @param ids the collection that is needed to represent in a URL
-     * @return section of URL that represents the array
-     */
-    static String getToken(String[] ids) {
         StringBuilder builder = new StringBuilder();
         for(String id : ids) {
             builder.append(id);

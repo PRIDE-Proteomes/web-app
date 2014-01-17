@@ -25,10 +25,8 @@ import uk.ac.ebi.pride.widgets.client.protein.events.*;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -68,7 +66,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     // we drag the area highlight without affecting the url
     private PeptideList currentPeptides = new EmptyPeptideList();
     private List<PeptideMatch> currentPeptideMatches = Collections.emptyList();
-    private Collection<String> selectedVarianceIDs = Collections.emptyList();
+    private List<String> selectedVarianceIDs = Collections.emptyList();
 
     //Needed to maintain temporary state while doing a selection
     private List<PeptideMatch> tempPeptides = Collections.emptyList();
@@ -192,7 +190,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
 
     @Override
     public void onVarianceUpdateEvent(VarianceUpdateEvent event) {
-        selectedVarianceIDs = Arrays.asList(event.getVarianceIDs());
+        selectedVarianceIDs = event.getVarianceIDs();
     }
 
     /**
@@ -202,8 +200,8 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-        if(event.getModifications().length > 0) {
-            String currentModification = event.getModifications()[0];
+        if(!event.getModifications().isEmpty()) {
+            String currentModification = event.getModifications().get(0);
             try {
                 int position = Integer.parseInt(currentModification);
 
@@ -345,7 +343,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
 
                 // We should restore the variance IDs too in case they need to be reselected
                 if(tempPeptides.size() == currentPeptideMatches.size()) {
-                    VarianceUpdateEvent.fire(this, selectedVarianceIDs.toArray(new String[selectedVarianceIDs.size()]));
+                    VarianceUpdateEvent.fire(this, selectedVarianceIDs);
                 }
             }
         }

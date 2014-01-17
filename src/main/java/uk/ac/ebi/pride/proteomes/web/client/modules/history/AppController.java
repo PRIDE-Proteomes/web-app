@@ -412,7 +412,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
      * selected peptides.
      */
     private State revisePeptideFilters(State uncheckedState) {
-        if(uncheckedState.getSelectedPeptides().length == 0) {
+        if(uncheckedState.getSelectedPeptides().isEmpty()) {
             return uncheckedState;
         }
 
@@ -432,7 +432,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 }
             }
             if(!contained) {
-                invalidTissues.addAll(Arrays.asList(uncheckedState.getSelectedTissues()));
+                invalidTissues.addAll(uncheckedState.getSelectedTissues());
                 break;
             }
         }
@@ -452,19 +452,19 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 }
             }
             if(!contained) {
-                invalidModifications.addAll(Arrays.asList(uncheckedState.getSelectedModifications()));
+                invalidModifications.addAll(uncheckedState.getSelectedModifications());
                 break;
             }
         }
 
-        validTissues = new ArrayList<String>(Arrays.asList(uncheckedState.getSelectedTissues()));
+        validTissues = new ArrayList<String>(uncheckedState.getSelectedTissues());
         validTissues.removeAll(invalidTissues);
-        if(validTissues.size() < uncheckedState.getSelectedTissues().length) {
+        if(validTissues.size() < uncheckedState.getSelectedTissues().size()) {
             sc.addTissueChange(validTissues);
         }
-        validModifications = new ArrayList<String>(Arrays.asList(uncheckedState.getSelectedModifications()));
+        validModifications = new ArrayList<String>(uncheckedState.getSelectedModifications());
         validModifications.removeAll(invalidModifications);
-        if(validModifications.size() < uncheckedState.getSelectedModifications().length) {
+        if(validModifications.size() < uncheckedState.getSelectedModifications().size()) {
             sc.addModificationChange(validModifications);
         }
 
@@ -487,13 +487,13 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         // (the caller should guarantee this, like processStateQueue() does)
         String title = "";
 
-        if(newState.getSelectedGroups().length > 0) {
+        if(!newState.getSelectedGroups().isEmpty()) {
             ValidStateEvent.fire(this, ValidStateEvent.ViewType.Group);
-            title += "Group " + newState.getSelectedGroups()[0];
+            title += "Group " + newState.getSelectedGroups().get(0);
         }
-        else if(newState.getSelectedProteins().length > 0) {
+        else if(!newState.getSelectedProteins().isEmpty()) {
             ValidStateEvent.fire(this, ValidStateEvent.ViewType.Protein);
-            title += "Protein " + newState.getSelectedProteins()[0];
+            title += "Protein " + newState.getSelectedProteins().get(0);
         }
         else {
             //we get an empty view, we don't do anything to update the view.
@@ -508,16 +508,13 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             History.newItem(newState.getHistoryToken(), false);
         }
 
-        if(!Arrays.equals(newState.getSelectedGroups(),
-                          appState.getSelectedGroups())) {
+        if(!newState.getSelectedGroups().equals(appState.getSelectedGroups())) {
             GroupUpdateEvent.fire(this, server.getGroups(newState.getSelectedGroups()));
         }
-        if(!Arrays.equals(newState.getSelectedProteins(),
-                          appState.getSelectedProteins())) {
+        if(!newState.getSelectedProteins().equals(appState.getSelectedProteins())) {
             ProteinUpdateEvent.fire(this, server.getProteins(newState.getSelectedProteins()));
         }
-        if(!Arrays.equals(newState.getSelectedRegions(),
-                          appState.getSelectedRegions())) {
+        if(!newState.getSelectedRegions().equals(appState.getSelectedRegions())) {
             try {
                 RegionUpdateEvent.fire(this, RegionUtils.tokenize(newState.getSelectedRegions()));
             } catch (IllegalRegionValueException e) {
@@ -528,24 +525,20 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 return;
             }
         }
-        if(!Arrays.equals(newState.getSelectedPeptides(),
-                          appState.getSelectedPeptides())) {
+        if(!newState.getSelectedPeptides().equals(appState.getSelectedPeptides())) {
             // This should group the peptides if there are several proteins
             // selected. Since the group view doesn't allow for this at the
             // moment there's no need to implement it at the moment.
 
             PeptideUpdateEvent.fire(this, server.getPeptideVarianceLists(newState.getSelectedPeptides()));
         }
-        if(!Arrays.equals(newState.getSelectedVariances(),
-                          appState.getSelectedVariances())) {
+        if(!newState.getSelectedVariances().equals(appState.getSelectedVariances())) {
             VarianceUpdateEvent.fire(this, newState.getSelectedVariances());
         }
-        if(!Arrays.equals(newState.getSelectedModifications(),
-                          appState.getSelectedModifications())) {
+        if(!newState.getSelectedModifications().equals(appState.getSelectedModifications())) {
             ModificationUpdateEvent.fire(this, newState.getSelectedModifications());
         }
-        if(!Arrays.equals(newState.getSelectedTissues(),
-                          appState.getSelectedTissues())) {
+        if(!newState.getSelectedTissues().equals(appState.getSelectedTissues())) {
             TissueUpdateEvent.fire(this, newState.getSelectedTissues());
         }
 

@@ -8,7 +8,6 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -211,16 +210,16 @@ public class PeptideUtils {
     }
 
     public static boolean isPeptideMatchNotFiltered(PeptideMatch match,
-                                                    String[] regions,
-                                                    String[] mods,
-                                                    String[] tissues) {
+                                                    List<String> regions,
+                                                    List<String> mods,
+                                                    List<String> tissues) {
         boolean notFiltered;
         List<String> newRegions, newMods, newTissues;
 
         // Check if the peptide match is inside any region,
         // any tissue and any modification type. The lack of
         // filters should yield that the peptide is contained.
-        notFiltered = regions.length == 0 && mods.length == 0 && tissues.length == 0;
+        notFiltered = regions.isEmpty() && mods.isEmpty() && tissues.isEmpty();
 
         if(notFiltered) {
             return true;
@@ -231,28 +230,28 @@ public class PeptideUtils {
         // otherwise we have to use a lot of nested ifs to check for all
         // possible cases where some filter lists are empty.
 
-        if(regions.length == 0) {
+        if(regions.isEmpty()) {
             newRegions = new ArrayList<String>();
             newRegions.add("");
         }
         else {
-            newRegions = Arrays.asList(regions);
+            newRegions = regions;
         }
 
-        if(mods.length == 0) {
+        if(mods.isEmpty()) {
             newMods = new ArrayList<String>();
             newMods.add("");
         }
         else {
-            newMods = Arrays.asList(mods);
+            newMods = mods;
         }
 
-        if(tissues.length == 0) {
+        if(tissues.isEmpty()) {
             newTissues = new ArrayList<String>();
             newTissues.add("");
         }
         else {
-            newTissues = Arrays.asList(tissues);
+            newTissues = tissues;
         }
 
         for(String regionId : newRegions) {

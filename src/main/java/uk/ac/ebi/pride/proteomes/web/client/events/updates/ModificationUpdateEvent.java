@@ -4,6 +4,8 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 
+import java.util.List;
+
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  *         Date: 04/11/13
@@ -16,20 +18,20 @@ public class ModificationUpdateEvent extends GwtEvent<ModificationUpdateEvent.Ha
 
     private static final Type<Handler> TYPE = new Type<Handler>();
 
-    private String[] modifications;
+    private List<String> modifications;
 
-    public ModificationUpdateEvent(String[] modifications, HasHandlers source) {
+    public ModificationUpdateEvent(List<String> modifications, HasHandlers source) {
         super();
         this.modifications = modifications;
         setSource(source);
     }
 
-    public static void fire(HasHandlers source, String[] modifications) {
+    public static void fire(HasHandlers source, List<String> modifications) {
         ModificationUpdateEvent eventInstance = new ModificationUpdateEvent(modifications, source);
         source.fireEvent(eventInstance);
     }
 
-    public String[] getModifications() {
+    public List<String> getModifications() {
         return modifications;
     }
 

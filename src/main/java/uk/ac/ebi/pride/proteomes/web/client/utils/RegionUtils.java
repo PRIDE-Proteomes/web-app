@@ -12,7 +12,7 @@ import java.util.List;
  *         Time: 16:32
  */
 public class RegionUtils {
-    public static List<Region> tokenize(String[] regionIds) throws
+    public static List<Region> tokenize(List<String> regionIds) throws
                                                     IllegalRegionValueException,
                                                     NumberFormatException,
                                                     IndexOutOfBoundsException {

@@ -133,7 +133,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public void requestGroups(String[] ids) {
+    public void requestGroups(List<String> ids) {
         Map<String, Boolean> request = new HashMap<String, Boolean>();
 
         groupRequests.add(request);
@@ -149,7 +149,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public void requestProteins(String[] accessions) {
+    public void requestProteins(List<String> accessions) {
         Map<String, Boolean> request = new HashMap<String, Boolean>();
 
         proteinRequests.add(request);
@@ -164,7 +164,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public void requestPeptideVariances(String[] sequences) {
+    public void requestPeptideVariances(List<String> sequences) {
         Map<String, Boolean> request = new HashMap<String, Boolean>();
 
         peptideVarianceRequests.add(request);
@@ -179,7 +179,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public List<Group> getGroups(String[] ids) {
+    public List<Group> getGroups(List<String> ids) {
         List<Group> groups = new ArrayList<Group>();
         for(String id : ids) {
             groups.add(groupCache.get(id));
@@ -188,7 +188,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public List<Protein> getProteins(String[] accessions) {
+    public List<Protein> getProteins(List<String> accessions) {
         List<Protein> proteins = new ArrayList<Protein>();
         for(String accession : accessions) {
             proteins.add(proteinCache.get(accession));
@@ -197,7 +197,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public List<PeptideList> getPeptideVarianceLists(String[] sequences) {
+    public List<PeptideList> getPeptideVarianceLists(List<String> sequences) {
         List<PeptideList> peptideVarianceLists = new ArrayList<PeptideList>();
         for(String sequence : sequences) {
             peptideVarianceLists.add(peptideVarianceCache.get(sequence));
