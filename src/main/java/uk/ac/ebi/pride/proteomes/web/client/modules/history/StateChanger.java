@@ -1,6 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.history;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
@@ -82,9 +83,13 @@ public class StateChanger {
                                       State.getToken(peptideIds)));
     }
 
-    public void addVarianceChange(Collection<String> varianceSelection) {
+    public void addVarianceChange(Collection<Peptide> varianceSelection) {
+        Collection<String> varianceIDs = new ArrayList<String>();
+        for(Peptide variance : varianceSelection) {
+            varianceIDs.add(variance.getId());
+        }
         orderedChanges.add(new Change(Type.Variance,
-                                      State.getToken(varianceSelection)));
+                                      State.getToken(varianceIDs)));
     }
 
     public void addModificationChange(Collection<String> modificationSelection) {

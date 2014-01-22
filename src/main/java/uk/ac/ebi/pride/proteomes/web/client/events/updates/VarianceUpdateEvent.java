@@ -3,6 +3,7 @@ package uk.ac.ebi.pride.proteomes.web.client.events.updates;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 
 import java.util.List;
 
@@ -18,21 +19,21 @@ public class VarianceUpdateEvent extends GwtEvent<VarianceUpdateEvent.Handler> {
 
     private static final Type<Handler> TYPE = new Type<Handler>();
 
-    private List<String> varianceIDs;
+    private List<Peptide> variances;
 
-    public VarianceUpdateEvent(List<String> varianceIDs, HasHandlers source) {
+    public VarianceUpdateEvent(List<Peptide> variances, HasHandlers source) {
         super();
-        this.varianceIDs = varianceIDs;
+        this.variances = variances;
         setSource(source);
     }
 
-    public static void fire(HasHandlers source, List<String> variances) {
+    public static void fire(HasHandlers source, List<Peptide> variances) {
         VarianceUpdateEvent eventInstance = new VarianceUpdateEvent(variances, source);
         source.fireEvent(eventInstance);
     }
 
-    public List<String> getVarianceIDs() {
-        return varianceIDs;
+    public List<Peptide> getVariances() {
+        return variances;
     }
 
     public static Type<Handler> getType() {

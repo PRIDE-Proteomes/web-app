@@ -5,11 +5,9 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -32,6 +30,27 @@ public class PeptideUtils {
             return peptideMatches;
         }
         for(PeptideMatch peptide : peptideMatches) {
+            if(inRange(peptide, start, end)) {
+                filteredList.add(peptide);
+            }
+        }
+
+        return filteredList;
+    }
+    /**
+     * Filters the peptide matches outside a region
+     * @param peptideMatches the peptide matches to filter
+     * @param start the start point of the region
+     * @param end the end point of the region
+     * @return a new list containing only the peptide matches inside the region
+     */
+    static public List<PeptideWithVariances> filterPeptideWithVariancesNotIn(List<PeptideWithVariances> peptideMatches, int start, int end) {
+        List<PeptideWithVariances> filteredList = new ArrayList<PeptideWithVariances>();
+
+        if(start == end && start == 0) {
+            return peptideMatches;
+        }
+        for(PeptideWithVariances peptide : peptideMatches) {
             if(inRange(peptide, start, end)) {
                 filteredList.add(peptide);
             }
@@ -182,18 +201,6 @@ public class PeptideUtils {
         int pepEnd = peptide.getSequence().length() + peptide.getPosition() - 1;
 
         return end > pepStart && start < pepEnd;
-    }
-
-    public static Collection<Peptide> getFirstOfEach(List<PeptideWithVariances> peptidesLists) {
-        List<Peptide> peptides = new ArrayList<Peptide>();
-
-        for(PeptideList list : peptidesLists) {
-            if(!list.getPeptideList().isEmpty()) {
-                peptides.add(list.getPeptideList().get(0));
-            }
-        }
-
-        return peptides;
     }
 
     public static List<PeptideMatch> filterPeptides(List<PeptideMatch> peptides,

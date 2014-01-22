@@ -618,7 +618,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             }
         }
         if(!newState.getSelectedVariances().equals(appState.getSelectedVariances())) {
-            VarianceUpdateEvent.fire(this, newState.getSelectedVariances());
+            VarianceUpdateEvent.fire(this, server.getCachedPeptideVariances(newState.getSelectedVariances()));
         }
         if(!newState.getSelectedModifications().equals(appState.getSelectedModifications())) {
             ModificationUpdateEvent.fire(this, newState.getSelectedModifications());

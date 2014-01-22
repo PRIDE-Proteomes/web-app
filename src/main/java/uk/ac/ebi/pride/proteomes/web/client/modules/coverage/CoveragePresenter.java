@@ -7,6 +7,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
@@ -59,15 +60,11 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
 
-    //We need to keep both peptide lists updated to be able to send the matches
-    // to the widget and send the peptides to the eventBus when
-    // we drag the area highlight without affecting the url
-    private PeptideWithVariances currentPeptide = PeptideWithVariances.emptyPeptideWithVariances();
-    private List<PeptideMatch> currentPeptideMatches = Collections.emptyList();
-    private List<String> selectedVarianceIDs = Collections.emptyList();
+    private List<PeptideWithVariances> currentPeptideMatches = Collections.emptyList();
+    private List<Peptide> selectedVariances = Collections.emptyList();
 
     //Needed to maintain temporary state while doing a selection
-    private List<PeptideMatch> tempPeptides = Collections.emptyList();
+    private List<PeptideWithVariances> tempPeptides = Collections.emptyList();
 
     public CoveragePresenter(EventBus eventBus, ThisView view) {
         super(eventBus, view);
@@ -155,38 +152,31 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
         List<PeptideAdapter> selectionAdapters;
-        List<PeptideMatch> selection;
 
         if(event.getSource() == this) {
             return;
         }
 
+        currentPeptideMatches = event.getPeptides();
+        tempPeptides = event.getPeptides();
+
         if(event.getPeptides().size() > 0) {
             selectionAdapters = new ArrayList<PeptideAdapter>();
-            selection = new ArrayList<PeptideMatch>();
 
-            for(PeptideMatch match : currentProtein.getPeptides()) {
-                if(match.getSequence().equals(event.getPeptides().get(0).getSequence())) {
-                    selectionAdapters.add(new PeptideAdapter(match));
-                    selection.add(match);
-                }
+            for(PeptideMatch match : event.getPeptides()) {
+                selectionAdapters.add(new PeptideAdapter(match));
             }
-            currentPeptide = event.getPeptides().get(0);
-            currentPeptideMatches = selection;
-            tempPeptides = selection;
+
             getView().updatePeptideSelection(selectionAdapters);
         }
         else {
             getView().resetPeptideSelection();
-            currentPeptide = PeptideWithVariances.emptyPeptideWithVariances();
-            currentPeptideMatches = Collections.emptyList();
-            tempPeptides = Collections.emptyList();
         }
     }
 
     @Override
     public void onVarianceUpdateEvent(VarianceUpdateEvent event) {
-        selectedVarianceIDs = event.getVarianceIDs();
+        selectedVariances = event.getVariances();
     }
 
     /**
@@ -320,26 +310,19 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
 
             // We have to send an update list of peptides that are selected with
             // the new list otherwise other widget might get desyncronized,
-            // that's not good.
+            // that's not good, this can be detected when the filtered list
+            // has a different the size compared with the last temporary list
+            // we stored.
 
-            //Check if the region changes the number of peptides selected
             if(tempPeptides.size() !=
-                    PeptideUtils.filterPeptideMatchesNotIn(currentPeptideMatches, start, end).size()) {
-                tempPeptides = PeptideUtils.filterPeptideMatchesNotIn(currentPeptideMatches, start, end);
+                    PeptideUtils.filterPeptideWithVariancesNotIn(currentPeptideMatches, start, end).size()) {
+                tempPeptides = PeptideUtils.filterPeptideWithVariancesNotIn(currentPeptideMatches, start, end);
 
-                // We have to do dirty things to able to give the peptide list to the
-                // other widgets :D
-                List<PeptideWithVariances> peptideList = new ArrayList<PeptideWithVariances>();
-
-                if(!tempPeptides.isEmpty()) {
-                    peptideList.add(currentPeptide);
-                }
-
-                PeptideUpdateEvent.fire(this, peptideList);
+                PeptideUpdateEvent.fire(this, tempPeptides);
 
                 // We should restore the variance IDs too in case they need to be reselected
                 if(tempPeptides.size() == currentPeptideMatches.size()) {
-                    VarianceUpdateEvent.fire(this, selectedVarianceIDs);
+                    VarianceUpdateEvent.fire(this, selectedVariances);
                 }
             }
         }
@@ -369,15 +352,15 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             }
         }
 
-        List<String> varianceIDs = new ArrayList<String>();
-        for(String varianceID : selectedVarianceIDs) {
-            if(peptide.getSequence().equals(varianceID.split("[|]")[0].substring(1))) {
-                varianceIDs.add(varianceID);
+        List<Peptide> variances = new ArrayList<Peptide>();
+        for(Peptide variance : selectedVariances) {
+            if(peptide.getSequence().equals(variance.getSequence())) {
+                variances.add(variance);
             }
         }
 
-        if(!varianceIDs.containsAll(selectedVarianceIDs)) {
-            changer.addVarianceChange(varianceIDs);
+        if(!variances.containsAll(selectedVariances)) {
+            changer.addVarianceChange(variances);
         }
         peptides.add(peptide);
         changer.addPeptideChange(peptides);

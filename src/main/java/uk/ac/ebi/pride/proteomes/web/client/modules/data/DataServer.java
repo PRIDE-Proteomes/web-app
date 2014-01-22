@@ -2,6 +2,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 
 import java.util.Collection;
@@ -37,6 +38,7 @@ public interface DataServer {
     public boolean isProteinCached(String accession);
     public boolean isPeptideCached(String sequence, String proteinId, int position);
     public boolean isAnyPeptideCached(String sequence);
+    public boolean isPeptideVarianceCached(String varianceId);
 
     public void requestGroups(List<String> ids);
     public void requestProteins(List<String> accessions);
@@ -47,9 +49,11 @@ public interface DataServer {
     public List<Protein> getCachedProteins(List<String> proteinIds);
     public List<PeptideWithVariances> getCachedPeptideVarianceLists(List<String> sequences, List<String> proteinIds, List<Integer> positions);
     public List<PeptideWithVariances> getCachedPeptideVarianceLists(List<String> sequences, List<String> proteinIds);
+    public List<Peptide> getCachedPeptideVariances(List<String> varianceId);
 
     public Group getCachedGroup(String ids);
     public Protein getCachedProtein(String accessions);
-    public PeptideWithVariances getCachedPeptideVarianceList(String varianceId, String proteinId, int position);
-    public PeptideWithVariances getCachedPeptideVarianceList(String varianceId, String proteinIds);
+    public PeptideWithVariances getCachedPeptideVarianceList(String sequence, String proteinId, int position);
+    public PeptideWithVariances getCachedPeptideVarianceList(String sequence, String proteinIds);
+    public Peptide getCachedPeptideVariance(String varianceId);
 }

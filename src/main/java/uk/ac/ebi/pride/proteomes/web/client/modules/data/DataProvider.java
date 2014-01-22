@@ -1,10 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.*;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.GroupRetriever;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.PeptideVarianceRetriever;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.ProteinRetriever;
@@ -37,10 +34,12 @@ public class DataProvider implements DataServer, TransactionHandler {
     // We cache the PeptideLists retrieved as well as store the mapping between
     // sequence and peptide matches, this way we can build PeptideWithVariances
     // dynamically while avoid being a time hog.
-    private Map<String, PeptideList> peptideVarianceCache = new HashMap<String, PeptideList>();
+    private Map<String, PeptideList> peptideVarianceListCache = new HashMap<String, PeptideList>();
     private Map<String, List<PeptideMatch>> peptideMatchCache = new HashMap<String, List<PeptideMatch>>();
     private List<Map<Pair<String, Integer>, Boolean>> peptideVarianceRequests = new ArrayList<Map<Pair<String, Integer>, Boolean>>();
     private final PeptideVarianceRetriever peptideVarianceRetriever;
+
+    private Map<String, Peptide> peptideVarianceCache = new HashMap<String, Peptide>();
 
     public DataProvider(String webServiceRoot) {
         groupRetriever = new GroupRetriever(webServiceRoot);
@@ -93,7 +92,7 @@ public class DataProvider implements DataServer, TransactionHandler {
         }
         else if(transaction.getResponse() instanceof PeptideList) {
             PeptideList pepListReceived = (PeptideList) transaction.getResponse();
-            peptideVarianceCache.put(transaction.getRequestedName(), pepListReceived);
+            peptideVarianceListCache.put(transaction.getRequestedName(), pepListReceived);
 
             // Search for the peptide match requested peptide in the request cache
             // and update the pending requests
@@ -108,6 +107,11 @@ public class DataProvider implements DataServer, TransactionHandler {
                         break;
                     }
                 }
+            }
+
+            // update the variance cache
+            for(Peptide variance : pepListReceived.getPeptideList()) {
+                peptideVarianceCache.put(variance.getId(), variance);
             }
 
             dispatchPeptideVariances();
@@ -148,7 +152,12 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public boolean isAnyPeptideCached(String sequence) {
-        return peptideVarianceCache.containsKey(sequence);
+        return peptideVarianceListCache.containsKey(sequence);
+    }
+
+    @Override
+    public boolean isPeptideVarianceCached(String varianceId) {
+        return peptideVarianceCache.containsKey(varianceId);
     }
 
     @Override
@@ -246,6 +255,15 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
+    public List<Peptide> getCachedPeptideVariances(List<String> varianceId) {
+        List<Peptide> varianceList = new ArrayList<Peptide>();
+        for (String id : varianceId) {
+            varianceList.add(getCachedPeptideVariance(id));
+        }
+        return varianceList;
+    }
+
+    @Override
     public Group getCachedGroup(String id) {
         return groupCache.get(id);
     }
@@ -265,13 +283,18 @@ public class DataProvider implements DataServer, TransactionHandler {
                 break;
             }
         }
-        return new PeptideWithVariances(match, peptideVarianceCache.get(sequence));
+        return new PeptideWithVariances(match, peptideVarianceListCache.get(sequence));
     }
 
     @Override
     public PeptideWithVariances getCachedPeptideVarianceList(String sequence, String proteinId) {
         PeptideMatch match = peptideMatchCache.get(sequence).isEmpty() ? null : peptideMatchCache.get(sequence).get(0);
-        return new PeptideWithVariances(match, peptideVarianceCache.get(sequence));
+        return new PeptideWithVariances(match, peptideVarianceListCache.get(sequence));
+    }
+
+    @Override
+    public Peptide getCachedPeptideVariance(String varianceId) {
+        return peptideVarianceCache.get(varianceId);
     }
 
     private void onErroneousResult(ErroneousResult error) {
@@ -332,7 +355,7 @@ public class DataProvider implements DataServer, TransactionHandler {
                             break;
                         }
                     }
-                    peptideVariances.add(new PeptideWithVariances(match, peptideVarianceCache.get(entry.getKey().getA())));
+                    peptideVariances.add(new PeptideWithVariances(match, peptideVarianceListCache.get(entry.getKey().getA())));
                 }
             }
         }

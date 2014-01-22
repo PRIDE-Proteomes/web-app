@@ -116,8 +116,8 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
         }
 
         selectedVariances = new ArrayList<Peptide>();
-        for(String Id : event.getVarianceIDs()) {
-            int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(), Id);
+        for(Peptide variance : event.getVariances()) {
+            int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(), variance.getId());
             if(peptidePosition > -1) {
                 selectedVariances.add(dataProvider.getList().get(peptidePosition));
             }
@@ -144,14 +144,14 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
             items = Collections.emptyList();
         }
 
-        Set<String> peptideIds = new HashSet<String>();
+        Set<Peptide> variances = new HashSet<Peptide>();
 
-        for(Peptide peptide : items) {
-            peptideIds.add(peptide.getId());
+        for(Peptide variance : items) {
+            variances.add(variance);
         }
 
         changer = new StateChanger();
-        changer.addVarianceChange(peptideIds);
+        changer.addVarianceChange(variances);
 
         if(items.isEmpty()) {
             action = new UserAction(UserAction.Type.variance, "Click Reset");

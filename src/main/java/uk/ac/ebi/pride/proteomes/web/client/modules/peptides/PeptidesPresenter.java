@@ -44,10 +44,10 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
     private boolean groups = true;
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
-    private Collection<PeptideMatch> selectedPeptidesMatches = Collections.emptyList();
+    private Collection<? extends PeptideMatch> selectedPeptidesMatches = Collections.emptyList();
     private List<String> currentTissues = Collections.emptyList();
     private List<String> currentModifications = Collections.emptyList();
-    private List<String> selectedVariancesIDs = Collections.emptyList();
+    private List<Peptide> selectedVariances = Collections.emptyList();
 
     private boolean selectionEventsDisabled = false;
 
@@ -149,18 +149,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
             deselectItem(peptide);
         }
 
-        // we don't care about all the modifications, so we get rid of them
-        // and pick a single variance per list of peptides.
-        Collection<Peptide> selectedPepVars = PeptideUtils.getFirstOfEach(event.getPeptides());
-        selectedPeptidesMatches = new ArrayList<PeptideMatch>();
-        for(Peptide pepVariance : selectedPepVars) {
-            for(PeptideMatch pepMatch : currentProtein.getPeptides()) {
-                if(pepVariance.getSequence().equals(pepMatch.getSequence())) {
-                    selectedPeptidesMatches.add(pepMatch);
-                    break;
-                }
-            }
-        }
+        selectedPeptidesMatches = event.getPeptides();
 
         if(!selectedPeptidesMatches.isEmpty()) {
             // we reselect the peptides only if there are any
@@ -170,7 +159,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
     @Override
     public void onVarianceUpdateEvent(VarianceUpdateEvent event) {
-        selectedVariancesIDs = event.getVarianceIDs();
+        selectedVariances = event.getVariances();
     }
 
     @Override
@@ -228,7 +217,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         }
 
         Set<String> peptideIds = new HashSet<String>();
-        Set<String> varianceIDs = new HashSet<String>();
+        Set<Peptide> variances = new HashSet<Peptide>();
 
         for(PeptideMatch peptide : items) {
             peptideIds.add(peptide.getSequence());
@@ -237,16 +226,16 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         // we should change the variance selection if it doesn't fit the
         // current peptide selection
 
-        for(String varianceID : selectedVariancesIDs) {
-            if(peptideIds.contains(varianceID.split("[|]")[0].substring(1))) {
-                varianceIDs.add(varianceID);
+        for(Peptide variance : selectedVariances) {
+            if(peptideIds.contains(variance.getSequence())) {
+                variances.add(variance);
             }
         }
 
         changer = new StateChanger();
         changer.addPeptideChange(items);
-        if(!varianceIDs.containsAll(selectedVariancesIDs)) {
-            changer.addVarianceChange(varianceIDs);
+        if(!variances.containsAll(selectedVariances)) {
+            changer.addVarianceChange(variances);
         }
 
         if(items.isEmpty()) {
