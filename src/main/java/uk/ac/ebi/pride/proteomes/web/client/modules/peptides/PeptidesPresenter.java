@@ -149,7 +149,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
             deselectItem(peptide);
         }
 
-        selectedPeptidesMatches = event.getPeptides();
+        selectedPeptidesMatches = new ArrayList<PeptideMatch>(event.getPeptides());
 
         if(!selectedPeptidesMatches.isEmpty()) {
             // we reselect the peptides only if there are any
@@ -256,9 +256,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         setList(peptideList);
 
         selectedPeptidesMatches.retainAll(peptideList);
-        for(PeptideMatch peptide : selectedPeptidesMatches) {
-            selectItem(peptide);
-        }
+        selectPeptides();
     }
 
     private void selectItem(PeptideMatch peptide) {
@@ -295,11 +293,6 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
     }
 
     private void selectPeptides() {
-        //we reselect the peptides inside the range, to do this,
-        // we must search first the first peptide match that has the same
-        // sequence as the peptide we want to select.
-        // We assume that if a peptide is in the selected list it already
-        // passes all the filters
         for(PeptideMatch peptide : selectedPeptidesMatches) {
             selectItem(peptide);
         }

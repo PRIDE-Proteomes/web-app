@@ -155,8 +155,9 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             return;
         }
 
-        peptideMatchSelection = event.getPeptides();
-        tempPeptides = event.getPeptides();
+        // we make a copy because if we don't it somehow it sometimes gets reset
+        peptideMatchSelection = new ArrayList<PeptideWithVariances>(event.getPeptides());
+        tempPeptides = new ArrayList<PeptideWithVariances>(event.getPeptides());
 
         if(event.getPeptides().size() > 0) {
             selectionAdapters = new ArrayList<PeptideAdapter>();
