@@ -1,10 +1,11 @@
 package uk.ac.ebi.pride.proteomes.web.client.utils;
 
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 
 import java.util.ArrayList;
@@ -183,7 +184,7 @@ public class PeptideUtils {
         return end > pepStart && start < pepEnd;
     }
 
-    public static Collection<Peptide> getFirstOfEach(List<PeptideList> peptidesLists) {
+    public static Collection<Peptide> getFirstOfEach(List<PeptideWithVariances> peptidesLists) {
         List<Peptide> peptides = new ArrayList<Peptide>();
 
         for(PeptideList list : peptidesLists) {

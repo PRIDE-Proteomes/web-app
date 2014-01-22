@@ -27,7 +27,7 @@ final class State {
     static final String sepTypes = "&";
     static final String sepMaps = "=";
     static final String sepValues = ",";
-    static final String sepFields = "+";
+    static final String sepFields = ";";
 
     static class EmptyState {
         private static final State INSTANCE = new State();
@@ -256,9 +256,21 @@ final class State {
             for(String varianceId : variances.split(sepValues)) {
                 if(!varianceId.isEmpty()) {
                     String varSeq = varianceId.split("[|]")[0].substring(1);
-                    if(!Arrays.asList(peptides.split(sepValues)).contains(varSeq)) {
-                        isValid = false;
+                    String[] pepIds = peptides.split(sepValues);
+                    boolean isContained = false;
+                    for(String pepId : pepIds) {
+                        if(pepId.contains(";")) {
+                            if(varSeq.equals(pepId.split(sepFields)[0])) {
+                                isContained = true;
+                                break;
+                            }
+                        }
+                        else if(varSeq.equals(pepId)) {
+                            isContained = true;
+                            break;
+                        }
                     }
+                    isValid = isContained;
                 }
             }
         }

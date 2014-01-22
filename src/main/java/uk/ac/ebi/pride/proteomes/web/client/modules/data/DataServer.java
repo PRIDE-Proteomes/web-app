@@ -1,7 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 
 import java.util.Collection;
@@ -21,7 +21,7 @@ public interface DataServer {
     public interface DataClient {
         public void onGroupsRetrieved(Collection<Group> groups);
         public void onProteinsRetrieved(Collection<Protein> proteins);
-        public void onPeptideVarianceListsRetrieved(Collection<PeptideList> peptides);
+        public void onPeptideVarianceListsRetrieved(Collection<PeptideWithVariances> peptides);
 
         public void onRetrievalError(ErroneousResult invalidResponse);
     }
@@ -35,17 +35,21 @@ public interface DataServer {
 
     public boolean isGroupCached(String id);
     public boolean isProteinCached(String accession);
-    public boolean isPeptideCached(String sequence);
+    public boolean isPeptideCached(String sequence, String proteinId, int position);
+    public boolean isAnyPeptideCached(String sequence);
 
     public void requestGroups(List<String> ids);
     public void requestProteins(List<String> accessions);
-    public void requestPeptideVariances(List<String> sequences);
+    public void requestPeptideVariances(List<String> sequences, List<String> proteinIds, List<Integer> positions);
+    public void requestPeptideVariances(List<String> sequences, List<String> proteinIds);
 
-    public List<Group> getGroups(List<String> ids);
-    public List<Protein> getProteins(List<String> accessions);
-    public List<PeptideList> getPeptideVarianceLists(List<String> sequences);
+    public List<Group> getCachedGroups(List<String> groupIds);
+    public List<Protein> getCachedProteins(List<String> proteinIds);
+    public List<PeptideWithVariances> getCachedPeptideVarianceLists(List<String> sequences, List<String> proteinIds, List<Integer> positions);
+    public List<PeptideWithVariances> getCachedPeptideVarianceLists(List<String> sequences, List<String> proteinIds);
 
-    public Group getGroup(String ids);
-    public Protein getProtein(String accessions);
-    public PeptideList getPeptideVarianceList(String sequences);
+    public Group getCachedGroup(String ids);
+    public Protein getCachedProtein(String accessions);
+    public PeptideWithVariances getCachedPeptideVarianceList(String varianceId, String proteinId, int position);
+    public PeptideWithVariances getCachedPeptideVarianceList(String varianceId, String proteinIds);
 }

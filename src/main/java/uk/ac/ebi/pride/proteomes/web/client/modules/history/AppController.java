@@ -7,6 +7,7 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.History;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.*;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.GroupRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.PeptideRequestEvent;
@@ -142,7 +143,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
     }
 
     @Override
-    public void onPeptideVarianceListsRetrieved(Collection<PeptideList>  peptides) {
+    public void onPeptideVarianceListsRetrieved(Collection<PeptideWithVariances>  peptides) {
         processStateQueue();
     }
 
@@ -155,7 +156,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
 
         if(erroneousResult.getRequestedType() == Protein.class) {
             for(State state : stateQueue) {
-                if(Arrays.asList(state.getSelectedProteins()).contains(
+                if(state.getSelectedProteins().contains(
                         erroneousResult.getRequestedIdentifier())) {
                     statesToRemove.add(state);
                 }
@@ -163,7 +164,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         }
         else if(erroneousResult.getRequestedType() == Group.class) {
             for(State state : stateQueue) {
-                if(Arrays.asList(state.getSelectedGroups()).contains(
+                if(state.getSelectedGroups().contains(
                         erroneousResult.getRequestedIdentifier())) {
                     statesToRemove.add(state);
                 }
@@ -171,7 +172,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         }
         else if(erroneousResult.getRequestedType() == PeptideList.class) {
             for(State state : stateQueue) {
-                if(Arrays.asList(state.getSelectedPeptides()).contains(
+                if(state.getSelectedPeptides().contains(
                         erroneousResult.getRequestedIdentifier())) {
                     statesToRemove.add(state);
                 }
@@ -233,10 +234,21 @@ public class AppController implements HasHandlers, DataServer.DataClient,
 
         if(!State.getToken(state.getSelectedPeptides()).equals(
                 State.getToken(appState.getSelectedPeptides()))) {
-            for(String sequence : state.getSelectedPeptides()) {
-                if(!server.isPeptideCached(sequence)) {
-                    arePeptidesCached = false;
-                    break;
+            for(String matchID : state.getSelectedPeptides()) {
+                if(matchID.contains(State.sepFields)){
+                    String[] split = matchID.split(State.sepFields);
+                    if(!server.isPeptideCached(split[0],
+                                               state.getSelectedProteins().get(0),
+                                               Integer.parseInt(split[1]))) {
+                        arePeptidesCached = false;
+                        break;
+                    }
+                }
+                else {
+                    if(!server.isAnyPeptideCached(matchID)) {
+                        arePeptidesCached = false;
+                        break;
+                    }
                 }
             }
         }
@@ -267,7 +279,23 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 server.requestProteins(state.getSelectedProteins());
             }
             if(!arePeptidesCached) {
-                server.requestPeptideVariances(state.getSelectedPeptides());
+                List<String> sequences = new ArrayList<String>();
+                List<String> proteins = new ArrayList<String>();
+                List<Integer> positions = new ArrayList<Integer>();
+                for(String id : state.getSelectedPeptides()) {
+                    String[] split = id.split(State.sepFields);
+                    sequences.add(split[0]);
+                    proteins.add(state.getSelectedProteins().get(0));
+                    if(id.contains(State.sepFields)) {
+                        positions.add(Integer.parseInt(split[1]));
+                        server.requestPeptideVariances(sequences, proteins, positions);
+                    }
+                    else {
+                        server.requestPeptideVariances(sequences, proteins);
+                    }
+                }
+
+
             }
         }
     }
@@ -336,9 +364,17 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 return false;
             }
         }
-        for(String sequence : state.getSelectedPeptides()) {
-            if(!server.isPeptideCached(sequence)) {
-                return false;
+        for(String matchID : state.getSelectedPeptides()) {
+            if(matchID.contains(State.sepFields)) {
+                String[] split = matchID.split(State.sepFields);
+                if(!server.isPeptideCached(split[0], state.getSelectedProteins().get(0), Integer.parseInt(split[1]))) {
+                    return false;
+                }
+            }
+            else {
+                if(!server.isAnyPeptideCached(matchID)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -359,9 +395,22 @@ public class AppController implements HasHandlers, DataServer.DataClient,
 
         // for each peptide in the state check if they belong in all the
         // selected groups, proteins and match the filters.
-        for(String sequence : state.getSelectedPeptides()) {
-            for(String id : state.getSelectedGroups()) {
-                if(!server.getGroup(id).getMemberProteins().contains
+        for(String pepId : state.getSelectedPeptides()) {
+            String sequence;
+            int position;
+
+            if(pepId.contains(State.sepFields)) {
+                String[] split = pepId.split(State.sepFields);
+                sequence = split[0];
+                position = Integer.parseInt(split[1]);
+            }
+            else {
+                sequence = pepId;
+                position = -1;
+            }
+
+            for(String groupId : state.getSelectedGroups()) {
+                if(!server.getCachedGroup(groupId).getMemberProteins().contains
                         (sequence)) {
                     isCorrect = false;
                     break;
@@ -375,8 +424,8 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 //check if the peptide in the state are actually in the
                 // protein, as well as inside the regions selected.
                 boolean isContained = false;
-                for(PeptideMatch match : server.getProtein(accession).getPeptides()) {
-                    if(sequence.equals(match.getSequence())) {
+                for(PeptideMatch match : server.getCachedProtein(accession).getPeptides()) {
+                    if(sequence.equals(match.getSequence()) && (position == -1 || position == match.getPosition())) {
                         isContained = PeptideUtils.isPeptideMatchNotFiltered(match,
                                 state.getSelectedRegions(),
                                 state.getSelectedModifications(),
@@ -423,7 +472,27 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         List<String> validModifications;
         boolean contained;
 
-        for(PeptideList peptideVariances : server.getPeptideVarianceLists(uncheckedState.getSelectedPeptides())) {
+        List<String> sequences = new ArrayList<String>();
+        List<String> proteins = new ArrayList<String>();
+        List<Integer> positions = new ArrayList<Integer>();
+        List<PeptideWithVariances> peptideLists;
+        for(String id : uncheckedState.getSelectedPeptides()) {
+            String[] split = id.split(State.sepFields);
+            sequences.add(split[0]);
+            proteins.add(uncheckedState.getSelectedProteins().get(0));
+
+            if(id.contains(State.sepFields)) {
+                positions.add(Integer.parseInt(split[1]));
+            }
+        }
+        if(!positions.isEmpty()) {
+            peptideLists = server.getCachedPeptideVarianceLists(sequences, proteins, positions);
+        }
+        else {
+            peptideLists = server.getCachedPeptideVarianceLists(sequences, proteins);
+        }
+
+        for(PeptideList peptideVariances : peptideLists) {
             contained = false;
             for(String tissue : uncheckedState.getSelectedTissues()) {
                 if(peptideVariances.getPeptideList().get(0).getTissues().contains(tissue)) {
@@ -437,7 +506,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             }
         }
 
-        for(PeptideList peptideVariances : server.getPeptideVarianceLists(uncheckedState.getSelectedPeptides())) {
+        for(PeptideList peptideVariances : peptideLists) {
             contained = false;
             for(String mod : uncheckedState.getSelectedModifications()) {
                 for(ModifiedLocation mLoc :
@@ -509,10 +578,10 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         }
 
         if(!newState.getSelectedGroups().equals(appState.getSelectedGroups())) {
-            GroupUpdateEvent.fire(this, server.getGroups(newState.getSelectedGroups()));
+            GroupUpdateEvent.fire(this, server.getCachedGroups(newState.getSelectedGroups()));
         }
         if(!newState.getSelectedProteins().equals(appState.getSelectedProteins())) {
-            ProteinUpdateEvent.fire(this, server.getProteins(newState.getSelectedProteins()));
+            ProteinUpdateEvent.fire(this, server.getCachedProteins(newState.getSelectedProteins()));
         }
         if(!newState.getSelectedRegions().equals(appState.getSelectedRegions())) {
             try {
@@ -530,7 +599,23 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             // selected. Since the group view doesn't allow for this at the
             // moment there's no need to implement it at the moment.
 
-            PeptideUpdateEvent.fire(this, server.getPeptideVarianceLists(newState.getSelectedPeptides()));
+            List<String> sequences = new ArrayList<String>();
+            List<String> proteins = new ArrayList<String>();
+            List<Integer> positions = new ArrayList<Integer>();
+            for(String id : newState.getSelectedPeptides()) {
+                String[] split = id.split(State.sepFields);
+                sequences.add(split[0]);
+                proteins.add(newState.getSelectedProteins().get(0));
+                if(id.contains(State.sepFields)) {
+                    positions.add(Integer.parseInt(split[1]));
+                }
+            }
+            if(!positions.isEmpty()) {
+                PeptideUpdateEvent.fire(this, server.getCachedPeptideVarianceLists(sequences, proteins, positions));
+            }
+            else {
+                PeptideUpdateEvent.fire(this, server.getCachedPeptideVarianceLists(sequences, proteins));
+            }
         }
         if(!newState.getSelectedVariances().equals(appState.getSelectedVariances())) {
             VarianceUpdateEvent.fire(this, newState.getSelectedVariances());

@@ -1,8 +1,13 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.history;
 
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
 import uk.ac.ebi.pride.proteomes.web.client.utils.DefaultHashMap;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -41,24 +46,40 @@ public class StateChanger {
 
     Queue<Change> orderedChanges = new LinkedList<Change>();
 
-    public void addGroupChange(Collection<String> groupSelection) {
+    public void addGroupChange(Collection<Group> groupSelection) {
+        Collection<String> groupIds = new ArrayList<String>();
+        for(Group group : groupSelection) {
+            groupIds.add(group.getId());
+        }
         orderedChanges.add(new Change(Type.Group,
-                                      State.getToken(groupSelection)));
+                                      State.getToken(groupIds)));
     }
 
-    public void addProteinChange(Collection<String> proteinSelection) {
+    public void addProteinChange(Collection<Protein> proteinSelection) {
+        Collection<String> proteinIds = new ArrayList<String>();
+        for(Protein prot : proteinSelection) {
+            proteinIds.add(prot.getAccession());
+        }
         orderedChanges.add(new Change(Type.Protein,
-                                      State.getToken(proteinSelection)));
+                                      State.getToken(proteinIds)));
     }
 
-    public void addRegionChange(Collection<String> regionSelection) {
+    public void addRegionChange(Collection<Region> regionSelection) {
+        Collection<String> regionIds = new ArrayList<String>();
+        for(Region reg : regionSelection) {
+            regionIds.add(reg.toString());
+        }
         orderedChanges.add(new Change(Type.Region,
-                                      State.getToken(regionSelection)));
+                                      State.getToken(regionIds)));
     }
 
-    public void addPeptideChange(Collection<String> peptideSelection) {
+    public void addPeptideChange(Collection<PeptideMatch> peptideSelection) {
+        Collection<String> peptideIds = new ArrayList<String>();
+        for(PeptideMatch match : peptideSelection) {
+            peptideIds.add(match.getSequence() + State.sepFields + match.getPosition());
+        }
         orderedChanges.add(new Change(Type.Peptide,
-                                      State.getToken(peptideSelection)));
+                                      State.getToken(peptideIds)));
     }
 
     public void addVarianceChange(Collection<String> varianceSelection) {
@@ -84,7 +105,7 @@ public class StateChanger {
     State change(State oldState) throws InconsistentStateException {
         State changedState;
 
-        if(orderedChanges.size() == 0) {
+        if(orderedChanges.isEmpty()) {
             changedState = oldState;
         }
         else {

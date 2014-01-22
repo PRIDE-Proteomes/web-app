@@ -80,7 +80,7 @@ public class WhistleBlower implements StateChangingActionEvent.Handler,
             String evName = StringUtils.getShortName(event.getClass());
             String vType = event.getState();
 
-            Console.info("(Whistler): " + getIndentation() + evName +
+            Console.info("(Whistler):   " + getIndentation() + evName +
                     "(\"" + vType + "\")" + " <- " + clName);
         }
     }

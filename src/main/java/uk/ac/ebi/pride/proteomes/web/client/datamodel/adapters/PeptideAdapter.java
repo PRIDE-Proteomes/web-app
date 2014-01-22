@@ -1,7 +1,7 @@
 package uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters;
 
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.widgets.client.common.handler.PeptideHandler;
 
 import java.util.List;

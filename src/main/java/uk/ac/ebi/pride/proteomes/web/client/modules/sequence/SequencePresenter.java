@@ -111,13 +111,12 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
         List<PeptideAdapter> selectionAdapters;
         List<PeptideMatch> selection;
 
-        if(event.getPeptides().size() > 0 && event.getPeptides().size() > 0) {
+        if(event.getPeptides().size() > 0) {
             selectionAdapters = new ArrayList<PeptideAdapter>();
             selection = new ArrayList<PeptideMatch>();
 
             for(PeptideMatch match : currentProtein.getPeptides()) {
-                if(match.getSequence().equals(event.getPeptides().get(0)
-                        .getPeptideList().get(0).getSequence())) {
+                if(match.getSequence().equals(event.getPeptides().get(0).getSequence())) {
                     selectionAdapters.add(new PeptideAdapter(match));
                     selection.add(match);
                 }
@@ -134,8 +133,8 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
 
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-        if(event.getModifications().length > 0) {
-            String currentModification = event.getModifications()[0];
+        if(!event.getModifications().isEmpty()) {
+            String currentModification = event.getModifications().get(0);
             try {
                 Integer.parseInt(currentModification);
             }
@@ -151,32 +150,31 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
     @Override
     public void onRegionSelected(ProteinRegionSelectionEvent event) {
         StateChanger changer = new StateChanger();
-        List<String> regions = new ArrayList<String>();
+        List<Region> regions = new ArrayList<Region>();
         UserAction action = new UserAction(UserAction.Type.region, "Drag Set");
-        Set<String> peptides;
+        Set<PeptideMatch> peptides;
 
         // if the selection is done right to left then start > end
         int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
         int end = event.getStart() + event.getEnd() - start;
 
         try {
-            regions.add(new Region(start, end).toString());
+            regions.add(new Region(start, end));
 
             // We should keep selecting only the peptides that fit in the new
             // region
             if(currentPeptides.size() > 0) {
-                peptides = new HashSet<String>();
+                peptides = new HashSet<PeptideMatch>();
                 for(PeptideMatch peptide : currentPeptides) {
                     if(PeptideUtils.inRange(peptide, start, end)) {
-                        peptides.add(peptide.getSequence());
+                        peptides.add(peptide);
                     }
                 }
 
                 changer.addPeptideChange(peptides);
             }
 
-        } catch (IllegalRegionValueException e) {
-            regions.add("");
+        } catch (IllegalRegionValueException ignore) {
 
         } finally {
             changer.addRegionChange(regions);

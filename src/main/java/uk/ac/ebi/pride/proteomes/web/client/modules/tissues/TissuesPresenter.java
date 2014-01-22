@@ -7,6 +7,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
@@ -43,7 +44,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
 
     private boolean groups = true;
     private Collection<String> selectedTissues = Collections.emptyList();
-    private Collection<Peptide> selectedPeptides = Collections.emptyList();
+    private Collection<? extends PeptideMatch> selectedPeptides = Collections.emptyList();
     private boolean selectionEventsDisabled = false;
 
     public TissuesPresenter(EventBus eventBus, ListView<String> view) {
@@ -119,7 +120,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
             selectedPeptides = Collections.emptyList();
         }
         else {
-            selectedPeptides = event.getPeptides().get(0).getPeptideList();
+            selectedPeptides = event.getPeptides();
         }
     }
 
@@ -140,7 +141,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
     public void onSelectionChanged(Collection<String> items) {
         StateChanger changer;
         UserAction action;
-        List<String> filteredPeptides;
+        List<PeptideMatch> filteredPeptides;
 
         // an empty selection is represented by a list with a null item,
         // we represent that with an empty list, so we have to add an
@@ -154,12 +155,12 @@ public class TissuesPresenter extends Presenter<ListView<String>>
 
         selectedTissues = items;
 
-        filteredPeptides = new ArrayList<String>();
-        for(Peptide pep : selectedPeptides) {
+        filteredPeptides = new ArrayList<PeptideMatch>();
+        for(PeptideMatch pep : selectedPeptides) {
             // If the collections are disjoint means the peptide doesn't have
             // any tissue in items. If this happens, we filter it out.
             if(!Collections.disjoint(pep.getTissues(), items) || items.isEmpty()) {
-                filteredPeptides.add(pep.getSequence());
+                filteredPeptides.add(pep);
             }
         }
 

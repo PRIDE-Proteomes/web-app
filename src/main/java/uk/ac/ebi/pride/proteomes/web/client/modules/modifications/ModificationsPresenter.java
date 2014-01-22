@@ -8,8 +8,8 @@ import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
@@ -45,7 +45,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
     private boolean groups;
     private boolean selectionEventsDisabled = false;
     private Collection<Multiset.Entry<String>> selectedModifications = Collections.emptyList();
-    private Collection<Peptide> selectedPeptides = Collections.emptyList();
+    private Collection<? extends PeptideMatch> selectedPeptides = Collections.emptyList();
 
     public ModificationsPresenter(EventBus eventBus, ListView<Multiset.Entry<String>> view) {
         super(eventBus, view);
@@ -122,7 +122,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
             selectedPeptides = Collections.emptyList();
         }
         else {
-            selectedPeptides = event.getPeptides().get(0).getPeptideList();
+            selectedPeptides = event.getPeptides();
         }
     }
 
@@ -149,7 +149,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
     public void onSelectionChanged(Collection<Multiset.Entry<String>> items) {
         StateChanger changer;
         UserAction action;
-        List<String> filteredPeptides;
+        List<PeptideMatch> filteredPeptides;
 
         if((items.containsAll(selectedModifications) &&
             selectedModifications.containsAll(items)) ||
@@ -166,8 +166,8 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
             selection.add(item.getElement());
         }
 
-        filteredPeptides = new ArrayList<String>();
-        for(Peptide pep : selectedPeptides) {
+        filteredPeptides = new ArrayList<PeptideMatch>();
+        for(PeptideMatch pep : selectedPeptides) {
             Set<String> mods = new HashSet<String>();
             for(ModifiedLocation modLoc : pep.getModifiedLocations()) {
                 mods.add(modLoc.getModification());
@@ -176,7 +176,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
             // If the collections are disjoint means the peptide doesn't have
             // any modifications in items. If this happens, we filter it out.
             if(!Collections.disjoint(mods, selection) || selection.isEmpty()) {
-                filteredPeptides.add(pep.getSequence());
+                filteredPeptides.add(pep);
             }
         }
 

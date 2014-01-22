@@ -5,8 +5,8 @@ import com.google.gwt.view.client.*;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
@@ -244,7 +244,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         }
 
         changer = new StateChanger();
-        changer.addPeptideChange(peptideIds);
+        changer.addPeptideChange(items);
         if(!varianceIDs.containsAll(selectedVariancesIDs)) {
             changer.addVarianceChange(varianceIDs);
         }
