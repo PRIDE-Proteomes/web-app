@@ -200,13 +200,13 @@ public class PeptideUtils {
         int pepStart = peptide.getPosition();
         int pepEnd = peptide.getSequence().length() + peptide.getPosition() - 1;
 
-        return end > pepStart && start < pepEnd;
+        return end >= pepStart && start <= pepEnd;
     }
 
-    public static List<PeptideMatch> filterPeptides(List<PeptideMatch> peptides,
-                                                    int start, int end,
-                                                    List<String> tissues,
-                                                    List<String> mods) {
+    public static List<PeptideMatch> filterPeptideMatches(List<PeptideMatch> peptides,
+                                                          int start, int end,
+                                                          List<String> tissues,
+                                                          List<String> mods) {
 
         return filterPeptideMatchesWithoutAnyModifications(
                 filterPeptidesNotInTissues(
@@ -268,7 +268,7 @@ public class PeptideUtils {
                     try {
                         //We want to check permutations,
                         // so we  pack the single tissues and modifications
-                        // into lists and use the filterPeptides method
+                        // into lists and use the filterPeptideMatches method
                         Region region;
                         if(regionId.equals("")) {
                             region = Region.emptyRegion();
@@ -283,7 +283,7 @@ public class PeptideUtils {
                         List<String> mList = new ArrayList<String>();
                         mList.add(mod);
 
-                        if(!filterPeptides(pList,
+                        if(!filterPeptideMatches(pList,
                                 region.getStart(), region.getEnd(),
                                 tList, mList).isEmpty()) {
                             return true;

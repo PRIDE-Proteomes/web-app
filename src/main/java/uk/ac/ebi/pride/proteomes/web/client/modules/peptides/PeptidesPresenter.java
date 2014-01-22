@@ -4,6 +4,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.view.client.*;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
@@ -44,7 +45,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
     private boolean groups = true;
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
-    private Collection<? extends PeptideMatch> selectedPeptidesMatches = Collections.emptyList();
+    private List<PeptideWithVariances> selectedPeptidesMatches = Collections.emptyList();
     private List<String> currentTissues = Collections.emptyList();
     private List<String> currentModifications = Collections.emptyList();
     private List<Peptide> selectedVariances = Collections.emptyList();
@@ -71,12 +72,10 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
-                if(!selectionEventsDisabled) {
-                    Set<PeptideMatch> selection = new HashSet<PeptideMatch>();
-                    selection.add(selectionModel.getSelectedObject());
-                    for(ListUiHandler<PeptideMatch> handler : getView().getUiHandlers()) {
-                        handler.onSelectionChanged(selection);
-                    }
+                Set<PeptideMatch> selection = new HashSet<PeptideMatch>();
+                selection.add(selectionModel.getSelectedObject());
+                for(ListUiHandler<PeptideMatch> handler : getView().getUiHandlers()) {
+                    handler.onSelectionChanged(selection);
                 }
             }
         });
@@ -138,18 +137,18 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
             currentRegion = event.getRegions().get(0);
         }
 
-        updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
+        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
                 currentTissues, currentModifications));
     }
 
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
-        for(Peptide peptide : selectedPeptidesMatches) {
+        for(PeptideMatch peptide : selectedPeptidesMatches) {
             deselectItem(peptide);
         }
 
-        selectedPeptidesMatches = new ArrayList<PeptideMatch>(event.getPeptides());
+        selectedPeptidesMatches = new ArrayList<PeptideWithVariances>(event.getPeptides());
 
         if(!selectedPeptidesMatches.isEmpty()) {
             // we reselect the peptides only if there are any
@@ -170,7 +169,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
                 currentTissues.add(tissue);
             }
         }
-        updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
+        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
                 currentTissues, currentModifications));
     }
@@ -195,7 +194,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
                 }
             }
         }
-        updateList(PeptideUtils.filterPeptides(currentProtein.getPeptides(),
+        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
                 currentTissues, currentModifications));
     }
@@ -204,6 +203,8 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
     public void onSelectionChanged(Collection<PeptideMatch> items) {
         StateChanger changer;
         UserAction action;
+        if(selectionEventsDisabled)
+            return;
 
         // an empty selection is represented by a list with a null items,
         // we represent that with an empty list, so we have to add an
@@ -248,20 +249,16 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         StateChangingActionEvent.fire(this, changer, action);
     }
 
-    private void updateList(List<PeptideMatch> peptideList) {
-        for(Peptide peptide : selectedPeptidesMatches) {
+    private void updateList(List<? extends PeptideMatch> peptideList) {
+        for(PeptideMatch peptide : selectedPeptidesMatches) {
             deselectItem(peptide);
         }
 
         setList(peptideList);
-
-        selectedPeptidesMatches.retainAll(peptideList);
         selectPeptides();
     }
 
     private void selectItem(PeptideMatch peptide) {
-        // search the first occurrence of the peptide, we can only select
-        // one because of the selection model
         int peptidePosition = -1;
         for(int i = 0; i < dataProvider.getList().size(); i++) {
             PeptideMatch match = dataProvider.getList().get(i);
@@ -279,11 +276,16 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         }
     }
 
-    private void deselectItem(Peptide peptide) {
-        // search the first occurrence of the peptide, we can only select
-        // one because of the selection model
-        int peptidePosition = PeptideUtils.firstIndexWithSequence(dataProvider.getList
-                (), peptide.getSequence());
+    private void deselectItem(PeptideMatch peptide) {
+        int peptidePosition = -1;
+        for(int i = 0; i < dataProvider.getList().size(); i++) {
+            PeptideMatch match = dataProvider.getList().get(i);
+            if(peptide.getSequence().equals(match.getSequence())
+                    && peptide.getPosition().equals(match.getPosition())) {
+                peptidePosition = i;
+                break;
+            }
+        }
 
         if(peptidePosition > -1) {
             selectionEventsDisabled = true;
@@ -308,7 +310,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
      * sure the view gets the updated list at this instant and everything
      * will be synchronized.
      */
-    private void setList(final List<PeptideMatch> peptideList) {
+    private void setList(final List<? extends PeptideMatch> peptideList) {
         dataProvider.getList().clear();
         dataProvider.getList().addAll(peptideList);
         dataSorter.repeatSort();
