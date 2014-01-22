@@ -28,9 +28,9 @@ public class GenericErroneousResult implements DataServer.ErroneousResult {
 
     @Override
     public String getErrorDescription() {
-        return "Received the unknown data type \""
+        return "Received invalid data of the type \""
                + StringUtils.getShortName(getRequestedType())
-               + "\" from the server with th id \""
+               + "\" from the server with the id \""
                + getRequestedIdentifier()
                + "\".";
     }

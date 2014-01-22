@@ -256,16 +256,23 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         setList(peptideList);
 
         selectedPeptidesMatches.retainAll(peptideList);
-        for(Peptide peptide : selectedPeptidesMatches) {
+        for(PeptideMatch peptide : selectedPeptidesMatches) {
             selectItem(peptide);
         }
     }
 
-    private void selectItem(Peptide peptide) {
+    private void selectItem(PeptideMatch peptide) {
         // search the first occurrence of the peptide, we can only select
         // one because of the selection model
-        int peptidePosition = PeptideUtils.firstIndexWithSequence(dataProvider.getList
-                (), peptide.getSequence());
+        int peptidePosition = -1;
+        for(int i = 0; i < dataProvider.getList().size(); i++) {
+            PeptideMatch match = dataProvider.getList().get(i);
+            if(peptide.getSequence().equals(match.getSequence())
+                && peptide.getPosition().equals(match.getPosition())) {
+                peptidePosition = i;
+                break;
+            }
+        }
 
         if(peptidePosition > -1) {
             selectionEventsDisabled = true;
@@ -293,7 +300,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         // sequence as the peptide we want to select.
         // We assume that if a peptide is in the selected list it already
         // passes all the filters
-        for(Peptide peptide : selectedPeptidesMatches) {
+        for(PeptideMatch peptide : selectedPeptidesMatches) {
             selectItem(peptide);
         }
     }

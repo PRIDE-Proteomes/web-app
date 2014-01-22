@@ -23,11 +23,11 @@ public class PeptideUtils {
      * @param end the end point of the region
      * @return a new list containing only the peptide matches inside the region
      */
-    static public List<PeptideMatch> filterPeptideMatchesNotIn(List<PeptideMatch> peptideMatches, int start, int end) {
+    static public List<PeptideMatch> filterPeptideMatchesNotIn(List<? extends PeptideMatch> peptideMatches, int start, int end) {
         List<PeptideMatch> filteredList = new ArrayList<PeptideMatch>();
 
         if(start == end && start == 0) {
-            return peptideMatches;
+            return (List<PeptideMatch>) peptideMatches;
         }
         for(PeptideMatch peptide : peptideMatches) {
             if(inRange(peptide, start, end)) {

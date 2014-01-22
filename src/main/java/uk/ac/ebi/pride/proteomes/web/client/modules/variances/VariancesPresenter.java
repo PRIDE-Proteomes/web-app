@@ -6,9 +6,8 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.EmptyPeptideList;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
@@ -95,13 +94,13 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
         if(!groups) {
-            PeptideList currentPeptide;
+            PeptideWithVariances currentPeptide;
             if(event.getPeptides().size() > 0) {
                 currentPeptide = event.getPeptides().get(0);
                 getView().showContent();
             }
             else {
-                currentPeptide = new EmptyPeptideList();
+                currentPeptide = PeptideWithVariances.emptyPeptideWithVariances();
             }
             updateList(currentPeptide.getPeptideList());
             selectedVariances = new ArrayList<Peptide>();

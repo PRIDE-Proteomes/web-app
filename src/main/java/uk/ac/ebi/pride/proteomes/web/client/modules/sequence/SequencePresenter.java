@@ -2,6 +2,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.sequence;
 
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
@@ -41,7 +42,7 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
                                           ModificationUpdateEvent.Handler {
     private boolean hiding = true;
     private Protein currentProtein;
-    private List<PeptideMatch> currentPeptides = Collections.emptyList();
+    private List<PeptideWithVariances> currentPeptides = Collections.emptyList();
 
     public interface ThisView extends View, HasUiHandlers<SequenceUiHandler> {
         void updateProtein(ProteinAdapter proteinAdapter);
@@ -109,19 +110,14 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
         List<PeptideAdapter> selectionAdapters;
-        List<PeptideMatch> selection;
 
         if(event.getPeptides().size() > 0) {
             selectionAdapters = new ArrayList<PeptideAdapter>();
-            selection = new ArrayList<PeptideMatch>();
 
-            for(PeptideMatch match : currentProtein.getPeptides()) {
-                if(match.getSequence().equals(event.getPeptides().get(0).getSequence())) {
-                    selectionAdapters.add(new PeptideAdapter(match));
-                    selection.add(match);
-                }
+            for(PeptideMatch match : event.getPeptides()) {
+                selectionAdapters.add(new PeptideAdapter(match));
             }
-            currentPeptides = selection;
+            currentPeptides = event.getPeptides();
             getView().updatePeptideSelection(selectionAdapters);
 
         }

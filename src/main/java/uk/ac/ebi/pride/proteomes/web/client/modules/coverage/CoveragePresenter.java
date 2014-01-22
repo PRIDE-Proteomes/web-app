@@ -24,8 +24,6 @@ import uk.ac.ebi.pride.widgets.client.protein.events.*;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Collections;
 
 /**
@@ -60,7 +58,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
 
-    private List<PeptideWithVariances> currentPeptideMatches = Collections.emptyList();
+    private List<PeptideWithVariances> peptideMatchSelection = Collections.emptyList();
     private List<Peptide> selectedVariances = Collections.emptyList();
 
     //Needed to maintain temporary state while doing a selection
@@ -133,9 +131,9 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         // Apparently when the region gets modified the peptide selection
         // gets reset, we must set it again manually.
 
-        if(!currentPeptideMatches.isEmpty()) {
+        if(!peptideMatchSelection.isEmpty()) {
             selectionAdapters = new ArrayList<PeptideAdapter>();
-            for(PeptideMatch match : currentPeptideMatches) {
+            for(PeptideMatch match : peptideMatchSelection) {
                 selectionAdapters.add(new PeptideAdapter(match));
             }
             getView().updatePeptideSelection(selectionAdapters);
@@ -157,7 +155,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             return;
         }
 
-        currentPeptideMatches = event.getPeptides();
+        peptideMatchSelection = event.getPeptides();
         tempPeptides = event.getPeptides();
 
         if(event.getPeptides().size() > 0) {
@@ -208,21 +206,19 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     public void onRegionClickSelected(ProteinRegionSelectionEvent event) {
         StateChanger changer = new StateChanger();
         List<Region> region = new ArrayList<Region>();
-        Set<PeptideMatch> peptides;
+        List<PeptideMatch> peptides;
 
         try {
             region.add(new Region(event.getStart(), event.getStart() + event
                     .getLength() - 1));
             changer.addRegionChange(region);
 
-            peptides = new HashSet<PeptideMatch>();
-            for(PeptideMatch peptide : currentPeptideMatches) {
-                if(PeptideUtils.inRange(peptide, event.getStart(),
-                        event.getStart() + event.getLength() - 1)) {
-                    peptides.add(peptide);
-                }
+            peptides = PeptideUtils.filterPeptideMatchesNotIn(peptideMatchSelection,
+                    event.getStart(), event.getStart() + event.getLength() - 1);
+
+            if(peptides.size() != peptideMatchSelection.size()) {
+                changer.addPeptideChange(peptides);
             }
-            changer.addPeptideChange(peptides);
 
             UserAction action = new UserAction(UserAction.Type.region,
                                                "Click Coverage Set");
@@ -238,7 +234,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         StateChanger changer = new StateChanger();
         List<Region> regions = new ArrayList<Region>();
         UserAction action = UserAction.emptyAction();
-        Set<PeptideMatch> peptides;
+        List<PeptideMatch> peptides;
         Region region;
 
         // if the selection is done right to left then start > end
@@ -264,17 +260,12 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
 
             regions.add(region);
 
-            peptides = new HashSet<PeptideMatch>();
-            if(!region.isEmpty() && !region.equals(currentRegion)) {
-                for(PeptideMatch peptide : currentPeptideMatches) {
-                    if(PeptideUtils.inRange(peptide, start, end)) {
-                        peptides.add(peptide);
-                    }
-                }
+            peptides = PeptideUtils.filterPeptideMatchesNotIn(peptideMatchSelection,
+                    start, end);
+
+            if(peptides.size() != peptideMatchSelection.size()) {
+                changer.addPeptideChange(peptides);
             }
-            // if the region is empty then an empty set will get sent, we reset
-            // the peptide selection.
-            changer.addPeptideChange(peptides);
 
         } catch (IllegalRegionValueException e) {
             action = new UserAction(UserAction.Type.region,
@@ -315,13 +306,13 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             // we stored.
 
             if(tempPeptides.size() !=
-                    PeptideUtils.filterPeptideWithVariancesNotIn(currentPeptideMatches, start, end).size()) {
-                tempPeptides = PeptideUtils.filterPeptideWithVariancesNotIn(currentPeptideMatches, start, end);
+                    PeptideUtils.filterPeptideWithVariancesNotIn(peptideMatchSelection, start, end).size()) {
+                tempPeptides = PeptideUtils.filterPeptideWithVariancesNotIn(peptideMatchSelection, start, end);
 
                 PeptideUpdateEvent.fire(this, tempPeptides);
 
                 // We should restore the variance IDs too in case they need to be reselected
-                if(tempPeptides.size() == currentPeptideMatches.size()) {
+                if(tempPeptides.size() == peptideMatchSelection.size()) {
                     VarianceUpdateEvent.fire(this, selectedVariances);
                 }
             }

@@ -92,6 +92,11 @@ public class DataProvider implements DataServer, TransactionHandler {
         }
         else if(transaction.getResponse() instanceof PeptideList) {
             PeptideList pepListReceived = (PeptideList) transaction.getResponse();
+            if(pepListReceived.getPeptideList() == null) {
+                onErroneousResult(new GenericErroneousResult(transaction.getResponse(),
+                        transaction.getRequestedName()));
+                return;
+            }
             peptideVarianceListCache.put(transaction.getRequestedName(), pepListReceived);
 
             // Search for the peptide match requested peptide in the request cache
