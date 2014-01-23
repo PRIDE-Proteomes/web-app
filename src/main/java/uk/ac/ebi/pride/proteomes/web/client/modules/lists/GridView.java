@@ -33,7 +33,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
     private DataGrid<T> grid;
     private ModuleContainer frame;
 
-    private String baseType;
+    private final String baseType;
 
     /* This selection manager allows the user to deselect a column just by
        clicking it, instead of having to use the ctrl modifier.

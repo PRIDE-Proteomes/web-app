@@ -18,7 +18,7 @@ import java.util.List;
 public class ProteinAdapter implements ProteinHandler {
     private final Protein protein;
     private final List<ProteinModificationHandler> modifications;
-    private List<PeptideHandler> peptideHandlers;
+    private final List<PeptideHandler> peptideHandlers;
 
     public ProteinAdapter(Protein protein) {
         this.protein = protein;

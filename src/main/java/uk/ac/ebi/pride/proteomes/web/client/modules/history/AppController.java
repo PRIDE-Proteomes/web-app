@@ -35,7 +35,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                                       ValueChangeHandler<String>,
                                       StateChangingActionEvent.Handler {
 
-    private static String defaultPageTitle = "EMBL-EBI PRIDE Proteomes";
+    private static final String defaultPageTitle = "EMBL-EBI PRIDE Proteomes";
 
     private final EventBus eventBus;
     private final DataServer server;

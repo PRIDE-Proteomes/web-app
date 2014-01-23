@@ -19,7 +19,7 @@ public class ProteinUpdateEvent extends GwtEvent<ProteinUpdateEvent.Handler> {
 
     private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<>();
 
-    private List<Protein> ProteinList;
+    private final List<Protein> ProteinList;
 
     private ProteinUpdateEvent(List<Protein> Proteins, HasHandlers source) {
         super();

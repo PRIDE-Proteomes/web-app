@@ -18,7 +18,7 @@ public class TissueUpdateEvent extends GwtEvent<TissueUpdateEvent.Handler> {
 
     private static final Type<Handler> TYPE = new Type<>();
 
-    private List<String> tissues;
+    private final List<String> tissues;
 
     private TissueUpdateEvent(List<String> tissues, HasHandlers source) {
         super();

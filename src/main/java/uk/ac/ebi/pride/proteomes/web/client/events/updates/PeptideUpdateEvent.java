@@ -4,7 +4,6 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class PeptideUpdateEvent extends GwtEvent<PeptideUpdateEvent.Handler> {
 
     private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<>();
 
-    private List<PeptideWithVariances> peptideVariances;
+    private final List<PeptideWithVariances> peptideVariances;
 
     private PeptideUpdateEvent(List<PeptideWithVariances> peptides, HasHandlers source) {
         super();

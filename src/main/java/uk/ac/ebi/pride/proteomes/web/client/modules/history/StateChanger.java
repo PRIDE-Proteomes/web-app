@@ -24,8 +24,8 @@ import java.util.Queue;
  */
 public class StateChanger {
     private final class Change {
-        private Type key;
-        private String value;
+        private final Type key;
+        private final String value;
 
         public Change(Type key, String value) {
             this.key = key;

@@ -8,7 +8,7 @@ import uk.ac.ebi.pride.widgets.client.common.handler.PrideModificationHandler;
  *         Time: 11:18
  */
 public class ModificationAdapter implements PrideModificationHandler {
-    private String type;
+    private final String type;
 
     public ModificationAdapter(String modificationType) {
         type = modificationType;

@@ -13,8 +13,8 @@ import java.net.URLEncoder;
 import java.util.Properties;
 
 public class AppWebServlet extends HttpServlet {
-    private static String templateUrl;
-    private static String propertiesLocation =
+    private static final String templateUrl;
+    private static final String propertiesLocation =
             "uk/ac/ebi/pride/proteomes/web/properties/template.properties";
 
     static {

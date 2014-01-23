@@ -18,7 +18,7 @@ public class ModificationUpdateEvent extends GwtEvent<ModificationUpdateEvent.Ha
 
     private static final Type<Handler> TYPE = new Type<>();
 
-    private List<String> modifications;
+    private final List<String> modifications;
 
     private ModificationUpdateEvent(List<String> modifications, HasHandlers source) {
         super();

@@ -16,7 +16,7 @@ public class ErrorOnUpdateEvent extends GwtEvent<ErrorOnUpdateEvent.Handler> {
 
     private static final Type<Handler> TYPE = new Type<>();
 
-    private String text;
+    private final String text;
 
     private ErrorOnUpdateEvent(String text, HasHandlers source) {
         super();
