@@ -252,9 +252,8 @@ public class DataProvider implements DataServer, TransactionHandler {
     @Override
     public List<PeptideWithVariances> getCachedPeptideVarianceLists(List<String> sequences, List<String> proteinIds) {
         List<PeptideWithVariances> peptideVarianceLists = new ArrayList<PeptideWithVariances>();
-        for(String sequence : sequences) {
-            //todo check bounds
-            peptideVarianceLists.add(getCachedPeptideVarianceList(sequence, proteinIds.get(0)));
+        for(int i = 0; i < sequences.size() && i < proteinIds.size(); i++) {
+            peptideVarianceLists.add(getCachedPeptideVarianceList(sequences.get(i), proteinIds.get(i)));
         }
         return peptideVarianceLists;
     }
