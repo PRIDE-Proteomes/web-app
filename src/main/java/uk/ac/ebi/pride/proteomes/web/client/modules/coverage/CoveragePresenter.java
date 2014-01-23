@@ -387,7 +387,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         }
         if(!contained) {
             // We need to remove all filtering modifications
-            List<String> correctMods = new ArrayList<String>();
+            List<String> correctMods = new ArrayList<>();
             for(String mod : currentModifications) {
                 try {
                     Integer.parseInt(mod);
