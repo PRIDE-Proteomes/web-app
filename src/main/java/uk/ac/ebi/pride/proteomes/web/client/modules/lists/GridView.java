@@ -17,7 +17,9 @@ import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -32,6 +34,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
 
     private DataGrid<T> grid;
     private ModuleContainer frame;
+    private Set<T> selection;
 
     private String baseType;
 
@@ -64,6 +67,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
         frame = ModuleContainerFactory.getModuleContainer(title);
         grid = new DataGrid<T>();
         baseType = typeName;
+        selection = new HashSet<T>();
 
         grid.addRowCountChangeHandler(this);
         grid.setEmptyTableWidget(new Label("No " +
@@ -88,8 +92,14 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
     public void selectItemOn(int row) {
         if(row >= 0 && row < grid.getRowCount()) {
             grid.getSelectionModel().setSelected(grid.getVisibleItem(row), true);
+            selection.add(grid.getVisibleItem(row));
+
             frame.setOpen(true);
-            frame.setPrimaryMessage(StringUtils.getName(grid.getVisibleItem(row)));
+            StringBuilder sb = new StringBuilder();
+            for(T item : selection) {
+                sb.append(StringUtils.getName(item)).append(", ");
+            }
+            frame.setPrimaryMessage(sb.substring(0, sb.length() - 2));
         }
     }
 
@@ -97,7 +107,18 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
     public void deselectItemOn(int row) {
         if(row >= 0 && row < grid.getRowCount()) {
             grid.getSelectionModel().setSelected(grid.getVisibleItem(row), false);
-            frame.clearPrimaryMessage();
+            selection.remove(grid.getVisibleItem(row));
+
+            if(selection.isEmpty()) {
+                frame.clearPrimaryMessage();
+            }
+            else {
+                StringBuilder sb = new StringBuilder();
+                for(T item : selection) {
+                    sb.append(StringUtils.getName(item)).append(", ");
+                }
+                frame.setPrimaryMessage(sb.substring(0, sb.length() - 2));
+            }
         }
     }
 
