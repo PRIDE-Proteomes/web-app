@@ -8,7 +8,7 @@
     <groupId>uk.ac.ebi.pride.proteomes.web</groupId>
     <artifactId>webapp</artifactId>
     <packaging>war</packaging>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
 
     <properties>
         <gwtVersion>2.6.0-rc1</gwtVersion>

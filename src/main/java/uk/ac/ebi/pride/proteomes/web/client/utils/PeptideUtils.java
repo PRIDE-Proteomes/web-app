@@ -89,52 +89,35 @@ public class PeptideUtils {
     }
 
     /**
-     * @param peptides
-     * @param modification
-     * @return A list of items that where already contained in the original
-     * list
-     */
-    public static List<Peptide> filterPeptidesWithoutAnyModifications
-    (List<? extends Peptide> peptides, String modification) {
-        List<Peptide> filteredList;
-
-        if(modification.isEmpty()) {
-            return (List<Peptide>) peptides;
-        }
-
-        filteredList = new ArrayList<>();
-
-        for(Peptide peptide : peptides) {
-            for(ModifiedLocation modLoc : peptide.getModifiedLocations()) {
-                if(modLoc.getModification().equals(modification)) {
-                    filteredList.add(peptide);
-                    break;
-                }
-            }
-        }
-
-        return filteredList;
-    }
-
-    /**
-     * @param peptideMatches
-     * @param modifications
+     * @param peptideMatches List of peptide matches that need to be filtered
+     *                       according to the modifications
+     * @param modifications List of modification that need to filter the
+     *                      peptides
      * @return A list of items that where already contained in the original
      * list
      */
     public static List<PeptideMatch> filterPeptideMatchesWithoutAnyModifications
-    (List<PeptideMatch> peptideMatches, List<String> modifications) {
+    (List<? extends PeptideMatch> peptideMatches, List<String> modifications) {
         List<PeptideMatch> filteredList;
         List<String> properModifications = new ArrayList<>();
 
         for(String modification : modifications) {
             if(!modification.equals("")) {
-                properModifications.add(modification);
+                boolean isALocation = false;
+                try {
+                    Integer.parseInt(modification);
+                    isALocation = true;
+                }
+                catch(NumberFormatException ignore) {}
+
+                if(!isALocation) {
+                    properModifications.add(modification);
+                }
             }
         }
 
         if(properModifications.isEmpty()) {
-            return peptideMatches;
+            return (List<PeptideMatch>) peptideMatches;
         }
 
         filteredList = new ArrayList<>();
@@ -154,19 +137,6 @@ public class PeptideUtils {
         return filteredList;
     }
 
-    static public int firstIndexWithSequence(List<? extends Peptide> peptides, String sequence) {
-        int index = -1;
-
-        for(int i = 0; i < peptides.size(); i++) {
-            if(peptides.get(i).getSequence().equals(sequence)) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    }
-
     static public int firstIndexWithId(List<? extends Peptide> peptides, String id) {
         int index = -1;
 
@@ -184,7 +154,7 @@ public class PeptideUtils {
      * This function determines whether the peptide match is "inside" a region,
      * which in practise means whether it's region intersects between the region
      * defined by start and end
-     * @param peptide The peptide match that needs to be checkd
+     * @param peptide The peptide match that needs to be checked
      * @param start the start point of the region
      * @param end the end point of the region
      * @return whether the region defined by peptide and start + end intersect

@@ -187,7 +187,6 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
             if(!mod.equals("")) {
                 try {
                     Integer.parseInt(mod);
-                    currentModifications.add("");
                 }
                 catch(NumberFormatException e) {
                     currentModifications.add(mod);
