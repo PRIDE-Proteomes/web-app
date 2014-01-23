@@ -511,6 +511,19 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         for(PeptideList peptideVariances : peptideLists) {
             contained = false;
             for(String mod : uncheckedState.getSelectedModifications()) {
+                // We need to check if the modification is a location or a type
+                // because we only filter if it's a type.
+                boolean isALocation = false;
+                try {
+                    Integer.parseInt(mod);
+                    isALocation = true;
+                }
+                catch(NumberFormatException ignore) {}
+
+                if(isALocation) {
+                    contained = true;
+                    continue;
+                }
                 for(ModifiedLocation mLoc :
                         peptideVariances.getPeptideList().get(0).getModifiedLocations()) {
                     if(mLoc.getModification().equals(mod)) {

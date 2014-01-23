@@ -7,6 +7,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
@@ -39,7 +40,9 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                                           RegionUpdateEvent.Handler,
                                           PeptideUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler,
-                                          VarianceUpdateEvent.Handler {
+                                          VarianceUpdateEvent.Handler,
+                                          TissueUpdateEvent.Handler {
+
 
     public interface ThisView extends View, HasUiHandlers<CoverageUiHandler> {
         public void updateProtein(ProteinAdapter protein);
@@ -57,6 +60,8 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     private boolean justHighlighted = false;
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
+    private List<String> currentModifications = Collections.emptyList();
+    private List<String> currentTissues = Collections.emptyList();
 
     private List<PeptideWithVariances> peptideMatchSelection = Collections.emptyList();
     private List<Peptide> selectedVariances = Collections.emptyList();
@@ -76,6 +81,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(ModificationUpdateEvent.getType(), this);
+        eventBus.addHandler(TissueUpdateEvent.getType(), this);
         eventBus.addHandler(VarianceUpdateEvent.getType(), this);
     }
 
@@ -185,21 +191,29 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
+        currentModifications = event.getModifications();
         if(!event.getModifications().isEmpty()) {
-            String currentModification = event.getModifications().get(0);
-            try {
-                int position = Integer.parseInt(currentModification);
+            for(String mod : event.getModifications()) {
+                try {
+                    int position = Integer.parseInt(mod);
 
-                getView().updateModificationHighlight(position, position);
-            }
-            catch (NumberFormatException e) {
-                getView().updateModificationHighlight(new ModificationAdapter(currentModification));
+                    getView().updateModificationHighlight(position, position);
+                }
+                catch (NumberFormatException e) {
+                    getView().updateModificationHighlight(new ModificationAdapter(mod));
+                }
             }
         }
         else {
             getView().resetModificationHighlight();
         }
     }
+
+    @Override
+    public void onTissueUpdateEvent(TissueUpdateEvent event) {
+        currentTissues = event.getTissues();
+    }
+
 
     // Callbacks that handle user events from the view.
 
@@ -329,6 +343,8 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                                            "Click Set");
 
         PeptideAdapter peptide = (PeptideAdapter) event.getPeptide();
+        peptides.add(peptide);
+        changer.addPeptideChange(peptides);
 
         // If the peptide doesn't fit the region that's selected we ought to
         // change the region too.
@@ -354,8 +370,51 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         if(!variances.containsAll(selectedVariances)) {
             changer.addVarianceChange(variances);
         }
-        peptides.add(peptide);
-        changer.addPeptideChange(peptides);
+
+        boolean contained = false;
+        for(ModifiedLocation modLoc : peptide.getModifiedLocations()) {
+            for(String mod : currentModifications) {
+                try {
+                    Integer.parseInt(mod);
+                }
+                catch(NumberFormatException e) {
+                    if(modLoc.getModification().equals(mod)) {
+                        contained = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if(!contained) {
+            // We need to remove all filtering modifications
+            List<String> correctMods = new ArrayList<String>();
+            for(String mod : currentModifications) {
+                try {
+                    Integer.parseInt(mod);
+                    correctMods.add(mod);
+
+                }
+                catch(NumberFormatException ignore) {}
+            }
+
+            if(correctMods.size() < currentModifications.size()) {
+                changer.addModificationChange(correctMods);
+            }
+        }
+        contained = false;
+        for(String pepTissue : peptide.getTissues()) {
+            for(String tissue: currentTissues) {
+                if(tissue.equals(pepTissue)) {
+                    contained = true;
+                    break;
+                }
+            }
+        }
+        if(!contained) {
+            if(!currentTissues.isEmpty()) {
+                changer.addTissueChange(new ArrayList<String>());
+            }
+        }
 
         StateChangingActionEvent.fire(this, changer, action);
     }
