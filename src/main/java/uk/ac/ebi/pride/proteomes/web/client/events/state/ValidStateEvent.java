@@ -18,7 +18,7 @@ public class ValidStateEvent extends GwtEvent<ValidStateEvent.Handler> {
         Group, Protein
     }
 
-    private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<Handler>();
+    private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<>();
     private final ViewType viewType;
 
     public ValidStateEvent(HasHandlers source, ViewType viewType) {

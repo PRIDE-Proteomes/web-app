@@ -17,7 +17,7 @@ public class RegionUpdateEvent extends GwtEvent<RegionUpdateEvent.Handler> {
         public void onRegionUpdateEvent(RegionUpdateEvent event);
     }
 
-    private static final Type<Handler> TYPE = new Type<Handler>();
+    private static final Type<Handler> TYPE = new Type<>();
 
     private List<Region> regionList;
 

@@ -18,7 +18,7 @@ public class PeptideUpdateEvent extends GwtEvent<PeptideUpdateEvent.Handler> {
         public void onPeptideUpdateEvent(PeptideUpdateEvent event);
     }
 
-    private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<Handler>();
+    private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<>();
 
     private List<PeptideWithVariances> peptideVariances;
 

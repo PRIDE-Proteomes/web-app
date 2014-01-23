@@ -26,7 +26,7 @@ public class GroupPeptideColumnProvider {
     public static List<Column<Pair<String, List<String>>, ?>> getSortingColumns
             (ListSorter<Pair<String, List<String>>> sorter) {
 
-        List<Column<Pair<String, List<String>>, ?>> columns = new ArrayList<Column<Pair<String, List<String>>, ?>>();
+        List<Column<Pair<String, List<String>>, ?>> columns = new ArrayList<>();
 
         TextColumn<Pair<String, List<String>>> sequenceColumn = new TextColumn<Pair<String, List<String>>>() {
             @Override
@@ -86,13 +86,13 @@ public class GroupPeptideColumnProvider {
     }
 
     public static List<String> getColumnTitles() {
-        List<String> titles = new ArrayList<String>();
+        List<String> titles = new ArrayList<>();
         Collections.addAll(titles, "Sequence", "Proteins");
         return titles;
     }
 
     public static List<String> getColumnWidths() {
-        List<String> widths = new ArrayList<String>();
+        List<String> widths = new ArrayList<>();
         Collections.addAll(widths, "40%", "60%");
         return widths;
     }

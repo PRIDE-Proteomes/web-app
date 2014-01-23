@@ -9,7 +9,7 @@ import java.util.Collection;
  *         Time: 11:21
  */
 public class ViewWithUiHandlers<H extends UiHandler> {
-    private Collection<H> uiHandlers = new ArrayList<H>();
+    private Collection<H> uiHandlers = new ArrayList<>();
 
     public Collection<H> getUiHandlers() {
         return uiHandlers;

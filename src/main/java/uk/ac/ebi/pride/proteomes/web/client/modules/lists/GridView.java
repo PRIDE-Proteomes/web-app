@@ -62,7 +62,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
 
     public GridView(String title, String typeName, boolean skipRowHoverStyleUpdate) {
         frame = ModuleContainerFactory.getModuleContainer(title);
-        grid = new DataGrid<T>();
+        grid = new DataGrid<>();
         baseType = typeName;
 
         grid.addRowCountChangeHandler(this);

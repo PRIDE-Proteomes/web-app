@@ -38,9 +38,9 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
                                           ModificationUpdateEvent.Handler,
                                           VarianceUpdateEvent.Handler {
     private final ListDataProvider<PeptideMatch> dataProvider = new
-                                            ListDataProvider<PeptideMatch>();
+                                            ListDataProvider<>();
     private final ListSorter<PeptideMatch> dataSorter = new
-                                    ListSorter<PeptideMatch>(new ArrayList<PeptideMatch>());
+                                    ListSorter<>(new ArrayList<PeptideMatch>());
 
     private boolean groups = true;
     private Protein currentProtein;
@@ -68,11 +68,11 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
         // We define how are the items selected here
         final SingleSelectionModel<PeptideMatch> selectionModel = new
-                SingleSelectionModel<PeptideMatch>();
+                SingleSelectionModel<>();
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
-                Set<PeptideMatch> selection = new HashSet<PeptideMatch>();
+                Set<PeptideMatch> selection = new HashSet<>();
                 selection.add(selectionModel.getSelectedObject());
                 for(ListUiHandler<PeptideMatch> handler : getView().getUiHandlers()) {
                     handler.onSelectionChanged(selection);
@@ -148,7 +148,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
             deselectItem(peptide);
         }
 
-        selectedPeptidesMatches = new ArrayList<PeptideWithVariances>(event.getPeptides());
+        selectedPeptidesMatches = new ArrayList<>(event.getPeptides());
 
         if(!selectedPeptidesMatches.isEmpty()) {
             // we reselect the peptides only if there are any
@@ -163,7 +163,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
-        currentTissues = new ArrayList<String>();
+        currentTissues = new ArrayList<>();
         for(String tissue : event.getTissues()) {
             if(!tissue.equals("")) {
                 currentTissues.add(tissue);
@@ -182,7 +182,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-        currentModifications = new ArrayList<String>();
+        currentModifications = new ArrayList<>();
         for(String mod : event.getModifications()) {
             if(!mod.equals("")) {
                 try {
@@ -217,8 +217,10 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
             items = Collections.emptyList();
         }
 
-        Set<String> peptideIds = new HashSet<String>();
-        Set<Peptide> variances = new HashSet<Peptide>();
+        // We use HashSets because we don't want duplicated and want a fast
+        // lookup
+        Set<String> peptideIds = new HashSet<>();
+        Set<Peptide> variances = new HashSet<>();
 
         for(PeptideMatch peptide : items) {
             peptideIds.add(peptide.getSequence());

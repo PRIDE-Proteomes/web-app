@@ -23,12 +23,12 @@ public class ProteinAdapter implements ProteinHandler {
     public ProteinAdapter(Protein protein) {
         this.protein = protein;
 
-        peptideHandlers = new ArrayList<PeptideHandler>();
+        peptideHandlers = new ArrayList<>();
         for(PeptideMatch p : protein.getPeptides()) {
             peptideHandlers.add(new PeptideAdapter(p));
         }
 
-        modifications = new ArrayList<ProteinModificationHandler>();
+        modifications = new ArrayList<>();
         for(ModifiedLocation mod : protein.getModifiedLocations()) {
             modifications.add(new ProteinModificationAdapter(mod, protein));
         }

@@ -14,7 +14,7 @@ public class InvalidStateEvent extends GwtEvent<InvalidStateEvent.Handler> {
         public void onInvalidStateEvent(InvalidStateEvent event);
     }
 
-    private static final Type<Handler> TYPE = new Type<Handler>();
+    private static final Type<Handler> TYPE = new Type<>();
     private final String message;
     private final String state;
 

@@ -16,7 +16,7 @@ public class RegionUtils {
                                                     IllegalRegionValueException,
                                                     NumberFormatException,
                                                     IndexOutOfBoundsException {
-        List<Region> regionList = new ArrayList<Region>();
+        List<Region> regionList = new ArrayList<>();
 
         for(String regionId : regionIds) {
             regionList.add(Region.tokenize(regionId));

@@ -12,8 +12,7 @@ import java.util.Collection;
  */
 public abstract class DataRetriever implements TransactionHandler.DataRetriever {
     final String root;
-    Collection<TransactionHandler> handlers = new
-            ArrayList<TransactionHandler>();
+    Collection<TransactionHandler> handlers = new ArrayList<>();
 
     public DataRetriever(String webServiceRoot) {
         root = webServiceRoot;

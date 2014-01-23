@@ -38,9 +38,9 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
                                                ModificationUpdateEvent.Handler {
 
     private final ListDataProvider<Multiset.Entry<String>> dataProvider = new
-            ListDataProvider<Multiset.Entry<String>>();
+            ListDataProvider<>();
     private final ListSorter<Multiset.Entry<String>> dataSorter = new
-            ListSorter<Multiset.Entry<String>>(new ArrayList<Multiset.Entry<String>>());
+            ListSorter<>(new ArrayList<Multiset.Entry<String>>());
 
     private boolean groups;
     private boolean selectionEventsDisabled = false;
@@ -61,7 +61,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
         view.hideContent();
 
         final MultiSelectionModel<Multiset.Entry<String>> selectionModel = new
-                MultiSelectionModel<Multiset.Entry<String>>();
+                MultiSelectionModel<>();
 
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
@@ -132,7 +132,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
             deselectItem(mod);
         }
 
-        selectedModifications = new ArrayList<Multiset.Entry<String>>();
+        selectedModifications = new ArrayList<>();
         for(String item : event.getModifications()) {
             for(Multiset.Entry<String> entry : dataProvider.getList()) {
                 if(entry.getElement().equals(item)) {
@@ -161,14 +161,14 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
 
         selectedModifications = items;
 
-        List<String> selection = new ArrayList<String>();
+        List<String> selection = new ArrayList<>();
         for(Multiset.Entry<String> item : items) {
             selection.add(item.getElement());
         }
 
-        filteredPeptides = new ArrayList<PeptideMatch>();
+        filteredPeptides = new ArrayList<>();
         for(PeptideMatch pep : selectedPeptides) {
-            Set<String> mods = new HashSet<String>();
+            Set<String> mods = new HashSet<>();
             for(ModifiedLocation modLoc : pep.getModifiedLocations()) {
                 mods.add(modLoc.getModification());
             }
@@ -199,7 +199,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
             deselectItem(tissue);
         }
 
-        setList(new ArrayList<Multiset.Entry<String>>(mods));
+        setList(new ArrayList<>(mods));
 
         selectedModifications.retainAll(mods);
         for(Multiset.Entry<String> tissue : selectedModifications) {

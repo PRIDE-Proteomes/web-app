@@ -73,9 +73,9 @@ public class AppStarter implements RunAsyncCallback {
         // the event bus, then creating the structure of the graphical elements
 
         // The two lists should have the same size
-        List<Presenter> presenterList = new ArrayList<Presenter>();
+        List<Presenter> presenterList = new ArrayList<>();
         List<AcceptsOneWidget> placeHolderList = new
-                ArrayList<AcceptsOneWidget>();
+                ArrayList<>();
 
         // Startup loggers & reporters
         new Reporter(eventBus);
@@ -91,11 +91,11 @@ public class AppStarter implements RunAsyncCallback {
         Presenter headerPresenter = new HeaderPresenter(eventBus,
                                             (HeaderPresenter.ThisView) headerView);
 
-        ListView<String> tissueView = new GridView<String>("Tissues", "tissue");
+        ListView<String> tissueView = new GridView<>("Tissues", "tissue");
         Presenter tissuePresenter = new TissuesPresenter(eventBus, tissueView);
 
         ListView<Multiset.Entry<String>> modView = new
-                GridView<Multiset.Entry<String>>("Modifications", "modification");
+                GridView<>("Modifications", "modification");
         Presenter modPresenter = new ModificationsPresenter(eventBus, modView);
 
         View coverageView = new CoverageView();
@@ -107,15 +107,15 @@ public class AppStarter implements RunAsyncCallback {
                                           (SequencePresenter.ThisView) sequenceView);
 
         ListView<PeptideMatch> peptideView =
-                new GridView<PeptideMatch>("Peptides", "peptide");
+                new GridView<>("Peptides", "peptide");
         Presenter peptidePresenter = new PeptidesPresenter(eventBus,
                 peptideView);
 
-        ListView<Pair<String, List<String>>> groupPeptideView = new GridView<Pair<String, List<String>>>("Peptides", "peptide", true);
+        ListView<Pair<String, List<String>>> groupPeptideView = new GridView<>("Peptides", "peptide", true);
         Presenter groupPeptidePresenter = new GroupPeptidePresenter(eventBus, groupPeptideView);
 
         ListView<Peptide> varianceView =
-                new GridView<Peptide>("Variances",
+                new GridView<>("Variances",
                         "variance");
         Presenter variancePresenter = new VariancesPresenter(eventBus,
                 varianceView);

@@ -51,10 +51,10 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
         if(groupView && groups.size() > 0) {
             getView().updateTitle("Protein group " + groups.get(0).getId());
             getView().updateDescription(groups.get(0).getDescription());
-            List<Pair<String, String>> proteins = new ArrayList<Pair<String, String>>();
+            List<Pair<String, String>> proteins = new ArrayList<>();
 
             for(String protID : groups.get(0).getMemberProteins()) {
-                proteins.add(new Pair<String, String>(protID, "protein=" + protID));
+                proteins.add(new Pair<>(protID, "protein=" + protID));
             }
             getView().updateProperties(proteins);
         }

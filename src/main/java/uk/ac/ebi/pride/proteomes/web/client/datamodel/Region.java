@@ -11,10 +11,6 @@ public class Region {
     private static class EmptyRegion extends Region {
         EmptyRegion() {}
 
-        EmptyRegion(int start, int end) throws IllegalRegionValueException {
-            super(0, 0);
-        }
-
         @Override
         public int getEnd() {
             return 0;

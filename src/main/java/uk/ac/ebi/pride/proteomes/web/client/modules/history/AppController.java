@@ -47,7 +47,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         this.eventBus = eventBus;
         this.server = server;
 
-        stateQueue = new LinkedList<State>();
+        stateQueue = new LinkedList<>();
         try {
             appState = State.tokenize("");
         } catch (InconsistentStateException e) {/**/}
@@ -152,7 +152,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         //we have to cleanup the request that caused the error, we need not
         // only the message, but what caused it.
 
-        Queue<State> statesToRemove = new LinkedList<State>();
+        Queue<State> statesToRemove = new LinkedList<>();
 
         if(erroneousResult.getRequestedType() == Protein.class) {
             for(State state : stateQueue) {
@@ -279,11 +279,11 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 server.requestProteins(state.getSelectedProteins());
             }
             if(!arePeptidesCached) {
-                List<String> sequences1 = new ArrayList<String>();
-                List<String> sequences2 = new ArrayList<String>();
-                List<String> proteins1 = new ArrayList<String>();
-                List<String> proteins2 = new ArrayList<String>();
-                List<Integer> positions = new ArrayList<Integer>();
+                List<String> sequences1 = new ArrayList<>();
+                List<String> sequences2 = new ArrayList<>();
+                List<String> proteins1 = new ArrayList<>();
+                List<String> proteins2 = new ArrayList<>();
+                List<Integer> positions = new ArrayList<>();
                 for(String id : state.getSelectedPeptides()) {
                     if(id.contains(State.sepFields)) {
                         String[] split = id.split(State.sepFields);
@@ -468,15 +468,15 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         }
 
         StateChanger sc = new StateChanger();
-        List<String> invalidTissues = new ArrayList<String>();
+        List<String> invalidTissues = new ArrayList<>();
         List<String> validTissues;
-        List<String> invalidModifications = new ArrayList<String>();
+        List<String> invalidModifications = new ArrayList<>();
         List<String> validModifications;
         boolean contained;
 
-        List<String> sequences = new ArrayList<String>();
-        List<String> proteins = new ArrayList<String>();
-        List<Integer> positions = new ArrayList<Integer>();
+        List<String> sequences = new ArrayList<>();
+        List<String> proteins = new ArrayList<>();
+        List<Integer> positions = new ArrayList<>();
         List<PeptideWithVariances> peptideLists;
         for(String id : uncheckedState.getSelectedPeptides()) {
             String[] split = id.split(State.sepFields);
@@ -528,12 +528,12 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             }
         }
 
-        validTissues = new ArrayList<String>(uncheckedState.getSelectedTissues());
+        validTissues = new ArrayList<>(uncheckedState.getSelectedTissues());
         validTissues.removeAll(invalidTissues);
         if(validTissues.size() < uncheckedState.getSelectedTissues().size()) {
             sc.addTissueChange(validTissues);
         }
-        validModifications = new ArrayList<String>(uncheckedState.getSelectedModifications());
+        validModifications = new ArrayList<>(uncheckedState.getSelectedModifications());
         validModifications.removeAll(invalidModifications);
         if(validModifications.size() < uncheckedState.getSelectedModifications().size()) {
             sc.addModificationChange(validModifications);
@@ -601,9 +601,9 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             // selected. Since the group view doesn't allow for this at the
             // moment there's no need to implement it at the moment.
 
-            List<String> sequences = new ArrayList<String>();
-            List<String> proteins = new ArrayList<String>();
-            List<Integer> positions = new ArrayList<Integer>();
+            List<String> sequences = new ArrayList<>();
+            List<String> proteins = new ArrayList<>();
+            List<Integer> positions = new ArrayList<>();
             for(String id : newState.getSelectedPeptides()) {
                 String[] split = id.split(State.sepFields);
                 sequences.add(split[0]);

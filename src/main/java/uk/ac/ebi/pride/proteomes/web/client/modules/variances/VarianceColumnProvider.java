@@ -26,7 +26,7 @@ import java.util.Collections;
  */
 public class VarianceColumnProvider {
     public static List<Column<Peptide, ?>> getSortingColumns(ListSorter<Peptide> sorter) {
-        List<Column<Peptide, ?>> columns = new ArrayList<Column<Peptide, ?>>();
+        List<Column<Peptide, ?>> columns = new ArrayList<>();
 
         TextColumn<Peptide> sequenceColumn = new TextColumn<Peptide>() {
             @Override
@@ -75,7 +75,7 @@ public class VarianceColumnProvider {
         TextColumn<Peptide> modsColumn = new TextColumn<Peptide>() {
             @Override
             public String getValue(Peptide object) {
-                Set<String> modSet = new HashSet<String>();
+                Set<String> modSet = new HashSet<>();
                 for(ModifiedLocation modLoc : object.getModifiedLocations()) {
                     modSet.add(modLoc.getPosition() + ":" + modLoc.getModification());
                 }
@@ -148,13 +148,13 @@ public class VarianceColumnProvider {
     }
 
     public static List<String> getColumnTitles() {
-        List<String> titles = new ArrayList<String>();
+        List<String> titles = new ArrayList<>();
         Collections.addAll(titles, "Sequence", "Modifications", "Tissues", "Assays");
         return titles;
     }
 
     public static List<String> getColumnWidths() {
-        List<String> widths = new ArrayList<String>();
+        List<String> widths = new ArrayList<>();
         Collections.addAll(widths, "25%", "25%", "25%", "25%");
         return widths;
     }

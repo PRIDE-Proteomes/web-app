@@ -23,23 +23,23 @@ import java.util.*;
 public class DataProvider implements DataServer, TransactionHandler {
     private DataServer.DataClient client = null;
 
-    private Map<String, Group> groupCache = new HashMap<String, Group>();
-    private List<Map<String, Boolean>> groupRequests = new ArrayList<Map<String, Boolean>>();
+    private Map<String, Group> groupCache = new HashMap<>();
+    private List<Map<String, Boolean>> groupRequests = new ArrayList<>();
     private final GroupRetriever groupRetriever;
 
-    private Map<String, Protein> proteinCache = new HashMap<String, Protein>();
-    private List<Map<String, Boolean>> proteinRequests = new ArrayList<Map<String, Boolean>>();
+    private Map<String, Protein> proteinCache = new HashMap<>();
+    private List<Map<String, Boolean>> proteinRequests = new ArrayList<>();
     private final ProteinRetriever proteinRetriever;
 
     // We cache the PeptideLists retrieved as well as store the mapping between
     // sequence and peptide matches, this way we can build PeptideWithVariances
     // dynamically while avoid being a time hog.
-    private Map<String, PeptideList> peptideVarianceListCache = new HashMap<String, PeptideList>();
-    private Map<String, List<PeptideMatch>> peptideMatchCache = new HashMap<String, List<PeptideMatch>>();
-    private List<Map<Pair<String, Integer>, Boolean>> peptideVarianceRequests = new ArrayList<Map<Pair<String, Integer>, Boolean>>();
+    private Map<String, PeptideList> peptideVarianceListCache = new HashMap<>();
+    private Map<String, List<PeptideMatch>> peptideMatchCache = new HashMap<>();
+    private List<Map<Pair<String, Integer>, Boolean>> peptideVarianceRequests = new ArrayList<>();
     private final PeptideVarianceRetriever peptideVarianceRetriever;
 
-    private Map<String, Peptide> peptideVarianceCache = new HashMap<String, Peptide>();
+    private Map<String, Peptide> peptideVarianceCache = new HashMap<>();
 
     public DataProvider(String webServiceRoot) {
         groupRetriever = new GroupRetriever(webServiceRoot);
@@ -82,7 +82,7 @@ public class DataProvider implements DataServer, TransactionHandler {
                 if(peptideMatchCache.containsKey(match.getSequence())) {
                     peptideMatchCache.get(match.getSequence()).add(match);
                 } else {
-                    List<PeptideMatch> matches = new ArrayList<PeptideMatch>();
+                    List<PeptideMatch> matches = new ArrayList<>();
                     matches.add(match);
                     peptideMatchCache.put(match.getSequence(), matches);
                 }
@@ -106,9 +106,9 @@ public class DataProvider implements DataServer, TransactionHandler {
                     if(transaction.getRequestedName().equals(entry.getKey().getA())) {
                         batchRequest.remove(entry.getKey());
                         batchRequest.put(new
-                                Pair<String, Integer>(entry.getKey().getA(),
-                                                      entry.getKey().getB()),
-                                                      true);
+                                Pair<>(entry.getKey().getA(),
+                                       entry.getKey().getB()),
+                                       true);
                         break;
                     }
                 }
@@ -167,7 +167,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public void requestGroups(List<String> ids) {
-        Map<String, Boolean> request = new HashMap<String, Boolean>();
+        Map<String, Boolean> request = new HashMap<>();
 
         groupRequests.add(request);
 
@@ -183,7 +183,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public void requestProteins(List<String> accessions) {
-        Map<String, Boolean> request = new HashMap<String, Boolean>();
+        Map<String, Boolean> request = new HashMap<>();
 
         proteinRequests.add(request);
 
@@ -198,12 +198,12 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public void requestPeptideVariances(List<String> sequences, List<String> proteinIds, List<Integer> positions) {
-        Map<Pair<String, Integer>, Boolean> request = new HashMap<Pair<String, Integer>, Boolean>();
+        Map<Pair<String, Integer>, Boolean> request = new HashMap<>();
 
         peptideVarianceRequests.add(request);
 
         for(int i = 0; i < sequences.size() && i < proteinIds.size() && i < positions.size(); i++) {
-            request.put(new Pair<String, Integer>(sequences.get(i), positions.get(i)),
+            request.put(new Pair<>(sequences.get(i), positions.get(i)),
                             isPeptideCached(sequences.get(i), proteinIds.get(i), positions.get(i)));
             if(!isPeptideCached(sequences.get(i), proteinIds.get(i), positions.get(i))) {
                 peptideVarianceRetriever.retrieveData(sequences.get(i));
@@ -217,14 +217,14 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public void requestPeptideVariances(List<String> sequences, List<String> proteinIds) {
-        List<Integer> positions = new ArrayList<Integer>(sequences.size());
+        List<Integer> positions = new ArrayList<>(sequences.size());
         while(positions.size() < sequences.size()) positions.add(-1);
         requestPeptideVariances(sequences, proteinIds, positions);
     }
 
     @Override
     public List<Group> getCachedGroups(List<String> ids) {
-        List<Group> groups = new ArrayList<Group>();
+        List<Group> groups = new ArrayList<>();
         for(String id : ids) {
             groups.add(groupCache.get(id));
         }
@@ -233,7 +233,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public List<Protein> getCachedProteins(List<String> accessions) {
-        List<Protein> proteins = new ArrayList<Protein>();
+        List<Protein> proteins = new ArrayList<>();
         for(String accession : accessions) {
             proteins.add(proteinCache.get(accession));
         }
@@ -242,7 +242,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public List<PeptideWithVariances> getCachedPeptideVarianceLists(List<String> sequences, List<String> proteinIds, List<Integer> positions) {
-        List<PeptideWithVariances> peptideVarianceLists = new ArrayList<PeptideWithVariances>();
+        List<PeptideWithVariances> peptideVarianceLists = new ArrayList<>();
         for(int i = 0; i < sequences.size() && i < proteinIds.size() && i < positions.size(); i++) {
             peptideVarianceLists.add(getCachedPeptideVarianceList(sequences.get(i), proteinIds.get(i), positions.get(i)));
         }
@@ -251,7 +251,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public List<PeptideWithVariances> getCachedPeptideVarianceLists(List<String> sequences, List<String> proteinIds) {
-        List<PeptideWithVariances> peptideVarianceLists = new ArrayList<PeptideWithVariances>();
+        List<PeptideWithVariances> peptideVarianceLists = new ArrayList<>();
         for(int i = 0; i < sequences.size() && i < proteinIds.size(); i++) {
             peptideVarianceLists.add(getCachedPeptideVarianceList(sequences.get(i), proteinIds.get(i)));
         }
@@ -260,7 +260,7 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public List<Peptide> getCachedPeptideVariances(List<String> varianceId) {
-        List<Peptide> varianceList = new ArrayList<Peptide>();
+        List<Peptide> varianceList = new ArrayList<>();
         for (String id : varianceId) {
             varianceList.add(getCachedPeptideVariance(id));
         }
@@ -306,8 +306,8 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     private void dispatchGroups() {
-        List<Map<String, Boolean>> toRemove = new ArrayList<Map<String, Boolean>>();
-        List<Group> groups = new ArrayList<Group>();
+        List<Map<String, Boolean>> toRemove = new ArrayList<>();
+        List<Group> groups = new ArrayList<>();
 
         for(Map<String, Boolean> batchRequest : groupRequests) {
             if(!batchRequest.containsValue(false)) {
@@ -325,8 +325,8 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     private void dispatchProteins() {
-        List<Map<String, Boolean>> toRemove = new ArrayList<Map<String, Boolean>>();
-        List<Protein> proteins = new ArrayList<Protein>();
+        List<Map<String, Boolean>> toRemove = new ArrayList<>();
+        List<Protein> proteins = new ArrayList<>();
 
         for(Map<String, Boolean> batchRequest : proteinRequests) {
             if(!batchRequest.containsValue(false)) {
@@ -344,8 +344,8 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     private void dispatchPeptideVariances() {
-        List<Map<Pair<String, Integer>, Boolean>> toRemove = new ArrayList<Map<Pair<String, Integer>, Boolean>>();
-        List<PeptideWithVariances> peptideVariances = new ArrayList<PeptideWithVariances>();
+        List<Map<Pair<String, Integer>, Boolean>> toRemove = new ArrayList<>();
+        List<PeptideWithVariances> peptideVariances = new ArrayList<>();
         for(Map<Pair<String, Integer>, Boolean> batchRequest : peptideVarianceRequests) {
             if(!batchRequest.containsValue(false)) {
                 toRemove.add(batchRequest);

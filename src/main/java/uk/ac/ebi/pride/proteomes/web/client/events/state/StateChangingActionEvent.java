@@ -18,7 +18,7 @@ public class StateChangingActionEvent extends
         public void onStateChangingActionEvent(StateChangingActionEvent event);
     }
 
-    private static final Type<Handler> TYPE = new Type<Handler>();
+    private static final Type<Handler> TYPE = new Type<>();
 
     private final StateChanger changer;
     private final UserAction action;

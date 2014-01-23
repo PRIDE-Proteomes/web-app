@@ -132,7 +132,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         // gets reset, we must set it again manually.
 
         if(!peptideMatchSelection.isEmpty()) {
-            selectionAdapters = new ArrayList<PeptideAdapter>();
+            selectionAdapters = new ArrayList<>();
             for(PeptideMatch match : peptideMatchSelection) {
                 selectionAdapters.add(new PeptideAdapter(match));
             }
@@ -156,11 +156,11 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         }
 
         // we make a copy because if we don't it somehow it sometimes gets reset
-        peptideMatchSelection = new ArrayList<PeptideWithVariances>(event.getPeptides());
-        tempPeptides = new ArrayList<PeptideWithVariances>(event.getPeptides());
+        peptideMatchSelection = new ArrayList<>(event.getPeptides());
+        tempPeptides = new ArrayList<>(event.getPeptides());
 
         if(event.getPeptides().size() > 0) {
-            selectionAdapters = new ArrayList<PeptideAdapter>();
+            selectionAdapters = new ArrayList<>();
 
             for(PeptideMatch match : event.getPeptides()) {
                 selectionAdapters.add(new PeptideAdapter(match));
@@ -206,7 +206,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     @Override
     public void onRegionClickSelected(ProteinRegionSelectionEvent event) {
         StateChanger changer = new StateChanger();
-        List<Region> region = new ArrayList<Region>();
+        List<Region> region = new ArrayList<>();
         List<PeptideMatch> peptides;
 
         try {
@@ -233,7 +233,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     @Override
     public void onRegionDragSelected(ProteinAreaSelectedEvent event) {
         StateChanger changer = new StateChanger();
-        List<Region> regions = new ArrayList<Region>();
+        List<Region> regions = new ArrayList<>();
         UserAction action = UserAction.emptyAction();
         List<PeptideMatch> peptides;
         Region region;
@@ -286,7 +286,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
 
     @Override
     public void onRegionDragHighlighted(ProteinAreaHighlightEvent event) {
-        List<Region> regions = new ArrayList<Region>();
+        List<Region> regions = new ArrayList<>();
 
         // if the selection is done right to left then start > end
         int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
@@ -323,8 +323,8 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     @Override
     public void onPeptideSelected(PeptideSelectedEvent event) {
         StateChanger changer = new StateChanger();
-        List<Region> regions = new ArrayList<Region>();
-        List<PeptideMatch> peptides = new ArrayList<PeptideMatch>();
+        List<Region> regions = new ArrayList<>();
+        List<PeptideMatch> peptides = new ArrayList<>();
         UserAction action = new UserAction(UserAction.Type.peptide,
                                            "Click Set");
 
@@ -344,7 +344,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             }
         }
 
-        List<Peptide> variances = new ArrayList<Peptide>();
+        List<Peptide> variances = new ArrayList<>();
         for(Peptide variance : selectedVariances) {
             if(peptide.getSequence().equals(variance.getSequence())) {
                 variances.add(variance);
@@ -363,8 +363,8 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     @Override
     public void onModificationSelected(ModificationSelectedEvent event) {
         StateChanger changer = new StateChanger();
-        List<Region> regions = new ArrayList<Region>();
-        List<String> modifications = new ArrayList<String>();
+        List<Region> regions = new ArrayList<>();
+        List<String> modifications = new ArrayList<>();
         UserAction action = new UserAction(UserAction.Type.modification,
                                            "Click Set");
 

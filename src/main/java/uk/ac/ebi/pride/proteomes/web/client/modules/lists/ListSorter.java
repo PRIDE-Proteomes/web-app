@@ -16,7 +16,7 @@ import java.util.*;
  *         Time: 10:47
  */
 public class ListSorter<T> implements ColumnSortEvent.Handler {
-    private final Map<Column<?, ?>, Comparator<T>> comparators = new HashMap<Column<?, ?>, Comparator<T>>();
+    private final Map<Column<?, ?>, Comparator<T>> comparators = new HashMap<>();
     private List<T> list;
 
     private Comparator<T> lastSortingComparator = null;

@@ -45,10 +45,10 @@ public class StateChanger {
         Group, Protein, Region, Peptide, Variance, Modification, Tissue
     }
 
-    Queue<Change> orderedChanges = new LinkedList<Change>();
+    Queue<Change> orderedChanges = new LinkedList<>();
 
     public void addGroupChange(Collection<Group> groupSelection) {
-        Collection<String> groupIds = new ArrayList<String>();
+        Collection<String> groupIds = new ArrayList<>();
         for(Group group : groupSelection) {
             groupIds.add(group.getId());
         }
@@ -57,7 +57,7 @@ public class StateChanger {
     }
 
     public void addProteinChange(Collection<Protein> proteinSelection) {
-        Collection<String> proteinIds = new ArrayList<String>();
+        Collection<String> proteinIds = new ArrayList<>();
         for(Protein prot : proteinSelection) {
             proteinIds.add(prot.getAccession());
         }
@@ -66,7 +66,7 @@ public class StateChanger {
     }
 
     public void addRegionChange(Collection<Region> regionSelection) {
-        Collection<String> regionIds = new ArrayList<String>();
+        Collection<String> regionIds = new ArrayList<>();
         for(Region reg : regionSelection) {
             regionIds.add(reg.toString());
         }
@@ -75,7 +75,7 @@ public class StateChanger {
     }
 
     public void addPeptideChange(Collection<PeptideMatch> peptideSelection) {
-        Collection<String> peptideIds = new ArrayList<String>();
+        Collection<String> peptideIds = new ArrayList<>();
         for(PeptideMatch match : peptideSelection) {
             peptideIds.add(match.getSequence() + State.sepFields + match.getPosition());
         }
@@ -84,7 +84,7 @@ public class StateChanger {
     }
 
     public void addVarianceChange(Collection<Peptide> varianceSelection) {
-        Collection<String> varianceIDs = new ArrayList<String>();
+        Collection<String> varianceIDs = new ArrayList<>();
         for(Peptide variance : varianceSelection) {
             varianceIDs.add(variance.getId());
         }
@@ -114,7 +114,7 @@ public class StateChanger {
             changedState = oldState;
         }
         else {
-            DefaultHashMap<Type, String> changesToApply = new DefaultHashMap<Type, String>();
+            DefaultHashMap<Type, String> changesToApply = new DefaultHashMap<>();
             for(Change change : orderedChanges) {
                 changesToApply.put(change.getKey(), change.getValue());
             }
@@ -144,7 +144,7 @@ public class StateChanger {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        DefaultHashMap<Type, String> changesToApply = new DefaultHashMap<Type, String>();
+        DefaultHashMap<Type, String> changesToApply = new DefaultHashMap<>();
         for(Change change : orderedChanges) {
             changesToApply.put(change.getKey(), change.getValue());
         }

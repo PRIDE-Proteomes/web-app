@@ -17,7 +17,7 @@ public class GroupUpdateEvent extends GwtEvent<GroupUpdateEvent.Handler> {
         public void onGroupUpdateEvent(GroupUpdateEvent event);
     }
 
-    private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<Handler>();
+    private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<>();
 
     private List<Group> GroupList;
 

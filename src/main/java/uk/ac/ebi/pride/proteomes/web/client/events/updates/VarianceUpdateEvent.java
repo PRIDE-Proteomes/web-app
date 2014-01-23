@@ -17,7 +17,7 @@ public class VarianceUpdateEvent extends GwtEvent<VarianceUpdateEvent.Handler> {
         public void onVarianceUpdateEvent(VarianceUpdateEvent event);
     }
 
-    private static final Type<Handler> TYPE = new Type<Handler>();
+    private static final Type<Handler> TYPE = new Type<>();
 
     private List<Peptide> variances;
 

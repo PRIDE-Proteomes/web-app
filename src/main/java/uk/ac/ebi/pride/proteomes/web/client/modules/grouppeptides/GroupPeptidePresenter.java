@@ -24,9 +24,9 @@ public class GroupPeptidePresenter extends Presenter<ListView<Pair<String, List<
                                    implements ValidStateEvent.Handler,
                                               GroupUpdateEvent.Handler {
     private final ListDataProvider<Pair<String, List<String>>> dataProvider = new
-            ListDataProvider<Pair<String, List<String>>>();
+            ListDataProvider<>();
     private final ListSorter<Pair<String, List<String>>> dataSorter = new
-            ListSorter<Pair<String, List<String>>>(new ArrayList<Pair<String, List<String>>>());
+            ListSorter<>(new ArrayList<Pair<String, List<String>>>());
 
     private boolean groups = true;
 
@@ -45,7 +45,7 @@ public class GroupPeptidePresenter extends Presenter<ListView<Pair<String, List<
         view.asWidget().setVisible(false);
 
         final NoSelectionModel<Pair<String, List<String>>> selectionModel = new
-                NoSelectionModel<Pair<String, List<String>>>();
+                NoSelectionModel<>();
         view.setSelectionModel(selectionModel);
         view.setKeyboardSelectionPolicy(GroupPeptideColumnProvider.getKeyboardSelectionPolicy());
 
@@ -75,9 +75,9 @@ public class GroupPeptidePresenter extends Presenter<ListView<Pair<String, List<
     }
 
     private void updateList(Map<String, List<String>> peptideMap) {
-        List<Pair<String, List<String>>> newList = new ArrayList<Pair<String, List<String>>>();
+        List<Pair<String, List<String>>> newList = new ArrayList<>();
         for(Map.Entry<String, List<String>> entry : peptideMap.entrySet()) {
-            newList.add(new Pair<String, List<String>>(entry.getKey(), entry.getValue()));
+            newList.add(new Pair<>(entry.getKey(), entry.getValue()));
         }
         setList(newList);
     }

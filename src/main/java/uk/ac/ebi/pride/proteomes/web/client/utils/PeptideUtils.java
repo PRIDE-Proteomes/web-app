@@ -24,7 +24,7 @@ public class PeptideUtils {
      * @return a new list containing only the peptide matches inside the region
      */
     static public List<PeptideMatch> filterPeptideMatchesNotIn(List<? extends PeptideMatch> peptideMatches, int start, int end) {
-        List<PeptideMatch> filteredList = new ArrayList<PeptideMatch>();
+        List<PeptideMatch> filteredList = new ArrayList<>();
 
         if(start == end && start == 0) {
             return (List<PeptideMatch>) peptideMatches;
@@ -45,7 +45,7 @@ public class PeptideUtils {
      * @return a new list containing only the peptide matches inside the region
      */
     static public List<PeptideWithVariances> filterPeptideWithVariancesNotIn(List<PeptideWithVariances> peptideMatches, int start, int end) {
-        List<PeptideWithVariances> filteredList = new ArrayList<PeptideWithVariances>();
+        List<PeptideWithVariances> filteredList = new ArrayList<>();
 
         if(start == end && start == 0) {
             return peptideMatches;
@@ -62,7 +62,7 @@ public class PeptideUtils {
     public static List<PeptideMatch> filterPeptidesNotInTissues
             (List<PeptideMatch> peptideMatches, List<String> tissues) {
         List<PeptideMatch> filteredList;
-        List<String> properTissues = new ArrayList<String>();
+        List<String> properTissues = new ArrayList<>();
 
         for(String tissue : tissues) {
             if(!tissue.equals("")) {
@@ -74,7 +74,7 @@ public class PeptideUtils {
             return peptideMatches;
         }
 
-        filteredList = new ArrayList<PeptideMatch>();
+        filteredList = new ArrayList<>();
 
         for(PeptideMatch peptide : peptideMatches) {
             for(String tissue : properTissues) {
@@ -102,7 +102,7 @@ public class PeptideUtils {
             return (List<Peptide>) peptides;
         }
 
-        filteredList = new ArrayList<Peptide>();
+        filteredList = new ArrayList<>();
 
         for(Peptide peptide : peptides) {
             for(ModifiedLocation modLoc : peptide.getModifiedLocations()) {
@@ -125,7 +125,7 @@ public class PeptideUtils {
     public static List<PeptideMatch> filterPeptideMatchesWithoutAnyModifications
     (List<PeptideMatch> peptideMatches, List<String> modifications) {
         List<PeptideMatch> filteredList;
-        List<String> properModifications = new ArrayList<String>();
+        List<String> properModifications = new ArrayList<>();
 
         for(String modification : modifications) {
             if(!modification.equals("")) {
@@ -137,7 +137,7 @@ public class PeptideUtils {
             return peptideMatches;
         }
 
-        filteredList = new ArrayList<PeptideMatch>();
+        filteredList = new ArrayList<>();
 
         for(PeptideMatch peptide : peptideMatches) {
             modLoc:
@@ -239,7 +239,7 @@ public class PeptideUtils {
         // possible cases where some filter lists are empty.
 
         if(regions.isEmpty()) {
-            newRegions = new ArrayList<String>();
+            newRegions = new ArrayList<>();
             newRegions.add("");
         }
         else {
@@ -247,7 +247,7 @@ public class PeptideUtils {
         }
 
         if(mods.isEmpty()) {
-            newMods = new ArrayList<String>();
+            newMods = new ArrayList<>();
             newMods.add("");
         }
         else {
@@ -255,7 +255,7 @@ public class PeptideUtils {
         }
 
         if(tissues.isEmpty()) {
-            newTissues = new ArrayList<String>();
+            newTissues = new ArrayList<>();
             newTissues.add("");
         }
         else {
@@ -276,11 +276,11 @@ public class PeptideUtils {
                         else {
                             region = Region.tokenize(regionId);
                         }
-                        List<PeptideMatch> pList = new ArrayList<PeptideMatch>();
+                        List<PeptideMatch> pList = new ArrayList<>();
                         pList.add(match);
-                        List<String> tList = new ArrayList<String>();
+                        List<String> tList = new ArrayList<>();
                         tList.add(tissue);
-                        List<String> mList = new ArrayList<String>();
+                        List<String> mList = new ArrayList<>();
                         mList.add(mod);
 
                         if(!filterPeptideMatches(pList,

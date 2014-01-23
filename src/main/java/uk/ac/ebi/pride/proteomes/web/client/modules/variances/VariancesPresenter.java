@@ -32,9 +32,9 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
                                            PeptideUpdateEvent.Handler,
                                            VarianceUpdateEvent.Handler {
     private final ListDataProvider<Peptide> dataProvider = new
-                                        ListDataProvider<Peptide>();
+                                        ListDataProvider<>();
     private final ListSorter<Peptide> dataSorter = new
-                                       ListSorter<Peptide>(new ArrayList<Peptide>());
+                                       ListSorter<>(new ArrayList<Peptide>());
 
     private boolean groups = true;
     private Collection<Peptide> selectedVariances = Collections.emptyList();
@@ -57,11 +57,11 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
 
         // We define how are the items selected here
         final SingleSelectionModel<Peptide> selectionModel = new
-                SingleSelectionModel<Peptide>();
+                SingleSelectionModel<>();
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             public void onSelectionChange(SelectionChangeEvent event) {
                 if(!selectionEventsDisabled) {
-                    Set<Peptide> selection = new HashSet<Peptide>();
+                    Set<Peptide> selection = new HashSet<>();
                     selection.add(selectionModel.getSelectedObject());
                     for(ListUiHandler<Peptide> handler : getView().getUiHandlers()) {
                         handler.onSelectionChanged(selection);
@@ -103,7 +103,7 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
                 currentPeptide = PeptideWithVariances.emptyPeptideWithVariances();
             }
             updateList(currentPeptide.getPeptideList());
-            selectedVariances = new ArrayList<Peptide>();
+            selectedVariances = new ArrayList<>();
             getView().loadList();
         }
     }
@@ -114,7 +114,7 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
             deselectItem(peptide);
         }
 
-        selectedVariances = new ArrayList<Peptide>();
+        selectedVariances = new ArrayList<>();
         for(Peptide variance : event.getVariances()) {
             int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(), variance.getId());
             if(peptidePosition > -1) {
@@ -143,7 +143,7 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
             items = Collections.emptyList();
         }
 
-        Set<Peptide> variances = new HashSet<Peptide>();
+        Set<Peptide> variances = new HashSet<>();
 
         for(Peptide variance : items) {
             variances.add(variance);

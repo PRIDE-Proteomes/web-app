@@ -37,7 +37,7 @@ public class SequenceView extends ViewWithUiHandlers<SequenceUiHandler>
     private Map<ProteinAdapter, SequenceViewer> viewersCache;
 
     public SequenceView() {
-        viewersCache = new HashMap<ProteinAdapter, SequenceViewer>();
+        viewersCache = new HashMap<>();
 
         outerBox = ModuleContainerFactory.getModuleContainer("Protein " +
                                                              "Sequence");

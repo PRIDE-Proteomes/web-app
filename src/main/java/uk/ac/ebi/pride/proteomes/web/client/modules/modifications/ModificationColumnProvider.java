@@ -19,7 +19,7 @@ import java.util.List;
 public class ModificationColumnProvider {
     public static List<Column<Multiset.Entry<String>, ?>> getSortingColumns
             (ListSorter<Multiset.Entry<String>> sorter) {
-        List<Column<Multiset.Entry<String>, ?>> columns = new ArrayList<Column<Multiset.Entry<String>, ?>>();
+        List<Column<Multiset.Entry<String>, ?>> columns = new ArrayList<>();
 
         TextColumn<Multiset.Entry<String>> nameColumn = new TextColumn<Multiset.Entry<String>>() {
             @Override
@@ -57,13 +57,13 @@ public class ModificationColumnProvider {
     }
 
     public static List<String> getColumnTitles() {
-        List<String> titles = new ArrayList<String>();
+        List<String> titles = new ArrayList<>();
         Collections.addAll(titles, "Name", "Count");
         return titles;
     }
 
     public static List<String> getColumnWidths() {
-        List<String> widths = new ArrayList<String>();
+        List<String> widths = new ArrayList<>();
         Collections.addAll(widths, "70%", "30%");
         return widths;
     }

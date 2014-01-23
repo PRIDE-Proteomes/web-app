@@ -112,7 +112,7 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
         List<PeptideAdapter> selectionAdapters;
 
         if(event.getPeptides().size() > 0) {
-            selectionAdapters = new ArrayList<PeptideAdapter>();
+            selectionAdapters = new ArrayList<>();
 
             for(PeptideMatch match : event.getPeptides()) {
                 selectionAdapters.add(new PeptideAdapter(match));
@@ -146,7 +146,7 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
     @Override
     public void onRegionSelected(ProteinRegionSelectionEvent event) {
         StateChanger changer = new StateChanger();
-        List<Region> regions = new ArrayList<Region>();
+        List<Region> regions = new ArrayList<>();
         UserAction action = new UserAction(UserAction.Type.region, "Drag Set");
         Set<PeptideMatch> peptides;
 
@@ -160,7 +160,7 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
             // We should keep selecting only the peptides that fit in the new
             // region
             if(currentPeptides.size() > 0) {
-                peptides = new HashSet<PeptideMatch>();
+                peptides = new HashSet<>();
                 for(PeptideMatch peptide : currentPeptides) {
                     if(PeptideUtils.inRange(peptide, start, end)) {
                         peptides.add(peptide);
@@ -180,7 +180,7 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
 
     @Override
     public void onRegionHighlighted(ProteinRegionHighlightedEvent event) {
-        List<Region> regions = new ArrayList<Region>();
+        List<Region> regions = new ArrayList<>();
 
         // if the selection is done right to left then start > end
         int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();

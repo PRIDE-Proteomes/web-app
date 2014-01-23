@@ -16,7 +16,7 @@ import java.util.Collection;
 public class DataRequester implements RequestCallback {
     final String id;
     final Class responseType;
-    private Collection<TransactionHandler> handlers = new ArrayList<TransactionHandler>();
+    private Collection<TransactionHandler> handlers = new ArrayList<>();
 
     public DataRequester(String identifier, String url, Class type, Collection<TransactionHandler> responseHandlers) {
         id = identifier;

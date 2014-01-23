@@ -36,7 +36,7 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
     private Map<ProteinAdapter, ProteinViewer> viewersCache;
 
     public CoverageView() {
-        viewersCache = new HashMap<ProteinAdapter, ProteinViewer>();
+        viewersCache = new HashMap<>();
 
         outerBox = ModuleContainerFactory.getModuleContainer("Protein " +
                                                              "Coverage");

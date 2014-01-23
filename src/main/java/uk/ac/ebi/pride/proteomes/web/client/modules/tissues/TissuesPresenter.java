@@ -36,10 +36,10 @@ public class TissuesPresenter extends Presenter<ListView<String>>
                                          ProteinRequestEvent.Handler,
                                          PeptideUpdateEvent.Handler,
                                          TissueUpdateEvent.Handler {
-    private final ListDataProvider<String> dataProvider = new
-            ListDataProvider<String>();
+
+    private final ListDataProvider<String> dataProvider = new ListDataProvider<>();
     private final ListSorter<String> dataSorter = new
-                                        ListSorter<String>(new ArrayList<String>());
+                                        ListSorter<>(new ArrayList<String>());
 
     private boolean groups = true;
     private Collection<String> selectedTissues = Collections.emptyList();
@@ -60,8 +60,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         view.asWidget().setVisible(false);
         view.hideContent();
 
-        final MultiSelectionModel<String> selectionModel = new
-                MultiSelectionModel<String>();
+        final MultiSelectionModel<String> selectionModel = new MultiSelectionModel<>();
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
@@ -129,7 +128,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
             deselectItem(tissue);
         }
 
-        selectedTissues = new ArrayList<String>();
+        selectedTissues = new ArrayList<>();
         for(String item : event.getTissues()) {
             selectItem(item);
             selectedTissues.add(item);
@@ -154,7 +153,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
 
         selectedTissues = items;
 
-        filteredPeptides = new ArrayList<PeptideMatch>();
+        filteredPeptides = new ArrayList<>();
         for(PeptideMatch pep : selectedPeptides) {
             // If the collections are disjoint means the peptide doesn't have
             // any tissue in items. If this happens, we filter it out.

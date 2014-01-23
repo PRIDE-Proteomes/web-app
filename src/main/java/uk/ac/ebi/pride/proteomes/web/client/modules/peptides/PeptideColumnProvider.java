@@ -18,8 +18,7 @@ public class PeptideColumnProvider {
     public static List<Column<PeptideMatch, ?>> getSortingColumns
             (ListSorter<PeptideMatch> sorter) {
 
-        List<Column<PeptideMatch, ?>> columns = new
-                ArrayList<Column<PeptideMatch, ?>>();
+        List<Column<PeptideMatch, ?>> columns = new ArrayList<>();
 
         TextColumn<PeptideMatch> sequenceColumn = new TextColumn<PeptideMatch>() {
             @Override
@@ -87,7 +86,7 @@ public class PeptideColumnProvider {
         TextColumn<PeptideMatch> modsColumn = new TextColumn<PeptideMatch>() {
             @Override
             public String getValue(PeptideMatch object) {
-                Set<String> modSet = new HashSet<String>();
+                Set<String> modSet = new HashSet<>();
                 for(ModifiedLocation modLoc : object.getModifiedLocations()) {
                     modSet.add(modLoc.getModification());
                 }
@@ -148,14 +147,14 @@ public class PeptideColumnProvider {
     }
 
     public static List<String> getColumnTitles() {
-        List<String> titles = new ArrayList<String>();
+        List<String> titles = new ArrayList<>();
         Collections.addAll(titles, "Sequence", "Region", "Modifications",
                                    "Tissues");
         return titles;
     }
 
     public static List<String> getColumnWidths() {
-        List<String> widths = new ArrayList<String>();
+        List<String> widths = new ArrayList<>();
         Collections.addAll(widths, "30%", "10%", "30%", "30%");
         return widths;
     }

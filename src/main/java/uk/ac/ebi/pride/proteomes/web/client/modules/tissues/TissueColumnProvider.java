@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class TissueColumnProvider {
     public static List<Column<String, ?>> getSortingColumns(ListSorter<String> sorter) {
-        List<Column<String, ?>> columns = new ArrayList<Column<String, ?>>();
+        List<Column<String, ?>> columns = new ArrayList<>();
 
         TextColumn<String> nameColumn = new TextColumn<String>() {
             @Override
@@ -40,13 +40,13 @@ public class TissueColumnProvider {
     }
 
     public static List<String> getColumnTitles() {
-        List<String> titles = new ArrayList<String>();
+        List<String> titles = new ArrayList<>();
         Collections.addAll(titles, "Name");
         return titles;
     }
 
     public static List<String> getColumnWidths() {
-        List<String> widths = new ArrayList<String>();
+        List<String> widths = new ArrayList<>();
         Collections.addAll(widths, "100%");
         return widths;
     }
