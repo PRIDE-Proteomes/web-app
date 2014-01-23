@@ -279,25 +279,25 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 server.requestProteins(state.getSelectedProteins());
             }
             if(!arePeptidesCached) {
-                List<String> sequences1 = new ArrayList<String>();
-                List<String> sequences2 = new ArrayList<String>();
-                List<String> proteins1 = new ArrayList<String>();
-                List<String> proteins2 = new ArrayList<String>();
-                List<Integer> positions = new ArrayList<Integer>();
+                List<String> matchSequences = new ArrayList<String>();
+                List<String> peptiSequences = new ArrayList<String>();
+                List<String> matchProteins = new ArrayList<String>();
+                List<String> peptiProteins = new ArrayList<String>();
+                List<Integer> matchPositions = new ArrayList<Integer>();
                 for(String id : state.getSelectedPeptides()) {
                     if(id.contains(State.sepFields)) {
                         String[] split = id.split(State.sepFields);
-                        sequences1.add(split[0]);
-                        proteins1.add(state.getSelectedProteins().get(0));
-                        positions.add(Integer.parseInt(split[1]));
+                        matchSequences.add(split[0]);
+                        matchProteins.add(state.getSelectedProteins().get(0));
+                        matchPositions.add(Integer.parseInt(split[1]));
                     }
                     else {
-                        sequences1.add(id);
-                        proteins1.add(state.getSelectedProteins().get(0));
+                        peptiSequences.add(id);
+                        peptiProteins.add(state.getSelectedProteins().get(0));
                     }
                 }
-                server.requestPeptideVariances(sequences1, proteins1, positions);
-                server.requestPeptideVariances(sequences2, proteins2);
+                server.requestPeptideVariances(matchSequences, matchProteins, matchPositions);
+                server.requestPeptideVariances(peptiSequences, peptiProteins);
             }
         }
     }
