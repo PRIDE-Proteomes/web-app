@@ -145,28 +145,23 @@ final class State {
                 continue;
             }
 
-            // TODO use switch statement, leads to less boilerplate
-            // for gwt 2.6, it supports java 7 with string switches
-            if(dict[0].compareToIgnoreCase("group") == 0) {
-                groupIds = dict[1];
-            }
-            else if(dict[0].compareToIgnoreCase("protein") == 0) {
-                proteinIds = dict[1];
-            }
-            else if(dict[0].compareToIgnoreCase("region") == 0) {
-                regionIds = dict[1];
-            }
-            else if(dict[0].compareToIgnoreCase("peptide") == 0) {
-                peptideIds = dict[1];
-            }
-            else if(dict[0].compareToIgnoreCase("variance") == 0) {
-                varianceIds = dict[1];
-            }
-            else if(dict[0].compareToIgnoreCase("modification") == 0) {
-                modificationIds = dict[1];
-            }
-            else if(dict[0].compareToIgnoreCase("tissue") == 0) {
-                tissueIds = dict[1];
+            String type = dict[0].toLowerCase();
+
+            switch (type) {
+                case "group":        groupIds = dict[1];
+                                     break;
+                case "protein":      proteinIds = dict[1];
+                                     break;
+                case "region":       regionIds = dict[1];
+                                     break;
+                case "peptide":      peptideIds = dict[1];
+                                     break;
+                case "variance":     varianceIds = dict[1];
+                                     break;
+                case "modification": modificationIds = dict[1];
+                                     break;
+                case "tissue":       tissueIds = dict[1];
+                                     break;
             }
         }
 
@@ -282,17 +277,17 @@ final class State {
      * Using some string that may create an invalid state,
      * we create a valid one to our best effort without using the data,
      * otherwise an exception is thrown.
-     * @param groupIds
-     * @param proteinIds
-     * @param regionIds
-     * @param peptideIds
-     * @param varianceIds
-     * @param modificationIds
-     * @param tissueIds
-     * @return
+     * @param groupIds the url-encoded identifiers of the groups
+     * @param proteinIds the url-encoded identifiers of the proteins
+     * @param regionIds the url-encoded identifiers of the regions
+     * @param peptideIds the url-encoded identifiers of the peptides
+     * @param varianceIds the url-encoded identifiers of the variances
+     * @param modificationIds the url-encoded identifiers of the modifications
+     * @param tissueIds the url-encoded identifiers of the tissues
+     * @return a new state with a state with removed properties to make it valid
      * @throws InconsistentStateException
      */
-    public static State simplifyState(String groupIds, String proteinIds,
+    protected static State simplifyState(String groupIds, String proteinIds,
                                       String regionIds, String peptideIds,
                                       String varianceIds, String modificationIds,
                                       String tissueIds)
