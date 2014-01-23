@@ -8,6 +8,7 @@ import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
@@ -119,6 +120,9 @@ class VarianceColumnProvider {
                FlowPanel panel = new FlowPanel();
                for (String assayId : obj.getAssays()) {
                    panel.add(new Anchor(assayId, "http://wwwdev.ebi.ac.uk/pride/archive/assays/" + assayId, "_blank"));
+                   if(!assayId.equals(obj.getAssays().get(obj.getAssays().size() - 1))) {
+                       panel.add(new InlineLabel(" "));
+                   }
                }
                return SafeHtmlUtils.fromSafeConstant(panel.toString());
            }
