@@ -23,9 +23,9 @@ public class StateChangingActionEvent extends
     private final StateChanger changer;
     private final UserAction action;
 
-    protected StateChangingActionEvent(HasHandlers source,
-                                       StateChanger changer,
-                                       UserAction action) {
+    private StateChangingActionEvent(HasHandlers source,
+                                     StateChanger changer,
+                                     UserAction action) {
         super();
         this.changer = changer;
         this.action = action;

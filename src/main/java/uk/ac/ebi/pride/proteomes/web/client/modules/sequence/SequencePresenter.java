@@ -41,7 +41,6 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
                                           PeptideUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler {
     private boolean hiding = true;
-    private Protein currentProtein;
     private List<PeptideWithVariances> currentPeptides = Collections.emptyList();
 
     public interface ThisView extends View, HasUiHandlers<SequenceUiHandler> {
@@ -84,7 +83,7 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
     @Override
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
         if(!hiding && event.getProteins().size() > 0) {
-            currentProtein = event.getProteins().get(0);
+            Protein currentProtein = event.getProteins().get(0);
             getView().updateProtein(new ProteinAdapter(currentProtein));
         }
     }

@@ -10,7 +10,7 @@ import uk.ac.ebi.pride.widgets.client.common.handler.ProteinModificationHandler;
  *         Date: 11/11/13
  *         Time: 13:48
  */
-public class ProteinModificationAdapter implements ProteinModificationHandler {
+class ProteinModificationAdapter implements ProteinModificationHandler {
     private final ModifiedLocation modifiedLocation;
     private final ModificationAdapter modification;
     private int count;

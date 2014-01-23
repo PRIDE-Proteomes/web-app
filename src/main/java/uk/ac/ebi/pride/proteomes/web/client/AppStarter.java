@@ -47,7 +47,7 @@ import java.util.List;
  *         Date: 15/10/13
  *         Time: 16:54
  */
-public class AppStarter implements RunAsyncCallback {
+class AppStarter implements RunAsyncCallback {
 
     private static final String webServiceRoot = "/pride/ws/proteomes";
     private final EventBus eventBus;

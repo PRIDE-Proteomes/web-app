@@ -16,7 +16,7 @@ public class ProteinRequestEvent extends GwtEvent<ProteinRequestEvent.Handler> {
 
     private static final Type<Handler> TYPE = new Type<>();
 
-    public ProteinRequestEvent(HasHandlers source) {
+    private ProteinRequestEvent(HasHandlers source) {
         super();
         setSource(source);
     }

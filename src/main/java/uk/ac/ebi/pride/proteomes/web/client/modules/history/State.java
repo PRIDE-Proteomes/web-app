@@ -287,10 +287,10 @@ final class State {
      * @return a new state with a state with removed properties to make it valid
      * @throws InconsistentStateException
      */
-    protected static State simplifyState(String groupIds, String proteinIds,
-                                      String regionIds, String peptideIds,
-                                      String varianceIds, String modificationIds,
-                                      String tissueIds)
+    static State simplifyState(String groupIds, String proteinIds,
+                               String regionIds, String peptideIds,
+                               String varianceIds, String modificationIds,
+                               String tissueIds)
                                        throws InconsistentStateException {
         String newRegionIds = "", newPeptideIds = "", newVariancesIds = "",
                 newModIds = "", newTissueIds = "";

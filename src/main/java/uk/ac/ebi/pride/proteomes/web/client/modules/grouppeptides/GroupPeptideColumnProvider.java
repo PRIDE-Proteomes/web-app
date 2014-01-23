@@ -22,7 +22,7 @@ import java.util.List;
  *         Date: 06/01/14
  *         Time: 16:01
  */
-public class GroupPeptideColumnProvider {
+class GroupPeptideColumnProvider {
     public static List<Column<Pair<String, List<String>>, ?>> getSortingColumns
             (ListSorter<Pair<String, List<String>>> sorter) {
 

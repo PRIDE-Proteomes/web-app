@@ -15,7 +15,7 @@ import java.util.List;
  *         Date: 22/11/13
  *         Time: 15:33
  */
-public class TissueColumnProvider {
+class TissueColumnProvider {
     public static List<Column<String, ?>> getSortingColumns(ListSorter<String> sorter) {
         List<Column<String, ?>> columns = new ArrayList<>();
 

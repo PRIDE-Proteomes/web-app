@@ -12,7 +12,7 @@ import uk.ac.ebi.pride.proteomes.web.client.exceptions.InvalidJSONException;
  *         Time: 15:44
  */
 public abstract class ModelFactory {
-    interface MyFactory extends AutoBeanFactory {
+    private interface MyFactory extends AutoBeanFactory {
         AutoBean<Group> group();
         AutoBean<Protein> protein();
         AutoBean<PeptideMatch> peptideMatch();

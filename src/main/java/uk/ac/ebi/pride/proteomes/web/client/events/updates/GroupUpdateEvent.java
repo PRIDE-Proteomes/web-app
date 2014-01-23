@@ -21,7 +21,7 @@ public class GroupUpdateEvent extends GwtEvent<GroupUpdateEvent.Handler> {
 
     private List<Group> GroupList;
 
-    public GroupUpdateEvent(List<Group> Groups, HasHandlers source) {
+    private GroupUpdateEvent(List<Group> Groups, HasHandlers source) {
         super();
         GroupList = Groups;
         setSource(source);

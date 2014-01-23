@@ -35,7 +35,7 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @UiField
     FlowPanel attributes;
 
-    HTMLPanel root;
+    private HTMLPanel root;
 
     public HeaderView() {
         root = ourUiBinder.createAndBindUi(this);

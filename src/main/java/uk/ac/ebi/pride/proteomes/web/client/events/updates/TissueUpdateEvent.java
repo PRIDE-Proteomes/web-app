@@ -20,7 +20,7 @@ public class TissueUpdateEvent extends GwtEvent<TissueUpdateEvent.Handler> {
 
     private List<String> tissues;
 
-    public TissueUpdateEvent(List<String> tissues, HasHandlers source) {
+    private TissueUpdateEvent(List<String> tissues, HasHandlers source) {
         super();
         this.tissues = tissues;
         setSource(source);

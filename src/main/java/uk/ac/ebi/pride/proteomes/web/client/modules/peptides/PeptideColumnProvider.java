@@ -14,7 +14,7 @@ import java.util.*;
  *         Date: 12/11/13
  *         Time: 15:44
  */
-public class PeptideColumnProvider {
+class PeptideColumnProvider {
     public static List<Column<PeptideMatch, ?>> getSortingColumns
             (ListSorter<PeptideMatch> sorter) {
 

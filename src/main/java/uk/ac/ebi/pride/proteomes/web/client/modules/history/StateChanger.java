@@ -45,7 +45,7 @@ public class StateChanger {
         Group, Protein, Region, Peptide, Variance, Modification, Tissue
     }
 
-    Queue<Change> orderedChanges = new LinkedList<>();
+    private Queue<Change> orderedChanges = new LinkedList<>();
 
     public void addGroupChange(Collection<Group> groupSelection) {
         Collection<String> groupIds = new ArrayList<>();

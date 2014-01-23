@@ -22,7 +22,7 @@ public class PeptideUpdateEvent extends GwtEvent<PeptideUpdateEvent.Handler> {
 
     private List<PeptideWithVariances> peptideVariances;
 
-    public PeptideUpdateEvent(List<PeptideWithVariances> peptides, HasHandlers source) {
+    private PeptideUpdateEvent(List<PeptideWithVariances> peptides, HasHandlers source) {
         super();
         peptideVariances = peptides;
         setSource(source);

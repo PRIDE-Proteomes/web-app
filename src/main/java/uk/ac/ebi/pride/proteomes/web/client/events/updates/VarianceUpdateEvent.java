@@ -21,7 +21,7 @@ public class VarianceUpdateEvent extends GwtEvent<VarianceUpdateEvent.Handler> {
 
     private List<Peptide> variances;
 
-    public VarianceUpdateEvent(List<Peptide> variances, HasHandlers source) {
+    private VarianceUpdateEvent(List<Peptide> variances, HasHandlers source) {
         super();
         this.variances = variances;
         setSource(source);

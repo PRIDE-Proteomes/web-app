@@ -18,8 +18,8 @@ public class InvalidStateEvent extends GwtEvent<InvalidStateEvent.Handler> {
     private final String message;
     private final String state;
 
-    public InvalidStateEvent(HasHandlers source, String message,
-                             String state) {
+    private InvalidStateEvent(HasHandlers source, String message,
+                              String state) {
         super();
         setSource(source);
         this.message = message;

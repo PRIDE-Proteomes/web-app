@@ -16,7 +16,7 @@ public class GroupRequestEvent extends GwtEvent<GroupRequestEvent.Handler> {
 
     private static final Type<Handler> TYPE = new Type<>();
 
-    public GroupRequestEvent(HasHandlers source) {
+    private GroupRequestEvent(HasHandlers source) {
         super();
         setSource(source);
     }

@@ -12,10 +12,10 @@ import uk.ac.ebi.pride.proteomes.web.client.events.SnoopingEventBus;
  *         Date: 15/10/13
  *         Time: 15:51
  */
-public class WebApp implements EntryPoint {
+class WebApp implements EntryPoint {
     // The id of the html element in the main page where we will inject the
     // application
-    public static final String PLACEHOLDER_ID = "webapp";
+    private static final String PLACEHOLDER_ID = "webapp";
 
     @Override
     public void onModuleLoad() {

@@ -13,9 +13,9 @@ import java.util.Collection;
  *         Date: 08/01/14
  *         Time: 16:14
  */
-public class DataRequester implements RequestCallback {
-    final String id;
-    final Class responseType;
+class DataRequester implements RequestCallback {
+    private final String id;
+    private final Class responseType;
     private Collection<TransactionHandler> handlers = new ArrayList<>();
 
     public DataRequester(String identifier, String url, Class type, Collection<TransactionHandler> responseHandlers) {

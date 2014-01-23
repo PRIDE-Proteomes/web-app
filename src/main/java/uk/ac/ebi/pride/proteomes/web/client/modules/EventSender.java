@@ -9,10 +9,10 @@ import com.google.web.bindery.event.shared.EventBus;
  *         Date: 17/12/13
  *         Time: 15:00
  */
-public class EventSender implements HasHandlers {
+class EventSender implements HasHandlers {
     private final EventBus eventBus;
 
-    public EventSender(EventBus eventBus) {
+    EventSender(EventBus eventBus) {
         this.eventBus = eventBus;
     }
 

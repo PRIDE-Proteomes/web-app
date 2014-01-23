@@ -38,7 +38,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
     /* This selection manager allows the user to deselect a column just by
        clicking it, instead of having to use the ctrl modifier.
      */
-    DefaultSelectionEventManager<T> selectionManager =
+    private DefaultSelectionEventManager<T> selectionManager =
             DefaultSelectionEventManager.createCustomManager(new DefaultSelectionEventManager.EventTranslator<T>(){
         @Override
         public boolean clearCurrentSelection(CellPreviewEvent<T> event) {

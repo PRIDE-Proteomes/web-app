@@ -16,7 +16,7 @@ public class PeptideRequestEvent extends GwtEvent<PeptideRequestEvent.Handler> {
 
     private static final Type<Handler> TYPE = new Type<>();
 
-    public PeptideRequestEvent(HasHandlers source) {
+    private PeptideRequestEvent(HasHandlers source) {
         super();
         setSource(source);
     }

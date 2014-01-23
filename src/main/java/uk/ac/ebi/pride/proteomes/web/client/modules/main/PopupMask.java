@@ -16,7 +16,7 @@ import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
  * Time: 11:39
  *
  */
-public class PopupMask extends    PopupPanel
+class PopupMask extends    PopupPanel
                        implements PopupPanel.PositionCallback,
                                   ResizeHandler,
                                   Window.ScrollHandler {

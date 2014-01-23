@@ -18,7 +18,7 @@ public class ErrorOnUpdateEvent extends GwtEvent<ErrorOnUpdateEvent.Handler> {
 
     private String text;
 
-    public ErrorOnUpdateEvent(String text, HasHandlers source) {
+    private ErrorOnUpdateEvent(String text, HasHandlers source) {
         super();
         this.text = text;
         setSource(source);

@@ -15,7 +15,7 @@ import com.google.web.bindery.event.shared.EventBus;
 public abstract class Presenter<V extends View> extends EventSender {
     private final V view;
 
-    public Presenter(EventBus eventBus, V view) {
+    protected Presenter(EventBus eventBus, V view) {
         super(eventBus);
         this.view = view;
     }
@@ -24,7 +24,7 @@ public abstract class Presenter<V extends View> extends EventSender {
         view.bindToContainer(container);
     }
 
-    public V getView() {
+    protected V getView() {
         return view;
     }
 }

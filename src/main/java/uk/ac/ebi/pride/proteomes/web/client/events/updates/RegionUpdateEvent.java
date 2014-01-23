@@ -21,7 +21,7 @@ public class RegionUpdateEvent extends GwtEvent<RegionUpdateEvent.Handler> {
 
     private List<Region> regionList;
 
-    public RegionUpdateEvent(List<Region> regions, HasHandlers source) {
+    private RegionUpdateEvent(List<Region> regions, HasHandlers source) {
         super();
         this.regionList = regions;
         setSource(source);

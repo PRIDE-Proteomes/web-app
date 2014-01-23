@@ -24,7 +24,7 @@ import java.util.Collections;
  *         Date: 29/11/13
  *         Time: 14:46
  */
-public class VarianceColumnProvider {
+class VarianceColumnProvider {
     public static List<Column<Peptide, ?>> getSortingColumns(ListSorter<Peptide> sorter) {
         List<Column<Peptide, ?>> columns = new ArrayList<>();
 

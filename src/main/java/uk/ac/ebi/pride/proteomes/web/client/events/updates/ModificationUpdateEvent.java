@@ -20,7 +20,7 @@ public class ModificationUpdateEvent extends GwtEvent<ModificationUpdateEvent.Ha
 
     private List<String> modifications;
 
-    public ModificationUpdateEvent(List<String> modifications, HasHandlers source) {
+    private ModificationUpdateEvent(List<String> modifications, HasHandlers source) {
         super();
         this.modifications = modifications;
         setSource(source);

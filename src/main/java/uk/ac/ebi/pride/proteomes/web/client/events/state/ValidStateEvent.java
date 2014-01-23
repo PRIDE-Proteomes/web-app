@@ -21,7 +21,7 @@ public class ValidStateEvent extends GwtEvent<ValidStateEvent.Handler> {
     private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<>();
     private final ViewType viewType;
 
-    public ValidStateEvent(HasHandlers source, ViewType viewType) {
+    private ValidStateEvent(HasHandlers source, ViewType viewType) {
         super();
         setSource(source);
         this.viewType = viewType;

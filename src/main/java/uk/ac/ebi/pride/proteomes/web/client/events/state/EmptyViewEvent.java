@@ -17,7 +17,7 @@ public class EmptyViewEvent extends GwtEvent<EmptyViewEvent.Handler> {
     private static final Type<Handler> TYPE = new Type<>();
     private final String message;
 
-    public EmptyViewEvent(HasHandlers source, String message) {
+    private EmptyViewEvent(HasHandlers source, String message) {
         super();
         setSource(source);
         this.message = message;

@@ -16,7 +16,7 @@ import java.util.List;
  *         Date: 26/11/13
  *         Time: 10:53
  */
-public class ModificationColumnProvider {
+class ModificationColumnProvider {
     public static List<Column<Multiset.Entry<String>, ?>> getSortingColumns
             (ListSorter<Multiset.Entry<String>> sorter) {
         List<Column<Multiset.Entry<String>, ?>> columns = new ArrayList<>();
