@@ -152,8 +152,6 @@ public class TissuesPresenter extends Presenter<ListView<String>>
             items = Collections.emptyList();
         }
 
-        selectedTissues = items;
-
         filteredPeptides = new ArrayList<PeptideMatch>();
         for(PeptideMatch pep : selectedPeptides) {
             // If the collections are disjoint means the peptide doesn't have

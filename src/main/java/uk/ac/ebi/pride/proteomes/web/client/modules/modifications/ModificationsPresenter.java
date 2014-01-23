@@ -159,8 +159,6 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
             items = Collections.emptyList();
         }
 
-        selectedModifications = items;
-
         List<String> selection = new ArrayList<String>();
         for(Multiset.Entry<String> item : items) {
             selection.add(item.getElement());
