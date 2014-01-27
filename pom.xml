@@ -11,7 +11,7 @@
     <version>0.3-SNAPSHOT</version>
 
     <properties>
-        <gwtVersion>2.6.0-rc1</gwtVersion>
+        <gwtVersion>2.6.0</gwtVersion>
 
         <!-- the webapp directory
              Attention: need to be the same as the finalName!
@@ -39,7 +39,7 @@
         <dependency>
             <groupId>uk.ac.ebi.pride.widgets</groupId>
             <artifactId>pride-gwt-widgets</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>0.2.1-SNAPSHOT</version>
         </dependency>
 
         <!-- PRIDE web utilities-->
@@ -99,7 +99,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
-                <version>${gwtVersion}</version>
+                <version>${gwtVersion}-rc3</version>
                 <executions>
                     <execution>
                         <goals>
@@ -151,7 +151,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
-                <version>${gwtVersion}</version>
+                <version>${gwtVersion}-rc3</version>
                 <reportSets>
                     <reportSet>
                         <reports>
