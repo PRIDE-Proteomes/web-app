@@ -4,6 +4,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.InvalidStateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.LoadingDataEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ErrorOnUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
@@ -20,7 +21,9 @@ public class MainPresenter extends Presenter<MainPresenter.ThisView>
                            implements EmptyViewEvent.Handler,
                                       ValidStateEvent.Handler,
                                       InvalidStateEvent.Handler,
-                                      ErrorOnUpdateEvent.Handler {
+                                      ErrorOnUpdateEvent.Handler,
+                                      LoadingDataEvent.Handler {
+
 
     public interface ThisView extends View {
         public void hideMessage();
@@ -40,6 +43,7 @@ public class MainPresenter extends Presenter<MainPresenter.ThisView>
         eventBus.addHandler(ErrorOnUpdateEvent.getType(), this);
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(InvalidStateEvent.getType(), this);
+        eventBus.addHandler(LoadingDataEvent.getType(), this);
     }
 
     @Override
@@ -68,5 +72,9 @@ public class MainPresenter extends Presenter<MainPresenter.ThisView>
     @Override
     public void onUpdateErrorEvent(ErrorOnUpdateEvent event) {
         getView().showInfoMessage(event.getMessage());
+    }
+    @Override
+    public void onLoadingDataEvent(LoadingDataEvent event) {
+        getView().showLoadingMessage();
     }
 }

@@ -12,10 +12,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.*;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.GroupRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.PeptideRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.state.EmptyViewEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.state.InvalidStateEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.state.*;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
@@ -272,6 +269,11 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         }
         else {
             // It's time to retrieve data and wait for the callback
+            boolean switching = (appState.getSelectedGroups().isEmpty() ^ state.getSelectedGroups().isEmpty()) &&
+                                (appState.getSelectedProteins().isEmpty() ^ state.getSelectedProteins().isEmpty());
+
+            LoadingDataEvent.fire(this, switching);
+
             if(!areGroupsCached) {
                 server.requestGroups(state.getSelectedGroups());
             }
