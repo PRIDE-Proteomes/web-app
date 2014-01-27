@@ -119,7 +119,7 @@ class VarianceColumnProvider {
                // create a direct link(s) to PRIDE Archive for the assay(s)
                FlowPanel panel = new FlowPanel();
                for (String assayId : obj.getAssays()) {
-                   panel.add(new Anchor(assayId, "http://wwwdev.ebi.ac.uk/pride/archive/assays/" + assayId, "_blank"));
+                   panel.add(new Anchor(assayId, "http://www.ebi.ac.uk/pride/archive/assays/" + assayId, "_blank"));
                    if(!assayId.equals(obj.getAssays().get(obj.getAssays().size() - 1))) {
                        panel.add(new InlineLabel(" "));
                    }
