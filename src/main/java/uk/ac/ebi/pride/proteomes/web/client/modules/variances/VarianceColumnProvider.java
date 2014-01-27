@@ -84,7 +84,7 @@ class VarianceColumnProvider {
                 for(String mod : modSet) {
                     sb.append(mod).append(", ");
                 }
-                return sb.length() == 0 ? "N/A" : sb.substring(0, sb.length() - 2);
+                return sb.length() == 0 ? "-" : sb.substring(0, sb.length() - 2);
             }
         };
 
