@@ -75,6 +75,8 @@ public class MainPresenter extends Presenter<MainPresenter.ThisView>
     }
     @Override
     public void onLoadingDataEvent(LoadingDataEvent event) {
-        getView().showLoadingMessage();
+        if(event.isSwitching()) {
+            getView().showLoadingMessage();
+        }
     }
 }
