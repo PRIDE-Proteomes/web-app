@@ -236,7 +236,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             }
 
             UserAction action = new UserAction(UserAction.Type.region,
-                                               "Click Coverage Set");
+                                               "Click Set");
             StateChangingActionEvent.fire(this, changer, action);
         } catch (IllegalRegionValueException e) {
             // This is probably because of an empty selection,
@@ -264,12 +264,12 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                 //we don't want to select a single aminoacid,
                 // we want to reset the selection
                 action = new UserAction(UserAction.Type.region,
-                        "Drag Coverage Reset");
+                        "Drag Reset");
                 region = Region.emptyRegion();
             }
             else {
                 action = new UserAction(UserAction.Type.region,
-                        "Drag Coverage Set");
+                        "Drag Set");
                 justHighlighted = false;
             }
 
@@ -284,7 +284,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
 
         } catch (IllegalRegionValueException e) {
             action = new UserAction(UserAction.Type.region,
-                    "Drag Coverage Reset");
+                    "Drag Reset");
             region = Region.emptyRegion();
             regions.add(region);
         } finally {
