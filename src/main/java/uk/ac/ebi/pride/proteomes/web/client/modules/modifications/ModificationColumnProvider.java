@@ -52,6 +52,7 @@ class ModificationColumnProvider {
         });
 
         columns.add(nameColumn);
+        columns.add(countColumn);
 
         return columns;
     }
