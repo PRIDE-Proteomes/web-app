@@ -6,7 +6,7 @@
 
     <name>PRIDE Proteomes Web Application</name>
     <groupId>uk.ac.ebi.pride.proteomes.web</groupId>
-    <artifactId>webapp</artifactId>
+    <artifactId>pride-proteomes-webapp</artifactId>
     <packaging>war</packaging>
     <version>0.5-SNAPSHOT</version>
 

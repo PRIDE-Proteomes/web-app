@@ -13,12 +13,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Comparator;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -76,7 +71,7 @@ class VarianceColumnProvider {
         TextColumn<Peptide> modsColumn = new TextColumn<Peptide>() {
             @Override
             public String getValue(Peptide object) {
-                Set<String> modSet = new HashSet<>();
+                List<String> modSet = new ArrayList<>();
                 for(ModifiedLocation modLoc : object.getModifiedLocations()) {
                     modSet.add(modLoc.getPosition() + ":" + modLoc.getModification());
                 }
@@ -100,11 +95,11 @@ class VarianceColumnProvider {
                 else {
                     StringBuilder sb1 = new StringBuilder();
                     StringBuilder sb2 = new StringBuilder();
-                    for(String tissue : o1.getTissues()) {
-                        sb1.append(tissue);
+                    for(ModifiedLocation mod  : o1.getModifiedLocations()) {
+                        sb1.append(mod.getModification());
                     }
-                    for(String tissue : o2.getTissues()) {
-                        sb2.append(tissue);
+                    for(ModifiedLocation mod : o2.getModifiedLocations()) {
+                        sb2.append(mod.getModification());
                     }
                     return sb1.toString().compareTo(sb2.toString());
                 }
