@@ -19,7 +19,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.data;
  */
 public interface TransactionHandler {
     public interface DataRetriever {
-        public void retrieveData(String query);
+        public void retrieveData(String query, Integer taxonId);
         public void addHandler(TransactionHandler handler);
     }
 

@@ -15,8 +15,12 @@ public class PeptideVarianceRetriever extends DataRetriever {
     }
 
     @Override
-    public void retrieveData(String id) {
-        String url = root + "/peptide/" + id;
-        new DataRequester(id, url, PeptideList.class, handlers);
+    public void retrieveData(String sequence, Integer taxonId) {
+        String url = root + "/peptide/" + sequence;
+        if (taxonId != null) {
+            url += "?species=" + taxonId;
+        }
+        new DataRequester(sequence, url, PeptideList.class, handlers);
     }
+
 }

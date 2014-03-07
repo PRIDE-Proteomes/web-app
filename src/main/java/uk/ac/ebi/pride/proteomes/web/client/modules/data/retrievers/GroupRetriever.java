@@ -13,7 +13,9 @@ public class GroupRetriever extends DataRetriever {
     }
 
     @Override
-    public void retrieveData(String id) {
+    public void retrieveData(String id, Integer taxonId) {
+        // retrieval of groups does not depend on the species (yet),
+        // therefore we ignore the provided taxonId
         String url = root + "/group/" + id;
         new DataRequester(id, url, Group.class, handlers);
     }

@@ -24,6 +24,8 @@ import java.util.*;
 public class DataProvider implements DataServer, TransactionHandler {
     private DataServer.DataClient client = null;
 
+    private Map<String, Integer> speciesCache = new HashMap<>();
+
     private Map<String, Group> groupCache = new HashMap<>();
     private List<Map<String, Boolean>> groupRequests = new ArrayList<>();
     private final GroupRetriever groupRetriever;
@@ -74,6 +76,7 @@ public class DataProvider implements DataServer, TransactionHandler {
         else if(transaction.getResponse() instanceof Protein) {
             Protein protein = (Protein) transaction.getResponse();
             proteinCache.put(protein.getAccession(), protein);
+            speciesCache.put(protein.getAccession(), protein.getTaxonID());
 
             for(Map<String, Boolean> batchRequest : proteinRequests) {
                 if(batchRequest.containsKey((protein.getAccession()))) {
@@ -178,7 +181,8 @@ public class DataProvider implements DataServer, TransactionHandler {
         for(String id : ids) {
             request.put(id, isGroupCached(id));
             if(!isGroupCached(id)) {
-                groupRetriever.retrieveData(id);
+                // no need for explicit taxon annotation
+                groupRetriever.retrieveData(id, null);
                 // we could also check whether there's a pending request or not
                 // in another batch
             }
@@ -194,7 +198,8 @@ public class DataProvider implements DataServer, TransactionHandler {
         for(String accession : accessions) {
             request.put(accession, isProteinCached(accession));
             if(!isProteinCached(accession)) {
-                proteinRetriever.retrieveData(accession);
+                // no need for explicit taxon annotation
+                proteinRetriever.retrieveData(accession, null);
                 // we could also check whether there's a pending request or not
             }
         }
@@ -208,7 +213,9 @@ public class DataProvider implements DataServer, TransactionHandler {
             request.put(new Triplet<>(sequences.get(i), positions.get(i), proteinIds.get(i)),
                             isPeptideCached(sequences.get(i), proteinIds.get(i), positions.get(i)));
             if(!isPeptideCached(sequences.get(i), proteinIds.get(i), positions.get(i))) {
-                peptideVarianceRetriever.retrieveData(sequences.get(i));
+                //Hack that allows to filter by species the peptiform. The species wasn't in the original design
+                // because it is implicit to the protein and symbolic peptides
+                peptideVarianceRetriever.retrieveData(sequences.get(i), speciesCache.get(proteinIds.get(i)));
                 // we could also check whether there's a pending request or not
             }
             else {
