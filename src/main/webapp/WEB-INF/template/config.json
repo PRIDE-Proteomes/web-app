@@ -19,6 +19,9 @@
         "cssList": [
             {
                 "url": "static/css/webapp.css"
+            },
+            {
+                "url": "static/css/pride-proteomes-colours.css"
             }
         ],
         "placeHolder": "webapp",
@@ -30,19 +33,19 @@
             "btnText": "Search",
             "action": "../search",
             "method": "get",
-            "inputName": "q",
+            "inputName": "query",
             "examples": [
                 {
                     "title": "albumin",
-                    "href": "../search?q=albumin"
+                    "href": "../search?query=albumin"
                 },
                 {
                     "title": "Q08648",
-                    "href": "../search?q=Q0864"
+                    "href": "../search?query=Q0864"
                 },
                 {
                     "title": "kinase",
-                    "href": "../search?q=kinase"
+                    "href": "../search?query=kinase"
                 }
             ]
         },

@@ -9,7 +9,11 @@
     <inherits name="com.google.common.collect.Collect"/>
 
     <!-- PRIDE modules                                              -->
-    <inherits name="uk.ac.ebi.pride.widgets.PrideWidgets" />
+    <!--<inherits name="uk.ac.ebi.pride.widgets.PrideWidgets" />-->
+    <inherits name="uk.ac.ebi.pride.widgets.client.disclosure.ModuleContainer" />
+    <inherits name="uk.ac.ebi.pride.widgets.client.protein.ProteinViewer" />
+    <inherits name="uk.ac.ebi.pride.widgets.client.sequence.SequenceViewer" />
+
     <inherits name="uk.ac.ebi.pride.proteomes.web.googleanalytics.googleanalytics" />
 
     <!-- Specify the app entry point class.                         -->

@@ -6,7 +6,7 @@
 
     <name>PRIDE Proteomes Web Application</name>
     <groupId>uk.ac.ebi.pride.proteomes.web</groupId>
-    <artifactId>pride-proteomes-webapp</artifactId>
+    <artifactId>webapp</artifactId>
     <packaging>war</packaging>
     <version>1.0.0</version>
 
@@ -35,11 +35,26 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-dev</artifactId>
+            <version>2.6.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-codeserver</artifactId>
+            <version>2.6.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+
         <!-- PRIDE Widgets -->
         <dependency>
             <groupId>uk.ac.ebi.pride.widgets</groupId>
             <artifactId>pride-gwt-widgets</artifactId>
-            <version>0.2.1-SNAPSHOT</version>
+            <version>0.2.4-SNAPSHOT</version>
         </dependency>
 
         <!-- PRIDE web utilities-->
@@ -143,6 +158,25 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            <!-- maven-jetty-plugin: run port 8888; stop port 8889 -->
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <version>6.1.26</version>
+                <configuration>
+                    <webAppConfig>
+                        <contextPath>/</contextPath>
+                    </webAppConfig>
+                    <stopPort>8889</stopPort>
+                    <stopKey>shutdown</stopKey>
+                    <connectors>
+                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                            <port>8888</port>
+                        </connector>
+                    </connectors>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -186,26 +220,22 @@
 
         <!-- EBI repo -->
         <repository>
-            <id>nexus-ebi-repo</id>
-            <name>The EBI internal repository</name>
+            <id>nexus-ebi-repo-old</id>
             <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo/</url>
-            <releases>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
         </repository>
-        <!-- EBI SNAPSHOT repo -->
+        <repository>
+            <id>nexus-ebi-repo-old-snapshots</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
+        </repository>
+        <repository>
+            <id>nexus-ebi-release-repo</id>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/</url>
+        </repository>
         <repository>
             <id>nexus-ebi-snapshot-repo</id>
-            <name>The EBI internal snapshot repository</name>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-            </snapshots>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-snapshots/</url>
         </repository>
+
     </repositories>
 
     <pluginRepositories>

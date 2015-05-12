@@ -6,7 +6,7 @@
     <inherits name='com.google.gwt.user.User'/>
 
     <!-- Google Analytics javascript file                           -->
-    <script src="http://www.google-analytics.com/ga.js"/>
+    <!--<script src="http://www.google-analytics.com/ga.js"/>-->
 
     <source path="client" />
 </module>

@@ -123,11 +123,11 @@ class AppStarter implements RunAsyncCallback {
         // Startup the main presenter, it's used as a container to hold the
         // rest of the widget-showing modules.
         presenterList.add(headerPresenter);
-        presenterList.add(tissuePresenter);
-        presenterList.add(modPresenter);
         presenterList.add(groupPeptidePresenter);
         presenterList.add(coveragePresenter);
         presenterList.add(sequencePresenter);
+        presenterList.add(tissuePresenter);
+        presenterList.add(modPresenter);
         presenterList.add(peptidePresenter);
         presenterList.add(variancePresenter);
 

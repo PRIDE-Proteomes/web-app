@@ -18,6 +18,10 @@ th, td{
     margin: 0;
 }
 
+th {
+    color: #ffffff !important;
+    text-shadow: #29292f 1px 1px 0 !important;
+}
 /** Most GWT widgets already have a style name defined */
 .gwt-DialogBox {
   width: 400px;

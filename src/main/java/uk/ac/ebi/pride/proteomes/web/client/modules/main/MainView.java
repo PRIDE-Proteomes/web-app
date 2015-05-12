@@ -28,12 +28,12 @@ public class MainView implements MainPresenter.ThisView {
         subHeader.setWidth("100%");
 
         for(int i = 0; i < panelList.size(); i++) {
-            if(i == 1) {
+            if(i == 4) {
                 layout.add(subHeader);
                 subHeader.add((Widget) panelList.get(i));
                 subHeader.setCellWidth((Widget) panelList.get(i), "50%");
             }
-            else if(i == 2) {
+            else if(i == 5) {
                 subHeader.add((Widget) panelList.get(i));
             }
             else {
