@@ -29,6 +29,7 @@
     },
     "localMasthead": {
         "title": "PRIDE Proteomes",
+        "homepageUrl": "../",
         "search": {
             "btnText": "Search",
             "action": "../search",
@@ -41,7 +42,7 @@
                 },
                 {
                     "title": "Q08648",
-                    "href": "../search?query=Q0864"
+                    "href": "../search?query=Q08648"
                 },
                 {
                     "title": "kinase",
@@ -65,13 +66,13 @@
             {
                 "selected": false,
                 "title": "Documentation",
-                "href": "../documentation",
+                "href": "/pride/help/proteomes",
                 "tooltip": "PRIDE Proteomes documentation"
             },
             {
                 "selected": false,
                 "title": "About PRIDE Proteomes",
-                "href": "../about",
+                "href": "/pride/help/proteomes/about",
                 "tooltip": "About PRIDE Proteomes"
             }
         ],
