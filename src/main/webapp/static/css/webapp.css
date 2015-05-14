@@ -42,3 +42,7 @@ th {
     background: rgba(255, 255, 255, 1.0);
     z-index: 101;
 }
+
+.displayInline {
+    display: inline;
+}

@@ -1,22 +1,22 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
-    <g:HTMLPanel>
-        <g:VerticalPanel horizontalAlignment="left" ui:field="vPanel">
-            <g:HTMLPanel>
-                <h2>
-                <g:Label ui:field="title"/>
-                </h2>
-            </g:HTMLPanel>
-            <g:HTMLPanel>
-                <p>
-                <g:Label ui:field="description"/>
-                </p>
-            </g:HTMLPanel>
-            <g:HTMLPanel>
-                <p>
-                <g:FlowPanel ui:field="attributes"/>
-                </p>
-            </g:HTMLPanel>
-        </g:VerticalPanel>
+    <g:HTMLPanel ui:field="panel">
+        <span>
+            <h2 class="displayInline">
+                <g:Anchor ui:field="title"/>
+            </h2>
+            <g:Anchor ui:field="groupLink"/>
+        </span>
+        <p>
+            <!--<g:InlineLabel ui:field="description"/><br/>-->
+            <g:InlineLabel ui:field="altId"/><br/>
+            <g:InlineLabel ui:field="name"/><br/>
+            <g:InlineLabel ui:field="species"/><br/>
+            <g:InlineLabel ui:field="geneSymbol"/><br/>
+            <g:InlineLabel ui:field="proteinEvidence"/>
+        </p>
+        <p>
+            <g:FlowPanel ui:field="attributes"/>
+        </p>
     </g:HTMLPanel>
 </ui:UiBinder>
