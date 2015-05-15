@@ -15,4 +15,5 @@ public interface Peptide {
     public List<ModifiedLocation> getModifiedLocations();
     public List<String> getTissues();
     public List<String> getAssays();
+    public List<String> getClusters();
 }

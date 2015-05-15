@@ -80,6 +80,11 @@ public class PeptideWithVariances implements PeptideMatch, PeptideList {
     }
 
     @Override
+    public List<String> getClusters() {
+        return match.getClusters();
+    }
+
+    @Override
     public List<Peptide> getPeptideList() {
         return list.getPeptideList();
     }

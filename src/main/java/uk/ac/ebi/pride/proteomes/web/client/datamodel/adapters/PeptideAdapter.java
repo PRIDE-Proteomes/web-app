@@ -54,6 +54,11 @@ public class PeptideAdapter implements PeptideHandler, PeptideMatch {
     }
 
     @Override
+    public List<String> getClusters() {
+        return peptide.getClusters();
+    }
+
+    @Override
     public Integer getSite() {
         return getPosition();
     }

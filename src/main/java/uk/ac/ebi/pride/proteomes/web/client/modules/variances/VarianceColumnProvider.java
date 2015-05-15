@@ -108,20 +108,20 @@ class VarianceColumnProvider {
 
         // Column that shows the assays the peptide has been seen in.
         Column<Peptide, SafeHtml> multiAssayLinkColumn = new Column<Peptide, SafeHtml>(new SafeHtmlCell()) {
-           @Override
-           public SafeHtml getValue(Peptide obj)
-           {
-               // create a direct link(s) to PRIDE Archive for the assay(s)
-               FlowPanel panel = new FlowPanel();
-               for (String assayId : obj.getAssays()) {
-                   String pepSeq = obj.getSequence();
-                   panel.add(new Anchor(assayId, "http://www.ebi.ac.uk/pride/archive/assays/" + assayId + "/psms?q=" + pepSeq, "_blank"));
-                   if(!assayId.equals(obj.getAssays().get(obj.getAssays().size() - 1))) {
-                       panel.add(new InlineLabel(" "));
-                   }
-               }
-               return SafeHtmlUtils.fromSafeConstant(panel.toString());
-           }
+            @Override
+            public SafeHtml getValue(Peptide obj)
+            {
+                // create a direct link(s) to PRIDE Archive for the assay(s)
+                FlowPanel panel = new FlowPanel();
+                for (String assayId : obj.getAssays()) {
+                    String pepSeq = obj.getSequence();
+                    panel.add(new Anchor(assayId, "http://www.ebi.ac.uk/pride/archive/assays/" + assayId + "/psms?q=" + pepSeq, "_blank"));
+                    if(!assayId.equals(obj.getAssays().get(obj.getAssays().size() - 1))) {
+                        panel.add(new InlineLabel(" "));
+                    }
+                }
+                return SafeHtmlUtils.fromSafeConstant(panel.toString());
+            }
         };
 
         multiAssayLinkColumn.setSortable(true);
@@ -140,22 +140,56 @@ class VarianceColumnProvider {
             }
         });
 
+        // Column that shows the assays the peptide has been seen in.
+        Column<Peptide, SafeHtml> multiClusterLinkColumn = new Column<Peptide, SafeHtml>(new SafeHtmlCell()) {
+           @Override
+           public SafeHtml getValue(Peptide obj)
+           {
+               // link to PRIDE Cluster for the cluster evidence(s)
+               FlowPanel panel = new FlowPanel();
+               for (String clusterId : obj.getClusters()) {
+                   panel.add(new Anchor(clusterId, "http://wwwdev.ebi.ac.uk/pride/cluster/#/cluster/" + clusterId, "_blank"));
+                   if(!clusterId.equals(obj.getClusters().get(obj.getClusters().size() - 1))) {
+                       panel.add(new InlineLabel(" "));
+                   }
+               }
+               return SafeHtmlUtils.fromSafeConstant(panel.toString());
+           }
+        };
+
+        multiClusterLinkColumn.setSortable(true);
+        sorter.setComparator(multiClusterLinkColumn, new Comparator<Peptide>() {
+            @Override
+            public int compare(Peptide o1, Peptide o2) {
+                StringBuilder sb1 = new StringBuilder();
+                StringBuilder sb2 = new StringBuilder();
+                for(String cluster : o1.getClusters()) {
+                    sb1.append(cluster);
+                }
+                for(String cluster : o2.getClusters()) {
+                    sb2.append(cluster);
+                }
+                return sb1.toString().compareTo(sb2.toString());
+            }
+        });
+
         columns.add(sequenceColumn);
         columns.add(modsColumn);
         columns.add(tissuesColumn);
         columns.add(multiAssayLinkColumn);
+        columns.add(multiClusterLinkColumn);
         return columns;
     }
 
     public static List<String> getColumnTitles() {
         List<String> titles = new ArrayList<>();
-        Collections.addAll(titles, "Sequence", "Modifications", "Tissues", "Assays");
+        Collections.addAll(titles, "Sequence", "Modifications", "Tissues", "Assays", "Clusters");
         return titles;
     }
 
     public static List<String> getColumnWidths() {
         List<String> widths = new ArrayList<>();
-        Collections.addAll(widths, "25%", "25%", "25%", "25%");
+        Collections.addAll(widths, "20%", "20%", "20%", "20%", "20%");
         return widths;
     }
 
