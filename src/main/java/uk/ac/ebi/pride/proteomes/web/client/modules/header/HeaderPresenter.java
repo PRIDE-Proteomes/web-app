@@ -25,7 +25,9 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
 
     public interface ThisView extends View {
         public void updateTitle(String title);
-        public void updateGroupLink(String groupLink);
+        public void updateUpGroupLink(String upGroupId);
+        public void updateGeneGroupLink(String geneGroupId);
+        public void updateUniquePeptideCount(int count);
         public void updateDescription(String description);
         public void updateProperties(List<Pair<String, String>> links);
         public void clearProperties();
@@ -67,7 +69,9 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
 
         if(!groupView) {
             getView().updateTitle(proteins.get(0).getAccession());
-            getView().updateGroupLink(proteins.get(0).getAccession());
+            getView().updateUpGroupLink(proteins.get(0).getAccession());
+            getView().updateGeneGroupLink(proteins.get(0).getGene());
+            getView().updateUniquePeptideCount(proteins.get(0).getUniquePeptideCount());
             getView().updateDescription(proteins.get(0).getDescription());
             getView().clearProperties();
         }

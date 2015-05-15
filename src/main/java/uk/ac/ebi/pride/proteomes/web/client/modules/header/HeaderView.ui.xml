@@ -5,7 +5,9 @@
             <h2 class="displayInline">
                 <g:Anchor ui:field="title"/>
             </h2>
-            <g:Anchor ui:field="groupLink"/>
+            <g:Anchor ui:field="upGroupLink"/> &#160;&#160;
+            <g:Anchor ui:field="geneGroupLink"/>  &#160;&#160;
+            <g:InlineLabel ui:field="uniquePeptideCount"/>
         </span>
         <p>
             <!--<g:InlineLabel ui:field="description"/><br/>-->

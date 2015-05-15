@@ -34,7 +34,12 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @UiField
     Anchor title;
     @UiField
-    Anchor groupLink;
+    Anchor upGroupLink;
+    @UiField
+    Anchor geneGroupLink;
+
+    @UiField
+    Label uniquePeptideCount;
 
 //    @UiField
 //    Label description;
@@ -56,7 +61,6 @@ public class HeaderView implements HeaderPresenter.ThisView {
 
     public HeaderView() {
         root = ourUiBinder.createAndBindUi(this);
-        title.setText("");
     }
     @Override
     public void updateTitle(String title) {
@@ -66,16 +70,38 @@ public class HeaderView implements HeaderPresenter.ThisView {
     }
 
     @Override
-    public void updateGroupLink(String groupLink) {
-        if (groupLink.contains("-")) {
-            groupLink = groupLink.substring(0, groupLink.indexOf("-"));
+    public void updateUpGroupLink(String upGroupId) {
+        if (upGroupId.contains("-")) {
+            upGroupId = upGroupId.substring(0, upGroupId.indexOf("-"));
         }
-        this.groupLink.setHref("#group="+groupLink);
-        this.groupLink.setText("Go to UniProt entry group");
+        this.upGroupLink.setHref("#group="+upGroupId);
+        this.upGroupLink.setText("View UniProt entry group");
+    }
+
+    @Override
+    public void updateGeneGroupLink(String geneGroupId) {
+        this.geneGroupLink.setHref("#group="+geneGroupId);
+        this.geneGroupLink.setText("View gene group");
+    }
+
+    @Override
+    public void updateUniquePeptideCount(int count) {
+        if (count > 0) {
+            this.uniquePeptideCount.setText(count + " unique peptides");
+        } else {
+            this.uniquePeptideCount.setText("No unique peptides");
+        }
     }
 
     @Override
     public void updateDescription(String description) {
+        // ToDo: this should be refactored to have individual fields, put the value parsing in the presenter or in the data model
+        // first reset any values, so we don't have old values hanging around
+        this.altId.setText("");
+        this.name.setText("");
+        this.species.setText("");
+        this.geneSymbol.setText("");
+        this.proteinEvidence.setText("");
 //        this.description.setText(description);
         String patternStr = "([A-Z_0-9]+)+\\s+(.+)\\s+OS=(.+)\\s+GN=([A-Z_]+)(\\sPE=([1-5]).*)?";
         RegExp regExp = RegExp.compile(patternStr);

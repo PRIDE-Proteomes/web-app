@@ -9,6 +9,7 @@ import java.util.List;
  */
 public interface Protein {
     public String getAccession();
+    public String getGene();
     public int getTaxonID();
     public String getSequence();
     public String getDescription();
@@ -17,4 +18,5 @@ public interface Protein {
     public String getCoverage();
     public List<List<Integer>> getRegions();
     public List<PeptideMatch> getPeptides();
+    public int getUniquePeptideCount();
 }
