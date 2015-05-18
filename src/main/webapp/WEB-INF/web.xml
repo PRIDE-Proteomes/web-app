@@ -17,15 +17,18 @@
         <servlet-class>uk.ac.ebi.pride.web.util.servlet.proxy.ProxyServlet</servlet-class>
         <init-param>
             <param-name>proxyHost</param-name>
-            <param-value>wwwdev.ebi.ac.uk</param-value>
+            <!--<param-value>wwwdev.ebi.ac.uk</param-value>-->
+            <param-value>localhost</param-value>
         </init-param>
         <init-param>
             <param-name>proxyPort</param-name>
-            <param-value>80</param-value>
+            <!--<param-value>80</param-value>       -->
+            <param-value>9190</param-value>
         </init-param>
         <init-param>
             <param-name>proxyPath</param-name>
-            <param-value>/pride/ws/proteomes</param-value>
+            <!--<param-value>/pride/ws/proteomes</param-value>-->
+            <param-value>/  </param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

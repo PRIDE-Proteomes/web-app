@@ -183,7 +183,7 @@ class VarianceColumnProvider {
 
     public static List<String> getColumnTitles() {
         List<String> titles = new ArrayList<>();
-        Collections.addAll(titles, "Sequence", "Modifications", "Tissues", "Assays", "Clusters");
+        Collections.addAll(titles, "Sequence", "Modifications", "Tissues", "Assay Evidences", "Cluster Evidences");
         return titles;
     }
 
