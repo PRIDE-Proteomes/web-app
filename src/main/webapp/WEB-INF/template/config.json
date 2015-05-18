@@ -65,6 +65,12 @@
             },
             {
                 "selected": false,
+                "title": "Browse",
+                "href": "../browse",
+                "tooltip": "Browse PRIDE Proteomes data"
+            },
+            {
+                "selected": false,
                 "title": "Documentation",
                 "href": "/pride/help/proteomes",
                 "tooltip": "PRIDE Proteomes documentation"
