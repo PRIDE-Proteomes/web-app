@@ -11,7 +11,7 @@
     <version>1.0.1-SNAPSHOT</version>
 
     <properties>
-        <gwtVersion>2.6.0</gwtVersion>
+        <gwtVersion>2.7.0</gwtVersion>
 
         <!-- the webapp directory
              Attention: need to be the same as the finalName!
@@ -35,25 +35,25 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-dev</artifactId>
-            <version>2.6.0</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.google.gwt</groupId>-->
+            <!--<artifactId>gwt-dev</artifactId>-->
+            <!--<version>${gwtVersion}</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-codeserver</artifactId>
-            <version>2.6.0</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.google.gwt</groupId>-->
+            <!--<artifactId>gwt-codeserver</artifactId>-->
+            <!--<version>${gwtVersion}</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
 
 
         <!-- PRIDE Widgets -->
         <dependency>
             <groupId>uk.ac.ebi.pride.widgets</groupId>
-            <artifactId>pride-gwt-widgets</artifactId>
+            <artifactId>gwt-widgets</artifactId>
             <version>0.2.4-SNAPSHOT</version>
         </dependency>
 
@@ -114,7 +114,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
-                <version>${gwtVersion}-rc3</version>
+                <version>${gwtVersion}</version>
                 <executions>
                     <execution>
                         <goals>

@@ -1,0 +1,108 @@
+/*Original*/
+/*@def UNIQUE_TO_GENE #98abc5;*/
+/*@def UNIQUE_TO_UP_ENTRY #8a89a6;*/
+/*@def UNIQUE_TO_PROTEIN  #7b6888;*/
+/*@def SHARED_PEPTIDE lightgrey;*/
+
+/*Purple*/
+/*@def UNIQUE_TO_PROTEIN  #88419d;*/
+/*@def UNIQUE_TO_UP_ENTRY #8c96c6;*/
+/*@def UNIQUE_TO_GENE #b3cde3;*/
+/*@def NON_UNIQUE_PEPTIDE #ced8db;*/
+
+/*@def BORDER_COLOR  #B594B5;*/
+/*@def BORDER_RIGHT_COLOR #461746;*/
+/*@def BORDER_BOTTOM_COLOR #461746;*/
+/*@def TEXT_SHADOW_COLOR  #461746;*/
+/*@def TEXT_COLOR_COLOR  #FFFFFF;*/
+
+/*Green*/
+@def UNIQUE_TO_PROTEIN  #238b45;
+@def UNIQUE_TO_UP_ENTRY #66c2a4;
+@def UNIQUE_TO_GENE #b2e2e2;
+@def NON_UNIQUE_PEPTIDE #ced8db;
+
+@def UNIQUE_TO_PROTEIN_DARKER  #0b2b15;
+@def UNIQUE_TO_UP_ENTRY_DARKER #498b76;
+@def UNIQUE_TO_GENE_DARKER #84a8a8;
+@def NON_UNIQUE_PEPTIDE_DARKER #a8b1b3;
+
+@def BORDER_COLOR  #b8b8b8;
+@def BORDER_RIGHT_COLOR #29292f;
+@def BORDER_BOTTOM_COLOR #29292f;
+@def TEXT_SHADOW_COLOR  #29292f;
+@def TEXT_COLOR_COLOR  #FFFFFF;
+
+.unique-to-gene-color {
+    background-color: UNIQUE_TO_GENE;
+}
+
+.unique-to-up-entry-color {
+    background-color: UNIQUE_TO_UP_ENTRY;
+}
+
+.unique-to-protein-color {
+    background-color: UNIQUE_TO_PROTEIN;
+}
+
+.non-unique-peptide-color {
+    background-color: NON_UNIQUE_PEPTIDE;
+}
+
+.unique-to-protein-box {
+    color: TEXT_COLOR_COLOR;
+    text-shadow: TEXT_SHADOW_COLOR 1px 1px;
+    border: 1px solid BORDER_COLOR;
+    border-right-color: BORDER_RIGHT_COLOR;
+    border-bottom-color: BORDER_BOTTOM_COLOR;
+    background-color: UNIQUE_TO_PROTEIN;
+    background-image: -moz-linear-gradient(top, UNIQUE_TO_PROTEIN, UNIQUE_TO_PROTEIN_DARKER);
+    /* @alternate */ background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, UNIQUE_TO_PROTEIN), color-stop(1, UNIQUE_TO_PROTEIN_DARKER));
+    /* @alternate */ background-image: -webkit-linear-gradient(UNIQUE_TO_PROTEIN, UNIQUE_TO_PROTEIN_DARKER);
+    /* @alternate */ background-image: linear-gradient(top,UNIQUE_TO_PROTEIN, UNIQUE_TO_PROTEIN_DARKER);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='UNIQUE_TO_PROTEIN', EndColorStr='UNIQUE_TO_PROTEIN_DARKER');
+
+}
+
+.unique-to-up–entry–box {
+    color: TEXT_COLOR_COLOR;
+    text-shadow: TEXT_SHADOW_COLOR 1px 1px;
+    border: 1px solid BORDER_COLOR;
+    border-right-color: BORDER_RIGHT_COLOR;
+    border-bottom-color: BORDER_BOTTOM_COLOR;
+    background-color: UNIQUE_TO_UP_ENTRY;
+    background-image: -moz-linear-gradient(top, UNIQUE_TO_UP_ENTRY, UNIQUE_TO_UP_ENTRY_DARKER);
+    /* @alternate */ background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, UNIQUE_TO_UP_ENTRY), color-stop(1, UNIQUE_TO_UP_ENTRY_DARKER));
+    /* @alternate */ background-image: -webkit-linear-gradient(UNIQUE_TO_UP_ENTRY, UNIQUE_TO_UP_ENTRY_DARKER);
+    /* @alternate */ background-image: linear-gradient(top, UNIQUE_TO_UP_ENTRY, UNIQUE_TO_UP_ENTRY_DARKER);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='UNIQUE_TO_UP_ENTRY', EndColorStr='UNIQUE_TO_UP_ENTRY_DARKER');
+}
+
+.unique-to-gene-box {
+    color: TEXT_COLOR_COLOR;
+    text-shadow:TEXT_SHADOW_COLOR 1px 1px;
+    border: 1px solid BORDER_COLOR;
+    border-right-color: BORDER_RIGHT_COLOR;
+    border-bottom-color: BORDER_BOTTOM_COLOR;
+    background-color: UNIQUE_TO_GENE;
+    background-image: -moz-linear-gradient(top, UNIQUE_TO_GENE, UNIQUE_TO_GENE_DARKER);
+    /* @alternate */ background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, UNIQUE_TO_GENE), color-stop(1, UNIQUE_TO_GENE_DARKER));
+    /* @alternate */ background-image: -webkit-linear-gradient(UNIQUE_TO_GENE, UNIQUE_TO_GENE_DARKER);
+    /* @alternate */ background-image: linear-gradient(top,UNIQUE_TO_GENE, UNIQUE_TO_GENE_DARKER);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='NON_UNIQUE_PEPTIDE', EndColorStr='#3f3e50');
+}
+
+.non-unique-peptide-box {
+    color:TEXT_COLOR_COLOR;
+    text-shadow: TEXT_SHADOW_COLOR 1px 1px;
+    border: 1px solid BORDER_COLOR;
+    border-right-color: BORDER_RIGHT_COLOR;
+    border-bottom-color: BORDER_BOTTOM_COLOR;
+    background-color: NON_UNIQUE_PEPTIDE;
+    background-image: -moz-linear-gradient(top, NON_UNIQUE_PEPTIDE, NON_UNIQUE_PEPTIDE_DARKER);
+    /* @alternate */ background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, NON_UNIQUE_PEPTIDE), color-stop(1, NON_UNIQUE_PEPTIDE_DARKER));
+    /* @alternate */ background-image: -webkit-linear-gradient(NON_UNIQUE_PEPTIDE, NON_UNIQUE_PEPTIDE_DARKER);
+    /* @alternate */ background-image: linear-gradient(top, NON_UNIQUE_PEPTIDE, NON_UNIQUE_PEPTIDE_DARKER);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='SHARED_PEPTIDE', EndColorStr='SHARED_PEPTIDE_DARKER');
+
+}

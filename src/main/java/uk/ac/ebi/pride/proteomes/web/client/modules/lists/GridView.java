@@ -5,7 +5,6 @@ import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.DisclosurePanel;
@@ -20,6 +19,8 @@ import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -32,7 +33,9 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
                                     OpenHandler<DisclosurePanel>,
                                     HasKeyboardSelectionPolicy {
 
-    private DataGrid<T> grid;
+    Logger logger = Logger.getLogger(GridView.class.getName());
+
+    private DataGridWithScroll<T> grid;
     private ModuleContainer frame;
     private Set<T> selection;
 
@@ -65,7 +68,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
 
     public GridView(String title, String typeName, boolean skipRowHoverStyleUpdate) {
         frame = ModuleContainerFactory.getModuleContainer(title);
-        grid = new DataGrid<>();
+        grid = new DataGridWithScroll<>();
         baseType = typeName;
         selection = new HashSet<>();
 
@@ -127,7 +130,9 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
         //scroll to the first column of the required row,
         // this way we ensure the horizontal scroll is at its leftmost.
         if(row >= 0 && row < grid.getRowCount()) {
-            grid.getRowElement(row).getCells().getItem(0).scrollIntoView();
+            int offset = grid.getRowElement(row).getOffsetTop();
+            grid.getScrollPanel().setVerticalScrollPosition(offset);
+            logger.log(Level.INFO, "Scroll active row: " + row);
         }
     }
 

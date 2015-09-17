@@ -18,5 +18,7 @@ public interface Protein {
     public String getCoverage();
     public List<List<Integer>> getRegions();
     public List<PeptideMatch> getPeptides();
+    public List<Feature> getFeatures();
     public int getUniquePeptideCount();
+
 }

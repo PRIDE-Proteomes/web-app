@@ -273,6 +273,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         if(peptidePosition > -1) {
             selectionEventsDisabled = true;
             getView().selectItemOn(peptidePosition);
+            getView().focusItemOn(peptidePosition);
             selectionEventsDisabled = false;
         }
     }

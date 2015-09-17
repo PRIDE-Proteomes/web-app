@@ -6,6 +6,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -42,6 +43,21 @@ public class PeptideWithVariances implements PeptideMatch, PeptideList {
     @Override
     public Integer getUniqueness() {
         return match.getUniqueness();
+    }
+
+    @Override
+    public Set<String> getSharedProteins() {
+        return match.getSharedProteins();
+    }
+
+    @Override
+    public Set<String> getSharedUpEntries() {
+        return match.getSharedUpEntries();
+    }
+
+    @Override
+    public Set<String> getSharedGenes() {
+        return match.getSharedGenes();
     }
 
     @Override

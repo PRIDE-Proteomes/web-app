@@ -5,6 +5,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.widgets.client.common.handler.PeptideHandler;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -76,5 +77,20 @@ public class PeptideAdapter implements PeptideHandler, PeptideMatch {
     @Override
     public Integer getUniqueness() {
         return peptide.getUniqueness();
+    }
+
+    @Override
+    public Set<String> getSharedProteins() {
+        return peptide.getSharedProteins();
+    }
+
+    @Override
+    public Set<String> getSharedUpEntries() {
+        return peptide.getSharedUpEntries();
+    }
+
+    @Override
+    public Set<String> getSharedGenes() {
+        return peptide.getSharedGenes();
     }
 }

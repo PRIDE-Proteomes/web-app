@@ -148,7 +148,7 @@ class VarianceColumnProvider {
                // link to PRIDE Cluster for the cluster evidence(s)
                FlowPanel panel = new FlowPanel();
                for (String clusterId : obj.getClusters()) {
-                   panel.add(new Anchor(clusterId, "http://wwwdev.ebi.ac.uk/pride/cluster/#/cluster/" + clusterId, "_blank"));
+                   panel.add(new Anchor(clusterId, "http://wwwdev.ebi.ac.uk/pride/cluster/#/id/" + clusterId, "_blank"));
                    if(!clusterId.equals(obj.getClusters().get(obj.getClusters().size() - 1))) {
                        panel.add(new InlineLabel(" "));
                    }

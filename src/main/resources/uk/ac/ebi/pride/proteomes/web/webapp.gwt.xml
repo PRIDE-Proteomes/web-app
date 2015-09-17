@@ -4,14 +4,20 @@
     <inherits name='com.google.gwt.user.User'/>
     <inherits name='com.google.gwt.http.HTTP'/>
     <inherits name="com.google.web.bindery.autobean.AutoBean"/>
+    <inherits name="com.google.gwt.resources.Resources" />
 
     <!-- Guava library                                              -->
     <inherits name="com.google.common.collect.Collect"/>
+
+
+    <!-- Logging library for development only                       -->
+    <inherits name="com.google.gwt.logging.Logging"/>
 
     <!-- PRIDE modules                                              -->
     <!--<inherits name="uk.ac.ebi.pride.widgets.PrideWidgets" />-->
     <inherits name="uk.ac.ebi.pride.widgets.client.disclosure.ModuleContainer" />
     <inherits name="uk.ac.ebi.pride.widgets.client.protein.ProteinViewer" />
+    <inherits name="uk.ac.ebi.pride.widgets.client.feature.FeatureViewer" />
     <inherits name="uk.ac.ebi.pride.widgets.client.sequence.SequenceViewer" />
 
     <inherits name="uk.ac.ebi.pride.proteomes.web.googleanalytics.googleanalytics" />
@@ -21,4 +27,8 @@
 
     <!-- Specify the paths for translatable code                    -->
     <source path='client'/>
+
+    <!-- Enable gss resource -->
+    <set-configuration-property name="CssResource.enableGss" value="true" />
+    <set-configuration-property name="CssResource.legacy" value="true" />
 </module>

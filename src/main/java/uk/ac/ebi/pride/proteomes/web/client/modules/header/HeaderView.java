@@ -1,12 +1,11 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.header;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.*;
+import uk.ac.ebi.pride.proteomes.web.client.resources.Resources;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Pair;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.HyperlinkFactory;
 
@@ -20,16 +19,10 @@ import java.util.List;
 public class HeaderView implements HeaderPresenter.ThisView {
 
     @UiTemplate("HeaderView.ui.xml")
-    interface HeaderUiBinder extends UiBinder<HTMLPanel, HeaderView> {
+    interface HeaderUiBinder extends UiBinder<FlowPanel, HeaderView> {
     }
 
     private static HeaderUiBinder ourUiBinder = GWT.create(HeaderUiBinder.class);
-
-//    @UiField
-//    VerticalPanel vPanel;
-
-    @UiField
-    HTMLPanel panel;
 
     @UiField
     Anchor title;
@@ -39,10 +32,8 @@ public class HeaderView implements HeaderPresenter.ThisView {
     Anchor geneGroupLink;
 
     @UiField
-    Label uniquePeptideCount;
+    InlineLabel uniquePeptideCount;
 
-//    @UiField
-//    Label description;
     @UiField
     Label altId;
     @UiField
@@ -57,16 +48,20 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @UiField
     FlowPanel attributes;
 
-    private HTMLPanel root;
+    private FlowPanel root;
 
     public HeaderView() {
         root = ourUiBinder.createAndBindUi(this);
+        Resources.INSTANCE.style().ensureInjected();
     }
+
     @Override
-    public void updateTitle(String title) {
-        this.title.setHref("http://www.uniprot.org/uniprot/"+title);
+    public void updateTitle(String title, String accession, String link) {
+        if (link != null) {
+            this.title.setHref(link + accession);
+        }
         this.title.setText(title);
-//        this.title.setTitle("tooltip");
+        this.title.setTitle("Go to UniProt");
     }
 
     @Override
@@ -74,71 +69,40 @@ public class HeaderView implements HeaderPresenter.ThisView {
         if (upGroupId.contains("-")) {
             upGroupId = upGroupId.substring(0, upGroupId.indexOf("-"));
         }
-        this.upGroupLink.setHref("#group="+upGroupId);
-        this.upGroupLink.setText("View UniProt entry group");
+        this.upGroupLink.setHref("#group=" + upGroupId);
+        this.upGroupLink.setText("Go to UniProt entry group");
     }
 
     @Override
     public void updateGeneGroupLink(String geneGroupId) {
-        this.geneGroupLink.setHref("#group="+geneGroupId);
-        this.geneGroupLink.setText("View gene group");
+        if (geneGroupId != null && !geneGroupId.isEmpty()) {
+            this.geneGroupLink.setHref("#group=" + geneGroupId);
+            this.geneGroupLink.setText("Go to gene group");
+        } else
+            this.geneGroupLink.setVisible(false);
     }
 
     @Override
     public void updateUniquePeptideCount(int count) {
-        if (count > 0) {
-            this.uniquePeptideCount.setText(count + " unique peptides");
-        } else {
-            this.uniquePeptideCount.setText("No unique peptides");
-        }
+        this.uniquePeptideCount.setText(String.valueOf(count));
     }
 
     @Override
-    public void updateDescription(String description) {
-        // ToDo: this should be refactored to have individual fields, put the value parsing in the presenter or in the data model
-        // first reset any values, so we don't have old values hanging around
-        this.altId.setText("");
-        this.name.setText("");
-        this.species.setText("");
-        this.geneSymbol.setText("");
-        this.proteinEvidence.setText("");
-//        this.description.setText(description);
-        String patternStr = "([A-Z_0-9]+)+\\s+(.+)\\s+OS=(.+)\\s+GN=([A-Z_]+)(\\sPE=([1-5]).*)?";
-        RegExp regExp = RegExp.compile(patternStr);
-        MatchResult matcher = regExp.exec(description);
-        boolean matchFound = (matcher != null);
+    public void updateDescription(HeaderPresenter.Description description) {
+        this.altId.setText(description.altId);
+        this.name.setText(description.name);
+        this.species.setText(description.species);
+        this.geneSymbol.setText(description.geneSymbol);
+        this.proteinEvidence.setText(description.proteinEvidence);
 
-        this.altId.setText(description);// just in case the parsing fails
-        if (matchFound) {
-            String match = matcher.getGroup(1);
-            if (match != null && !match.isEmpty()) {
-                this.altId.setText("Protein ID: "+match);
-                match = matcher.getGroup(2);
-                if (match != null && !match.isEmpty()) {
-                    this.name.setText("Protein Name: "+match);
-                    match = matcher.getGroup(3);
-                    if (match != null && !match.isEmpty()) {
-                        this.species.setText("Species Name: "+match);
-                        match = matcher.getGroup(4);
-                        if (match != null && !match.isEmpty()) {
-                            this.geneSymbol.setText("Gene symbol (UniProt): "+match);
-                            match = matcher.getGroup(6);
-                            if (match != null && !match.isEmpty()) {
-                                this.proteinEvidence.setText("UniProt Evidence level: "+match);
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     @Override
     public void updateProperties(List<Pair<String, String>> links) {
         clearProperties();
-        for(Pair<String, String> link : links) {
+        for (Pair<String, String> link : links) {
             attributes.add(HyperlinkFactory.getInlineHyperLink(link.getA(), link.getB()));
-            if(link != links.get(links.size() - 1)) {
+            if (link != links.get(links.size() - 1)) {
                 attributes.add(new InlineLabel(", "));
             }
         }
@@ -156,7 +120,7 @@ public class HeaderView implements HeaderPresenter.ThisView {
 
     @Override
     public Widget asWidget() {
-        return panel;
+        return root;
     }
 
     @Override

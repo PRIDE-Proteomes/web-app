@@ -5,6 +5,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -23,6 +24,21 @@ public class EmptyPeptideMatch implements PeptideMatch{
     @Override
     public Integer getUniqueness() {
         return 0;
+    }
+
+    @Override
+    public Set<String> getSharedProteins() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<String> getSharedUpEntries() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<String> getSharedGenes() {
+        return Collections.emptySet();
     }
 
     @Override
