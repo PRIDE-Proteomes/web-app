@@ -1,37 +1,22 @@
-/*Original*/
-/*@def UNIQUE_TO_GENE #98abc5;*/
-/*@def UNIQUE_TO_UP_ENTRY #8a89a6;*/
-/*@def UNIQUE_TO_PROTEIN  #7b6888;*/
-/*@def SHARED_PEPTIDE lightgrey;*/
+/*The colors are extracted from the original peptide colors of the widget to match the style */
+/*To change the colors: modify the peptide colors in the widget
 
-/*Purple*/
-/*@def UNIQUE_TO_PROTEIN  #88419d;*/
-/*@def UNIQUE_TO_UP_ENTRY #8c96c6;*/
-/*@def UNIQUE_TO_GENE #b3cde3;*/
-/*@def NON_UNIQUE_PEPTIDE #ced8db;*/
+/*@import "peptide-colours.gss";*/
+@def UNIQUE_TO_PROTEIN  eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_PROTEIN_COLOR");
+@def UNIQUE_TO_UP_ENTRY eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_UP_ENTRY_COLOR");
+@def UNIQUE_TO_GENE eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_GENE_COLOR");
+@def NON_UNIQUE_PEPTIDE eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.NON_UNIQUE_PEPTIDE_COLOR");
 
-/*@def BORDER_COLOR  #B594B5;*/
-/*@def BORDER_RIGHT_COLOR #461746;*/
-/*@def BORDER_BOTTOM_COLOR #461746;*/
-/*@def TEXT_SHADOW_COLOR  #461746;*/
-/*@def TEXT_COLOR_COLOR  #FFFFFF;*/
+@def UNIQUE_TO_PROTEIN_DARKER  eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_PROTEIN_DARKER_COLOR");
+@def UNIQUE_TO_UP_ENTRY_DARKER eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_UP_ENTRY_DARKER_COLOR");
+@def UNIQUE_TO_GENE_DARKER eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_GENE_DARKER_COLOR");
+@def NON_UNIQUE_PEPTIDE_DARKER eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.NON_UNIQUE_PEPTIDE_DARKER_COLOR");
 
-/*Green*/
-@def UNIQUE_TO_PROTEIN  #238b45;
-@def UNIQUE_TO_UP_ENTRY #66c2a4;
-@def UNIQUE_TO_GENE #b2e2e2;
-@def NON_UNIQUE_PEPTIDE #ced8db;
-
-@def UNIQUE_TO_PROTEIN_DARKER  #0b2b15;
-@def UNIQUE_TO_UP_ENTRY_DARKER #498b76;
-@def UNIQUE_TO_GENE_DARKER #84a8a8;
-@def NON_UNIQUE_PEPTIDE_DARKER #a8b1b3;
-
-@def BORDER_COLOR  #b8b8b8;
-@def BORDER_RIGHT_COLOR #29292f;
-@def BORDER_BOTTOM_COLOR #29292f;
-@def TEXT_SHADOW_COLOR  #29292f;
-@def TEXT_COLOR_COLOR  #FFFFFF;
+@def BORDER_COLOR  #c2c2c2;
+@def BORDER_RIGHT_COLOR #3d3d46;
+@def BORDER_BOTTOM_COLOR #3D3D46;
+@def TEXT_SHADOW_COLOR  #3D3D46;
+@def TEXT_LIGHT_COLOR  #FFFFFF;
 
 .unique-to-gene-color {
     background-color: UNIQUE_TO_GENE;
@@ -50,7 +35,7 @@
 }
 
 .unique-to-protein-box {
-    color: TEXT_COLOR_COLOR;
+    color: TEXT_LIGHT_COLOR;
     text-shadow: TEXT_SHADOW_COLOR 1px 1px;
     border: 1px solid BORDER_COLOR;
     border-right-color: BORDER_RIGHT_COLOR;
@@ -61,11 +46,10 @@
     /* @alternate */ background-image: -webkit-linear-gradient(UNIQUE_TO_PROTEIN, UNIQUE_TO_PROTEIN_DARKER);
     /* @alternate */ background-image: linear-gradient(top,UNIQUE_TO_PROTEIN, UNIQUE_TO_PROTEIN_DARKER);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='UNIQUE_TO_PROTEIN', EndColorStr='UNIQUE_TO_PROTEIN_DARKER');
-
 }
 
 .unique-to-up–entry–box {
-    color: TEXT_COLOR_COLOR;
+    color: TEXT_LIGHT_COLOR;
     text-shadow: TEXT_SHADOW_COLOR 1px 1px;
     border: 1px solid BORDER_COLOR;
     border-right-color: BORDER_RIGHT_COLOR;
@@ -79,7 +63,7 @@
 }
 
 .unique-to-gene-box {
-    color: TEXT_COLOR_COLOR;
+    color: TEXT_LIGHT_COLOR;
     text-shadow:TEXT_SHADOW_COLOR 1px 1px;
     border: 1px solid BORDER_COLOR;
     border-right-color: BORDER_RIGHT_COLOR;
@@ -93,7 +77,7 @@
 }
 
 .non-unique-peptide-box {
-    color:TEXT_COLOR_COLOR;
+    color: TEXT_LIGHT_COLOR;
     text-shadow: TEXT_SHADOW_COLOR 1px 1px;
     border: 1px solid BORDER_COLOR;
     border-right-color: BORDER_RIGHT_COLOR;
@@ -104,5 +88,4 @@
     /* @alternate */ background-image: -webkit-linear-gradient(NON_UNIQUE_PEPTIDE, NON_UNIQUE_PEPTIDE_DARKER);
     /* @alternate */ background-image: linear-gradient(top, NON_UNIQUE_PEPTIDE, NON_UNIQUE_PEPTIDE_DARKER);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='SHARED_PEPTIDE', EndColorStr='SHARED_PEPTIDE_DARKER');
-
 }

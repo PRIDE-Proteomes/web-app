@@ -48,7 +48,12 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
         FeatureRegionSelectedHandler
 
 {
+
     Logger logger = Logger.getLogger(CoverageView.class.getName());
+
+    public static final int WIDTH = 982; //Same with than sequence viewer to align the widgets
+    public static final int PW_HEIGHT = 90;
+    public static final int FW_HEIGHT = 20; //Optimize to 20
 
     private HTMLPanel panel;
     private ModuleContainer outerBox;
@@ -78,8 +83,8 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
     @Override
     public void updateProtein(ProteinAdapter protein) {
         if (!coverageVwCache.containsKey(protein) || !featureVwCache.containsKey(protein)) {
-            ProteinViewer proteinViewer = new ProteinViewer(1020, 90, protein);
-            FeatureViewer featureViewer = new FeatureViewer(1020, 20, protein); //Optimize to 20
+            ProteinViewer proteinViewer = new ProteinViewer(WIDTH, PW_HEIGHT, protein);
+            FeatureViewer featureViewer = new FeatureViewer(WIDTH, FW_HEIGHT, protein);
 
             bindCoverageViewer(proteinViewer);
             bindFeatureViewer(featureViewer);
@@ -92,13 +97,13 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
         featureViewer = featureVwCache.get(protein);
 
         panel.clear();
-        panel.add(new LegendView());
         panel.add(coverageViewer);
 
         //We add the viewer if we have features to display
         if(protein.getFeatures()!= null && !protein.getFeatures().isEmpty()) {
             panel.add(featureViewer);
         }
+        panel.add(new LegendView());
 
         outerBox.setContent(panel);
     }

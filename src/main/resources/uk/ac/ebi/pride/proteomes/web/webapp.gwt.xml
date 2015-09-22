@@ -11,7 +11,7 @@
 
 
     <!-- Logging library for development only                       -->
-    <inherits name="com.google.gwt.logging.Logging"/>
+    <!--<inherits name="com.google.gwt.logging.Logging"/>-->
 
     <!-- PRIDE modules                                              -->
     <!--<inherits name="uk.ac.ebi.pride.widgets.PrideWidgets" />-->

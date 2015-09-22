@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.proteomes.web.client.resources;
+package uk.ac.ebi.pride.proteomes.web.client.style;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
@@ -39,8 +39,9 @@ public interface Resources extends ClientBundle {
         @ClassName("non-unique-peptide-box")
         String nonUniquePeptideBox();
 
+
     }
 
-    @Source("peptide-colours.gss")
+    @Source("peptide-style.gss")
     PeptideStyle style();
 }

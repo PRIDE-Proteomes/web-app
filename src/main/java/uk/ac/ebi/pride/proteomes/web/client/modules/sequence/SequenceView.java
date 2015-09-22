@@ -38,19 +38,47 @@ public class SequenceView extends ViewWithUiHandlers<SequenceUiHandler>
 
     public SequenceView() {
         viewersCache = new HashMap<>();
-
         outerBox = ModuleContainerFactory.getModuleContainer("Protein " +
                                                              "Sequence");
         panel = new HTMLPanel("");
         outerBox.setWidth("100%");
         outerBox.setContent(panel);
         outerBox.setOpen(true);
+
+
     }
 
     @Override
     public void updateProtein(ProteinAdapter protein) {
         if(!viewersCache.containsKey(protein)) {
-            SequenceType type = new Pride();
+            //TODO move to other place
+            final SequenceType type = new SequenceType() {
+                SequenceType sq = new Pride();
+                @Override
+                public String getTypeName() {
+                    return "Proteomes";
+                }
+
+                @Override
+                public boolean isPositionShown() {
+                    return false;
+                }
+
+                @Override
+                public String getFormattedPositionNumber(int number) {
+                    return sq.getFormattedPositionNumber(number);
+                }
+
+                @Override
+                public int getNumOfBlocks() {
+                    return 10;
+                }
+
+                @Override
+                public int getBlockSize() {
+                    return sq.getBlockSize();
+                }
+            };
             SequenceViewer viewer = new SequenceViewer(type, protein);
             bindViewer(viewer);
             viewersCache.put(protein, viewer);

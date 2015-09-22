@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import uk.ac.ebi.pride.proteomes.web.client.modules.View;
-import uk.ac.ebi.pride.proteomes.web.client.resources.Resources;
+import uk.ac.ebi.pride.proteomes.web.client.style.Resources;
 
 /**
  * @author ntoro

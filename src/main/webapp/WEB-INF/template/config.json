@@ -25,7 +25,7 @@
             }
         ],
         "placeHolder": "webapp",
-        "bodyMaxWidth": 1050
+        "bodyMaxWidth": 1012
     },
     "localMasthead": {
         "title": "PRIDE Proteomes",

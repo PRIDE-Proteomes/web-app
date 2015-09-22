@@ -1,37 +1,46 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
-    <ui:with field="resources" type="uk.ac.ebi.pride.proteomes.web.client.resources.Resources"/>
+    <ui:with field="resources" type="uk.ac.ebi.pride.proteomes.web.client.style.Resources"/>
 
     <ui:style>
+
         .legend {
             list-style: none;
             padding: 0;
-
+            text-align: center;
         }
 
         .legend li {
             display: inline-block;
             margin-right: 10px;
             padding: 0;
+            line-height: 11px;
+            vertical-align: middle;
+        }
+
+        .legend div {
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+            line-height: 12px;
+            vertical-align: middle;
         }
 
         .legend span {
-            float: left;
-            width: 12px;
-            height: 12px;
-            margin:2px;
-            padding-right: 1px;
-
+            line-height: 12px;
+            vertical-align: middle;
         }
 
         /* your colors */
         .legend .modification {
             width: 0;
             height: 0;
-            border-left: 7px solid transparent;
-            border-right: 7px solid transparent;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
             border-bottom: 12px solid red;
+            line-height: 12px;
+            vertical-align: middle;
         }
 
     </ui:style>
@@ -40,24 +49,24 @@
     <g:HTMLPanel ui:field="panel">
         <ul class="{style.legend}">
             <li>
-                <span class="{style.modification}"/>
-                Modification
+                <div class="{style.modification}"/>
+                <span>Modification</span>
             </li>
             <li>
-                <span class="{resources.style.uniqueToProteinColor}"/>
-                Peptide unique to the protein
+                <div class="{resources.style.uniqueToProteinColor}"/>
+                <span>Unique Peptide to the Protein</span>
             </li>
             <li>
-                <span class="{resources.style.uniqueToUpEntryColor}"/>
-                Peptide unique to UniProt entry
+                <div class="{resources.style.uniqueToUpEntryColor}"/>
+                <span>Peptide unique to Protein Isoforms</span>
             </li>
             <li>
-                <span class="{resources.style.uniqueToGeneColor}"/>
-                Peptide unique to proteins of the same gene
+                <div class="{resources.style.uniqueToGeneColor}"/>
+                <span>Peptide unique to Proteins encoded by the same gene</span>
             </li>
             <li>
-                <span class="{resources.style.nonUniquePeptideColor}"/>
-                Peptide non unique
+                <div class="{resources.style.nonUniquePeptideColor}"/>
+                <span>Peptide non unique</span>
             </li>
         </ul>
     </g:HTMLPanel>

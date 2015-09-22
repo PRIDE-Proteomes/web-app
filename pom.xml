@@ -8,7 +8,7 @@
     <groupId>uk.ac.ebi.pride.proteomes.web</groupId>
     <artifactId>webapp</artifactId>
     <packaging>war</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1-ALFA</version>
 
     <properties>
         <gwtVersion>2.7.0</gwtVersion>
@@ -54,14 +54,14 @@
         <dependency>
             <groupId>uk.ac.ebi.pride.widgets</groupId>
             <artifactId>gwt-widgets</artifactId>
-            <version>0.2.4-SNAPSHOT</version>
+            <version>0.2.5</version>
         </dependency>
 
         <!-- PRIDE web utilities-->
         <dependency>
             <groupId>uk.ac.ebi.pride.web</groupId>
             <artifactId>pride-web-utils</artifactId>
-            <version>1.3.1-SNAPSHOT</version>
+            <version>1.3.11</version>
         </dependency>
 
         <dependency>
@@ -185,7 +185,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
-                <version>${gwtVersion}-rc3</version>
+                <version>${gwtVersion}</version>
                 <reportSets>
                     <reportSet>
                         <reports>

@@ -5,9 +5,11 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.*;
-import uk.ac.ebi.pride.proteomes.web.client.resources.Resources;
+import uk.ac.ebi.pride.proteomes.web.client.style.Resources;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Pair;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.HyperlinkFactory;
+import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
+import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 
 import java.util.List;
 
@@ -19,20 +21,27 @@ import java.util.List;
 public class HeaderView implements HeaderPresenter.ThisView {
 
     @UiTemplate("HeaderView.ui.xml")
-    interface HeaderUiBinder extends UiBinder<FlowPanel, HeaderView> {
+    interface HeaderUiBinder extends UiBinder<HTMLPanel, HeaderView> {
     }
 
     private static HeaderUiBinder ourUiBinder = GWT.create(HeaderUiBinder.class);
 
     @UiField
     Anchor title;
+
     @UiField
     Anchor upGroupLink;
     @UiField
     Anchor geneGroupLink;
 
     @UiField
-    InlineLabel uniquePeptideCount;
+    InlineLabel uniquePeptideToProteinCount;
+    @UiField
+    InlineLabel uniquePeptideToIsoformCount;
+    @UiField
+    InlineLabel uniquePeptideToGeneCount;
+    @UiField
+    InlineLabel nonUniquePeptidesCount;
 
     @UiField
     Label altId;
@@ -48,20 +57,40 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @UiField
     FlowPanel attributes;
 
-    private FlowPanel root;
+    @UiField
+    HTMLPanel panel;
+
+    @UiField
+    HTMLPanel summaryPanel;
+
+    private HTMLPanel root;
+    private ModuleContainer outerBox;
 
     public HeaderView() {
-        root = ourUiBinder.createAndBindUi(this);
+
         Resources.INSTANCE.style().ensureInjected();
+        root = ourUiBinder.createAndBindUi(this);
+        //Disclosure panel
+        outerBox = ModuleContainerFactory.getModuleContainer("Protein " + "Summary");
+        outerBox.setWidth("100%");
+        outerBox.setContent(panel);
+        outerBox.setOpen(true);
+        outerBox.setVisible(true);
+        root.add(outerBox);
+
     }
 
     @Override
     public void updateTitle(String title, String accession, String link) {
+        panel.clear();
+        panel.add(summaryPanel);
+
         if (link != null) {
             this.title.setHref(link + accession);
+            this.title.setTitle("Go to UniProtKB");
         }
         this.title.setText(title);
-        this.title.setTitle("Go to UniProt");
+        outerBox.setContent(panel);
     }
 
     @Override
@@ -70,21 +99,39 @@ public class HeaderView implements HeaderPresenter.ThisView {
             upGroupId = upGroupId.substring(0, upGroupId.indexOf("-"));
         }
         this.upGroupLink.setHref("#group=" + upGroupId);
-        this.upGroupLink.setText("Go to UniProt entry group");
+        this.upGroupLink.setText("Isoforms of the Protein");
+        this.upGroupLink.setTitle("Go To Isoforms of the Protein");
+
     }
 
     @Override
     public void updateGeneGroupLink(String geneGroupId) {
         if (geneGroupId != null && !geneGroupId.isEmpty()) {
             this.geneGroupLink.setHref("#group=" + geneGroupId);
-            this.geneGroupLink.setText("Go to gene group");
+            this.geneGroupLink.setText("Gene");
+            this.geneGroupLink.setTitle("Go To Gene of the Protein");
         } else
             this.geneGroupLink.setVisible(false);
     }
 
     @Override
-    public void updateUniquePeptideCount(int count) {
-        this.uniquePeptideCount.setText(String.valueOf(count));
+    public void updateUniquePeptideToProteinCount(int count) {
+        this.uniquePeptideToProteinCount.setText(String.valueOf(count));
+    }
+
+    @Override
+    public void updateUniquePeptideToIsoformCount(int count) {
+        this.uniquePeptideToIsoformCount.setText(String.valueOf(count));
+    }
+
+    @Override
+    public void updateUniquePeptideToGeneCount(int count) {
+        this.uniquePeptideToGeneCount.setText(String.valueOf(count));
+    }
+
+    @Override
+    public void updateNonUniquePeptidesCount(int count) {
+        this.nonUniquePeptidesCount.setText(String.valueOf(count));
     }
 
     @Override
@@ -94,7 +141,6 @@ public class HeaderView implements HeaderPresenter.ThisView {
         this.species.setText(description.species);
         this.geneSymbol.setText(description.geneSymbol);
         this.proteinEvidence.setText(description.proteinEvidence);
-
     }
 
     @Override
@@ -114,6 +160,12 @@ public class HeaderView implements HeaderPresenter.ThisView {
     }
 
     @Override
+    public void clearTitle() {
+        title.setText("");
+        title.setHref("");
+    }
+
+    @Override
     public void bindToContainer(AcceptsOneWidget container) {
         container.setWidget(root);
     }
@@ -126,5 +178,10 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @Override
     public void setVisible(boolean visible) {
         asWidget().setVisible(visible);
+    }
+
+    @Override
+    public void displayLoadingMessage() {
+        outerBox.setContent(ModuleContainer.getLoadingPanel());
     }
 }

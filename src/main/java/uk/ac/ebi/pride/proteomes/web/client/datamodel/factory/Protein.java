@@ -19,6 +19,8 @@ public interface Protein {
     public List<List<Integer>> getRegions();
     public List<PeptideMatch> getPeptides();
     public List<Feature> getFeatures();
-    public int getUniquePeptideCount();
-
+    public int getUniquePeptideToProteinCount();
+    public int getUniquePeptideToIsoformCount();
+    public int getUniquePeptideToGeneCount();
+    public int getNonUniquePeptidesCount();
 }
