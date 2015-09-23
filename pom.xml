@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>PRIDE Proteomes Web Application</name>
     <groupId>uk.ac.ebi.pride.proteomes.web</groupId>
     <artifactId>webapp</artifactId>
     <packaging>war</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1-alpha</version>
 
     <properties>
         <gwtVersion>2.7.0</gwtVersion>
@@ -267,7 +265,7 @@
         <connection>scm:git:github.com/PRIDE-Proteomes/webapp.git</connection>
         <developerConnection>scm:git:git@github.com:PRIDE-Proteomes/webapp.git</developerConnection>
         <url>https://github.com/PRIDE-Proteomes/webapp.git</url>
-        <tag>HEAD</tag>
+        <tag>webapp-1.0.1-alpha</tag>
     </scm>
 
     <!-- Overwrites the previous repositories-->
