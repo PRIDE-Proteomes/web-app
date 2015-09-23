@@ -8,7 +8,7 @@
     <groupId>uk.ac.ebi.pride.proteomes.web</groupId>
     <artifactId>webapp</artifactId>
     <packaging>war</packaging>
-    <version>1.0.1-ALFA</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <properties>
         <gwtVersion>2.7.0</gwtVersion>
@@ -158,6 +158,29 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <remoteTagging>true</remoteTagging>
+                </configuration>
+            </plugin>
             <!-- maven-jetty-plugin: run port 8888; stop port 8889 -->
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
@@ -177,6 +200,7 @@
                     <scanIntervalSeconds>10</scanIntervalSeconds>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 
@@ -237,6 +261,31 @@
         </repository>
 
     </repositories>
+
+    <!--scm git config-->
+    <scm>
+        <connection>scm:git:github.com/PRIDE-Proteomes/webapp.git</connection>
+        <developerConnection>scm:git:git@github.com:PRIDE-Proteomes/webapp.git</developerConnection>
+        <url>https://github.com/PRIDE-Proteomes/webapp.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <!-- Overwrites the previous repositories-->
+    <distributionManagement>
+        <!-- EBI repo -->
+        <repository>
+            <id>pst-release</id>
+            <name>EBI Nexus Repository</name>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/repositories/pst-release</url>
+        </repository>
+        <!-- EBI SNAPSHOT repo -->
+        <snapshotRepository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>pst-snapshots</id>
+            <name>EBI Nexus Snapshots Repository</name>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/repositories/pst-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <pluginRepositories>
         <pluginRepository>
