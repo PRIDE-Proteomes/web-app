@@ -6,7 +6,7 @@
     <groupId>uk.ac.ebi.pride.proteomes.web</groupId>
     <artifactId>webapp</artifactId>
     <packaging>war</packaging>
-    <version>1.0.1-alpha</version>
+    <version>1.0.1-beta-SNAPSHOT</version>
 
     <properties>
         <gwtVersion>2.7.0</gwtVersion>
@@ -265,7 +265,7 @@
         <connection>scm:git:github.com/PRIDE-Proteomes/web-app.git</connection>
         <developerConnection>scm:git:git@github.com:PRIDE-Proteomes/web-app.git</developerConnection>
         <url>https://github.com/PRIDE-Proteomes/web-app.git</url>
-        <tag>webapp-1.0.1-alpha</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <!-- Overwrites the previous repositories-->
