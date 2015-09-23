@@ -264,9 +264,9 @@
 
     <!--scm git config-->
     <scm>
-        <connection>scm:git:github.com/PRIDE-Proteomes/webapp.git</connection>
-        <developerConnection>scm:git:git@github.com:PRIDE-Proteomes/webapp.git</developerConnection>
-        <url>https://github.com/PRIDE-Proteomes/webapp.git</url>
+        <connection>scm:git:github.com/PRIDE-Proteomes/web-app.git</connection>
+        <developerConnection>scm:git:git@github.com:PRIDE-Proteomes/web-app.git</developerConnection>
+        <url>https://github.com/PRIDE-Proteomes/web-app.git</url>
         <tag>HEAD</tag>
     </scm>
 
