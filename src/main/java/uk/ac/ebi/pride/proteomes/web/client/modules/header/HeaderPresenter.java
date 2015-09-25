@@ -5,6 +5,7 @@ import com.google.gwt.regexp.shared.RegExp;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.events.requests.GroupRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.GroupUpdateEvent;
@@ -25,31 +26,23 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
         implements ValidStateEvent.Handler,
         GroupUpdateEvent.Handler,
         ProteinUpdateEvent.Handler,
-        ProteinRequestEvent.Handler {
+        ProteinRequestEvent.Handler,
+        GroupRequestEvent.Handler {
+
+
 
     public interface ThisView extends View {
         public void updateTitle(String title, String accession, String link);
-
         public void updateUpGroupLink(String upGroupId);
-
         public void updateGeneGroupLink(String geneGroupId);
-
         public void updateUniquePeptideToProteinCount(int count);
-
         public void updateUniquePeptideToIsoformCount(int count);
-
         public void updateUniquePeptideToGeneCount(int count);
-
         public void updateNonUniquePeptidesCount(int count);
-
         public void updateDescription(Description description);
-
         public void updateProperties(List<Pair<String, String>> links);
-
         public void clearProperties();
-
         public void clearTitle();
-
         public void displayLoadingMessage();
 
     }
@@ -78,6 +71,7 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
         eventBus.addHandler(GroupUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
+        eventBus.addHandler(GroupRequestEvent.getType(), this);
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
     }
@@ -138,6 +132,11 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
 
     @Override
     public void onProteinRequestEvent(ProteinRequestEvent event) {
+        getView().displayLoadingMessage();
+    }
+
+    @Override
+    public void onGroupRequestEvent(GroupRequestEvent event) {
         getView().displayLoadingMessage();
     }
 

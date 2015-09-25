@@ -37,16 +37,16 @@
             "inputName": "query",
             "examples": [
                 {
-                    "title": "albumin",
-                    "href": "../search?query=albumin"
+                    "title": "P02787",
+                    "href": "../search?query=P02787"
                 },
                 {
-                    "title": "Q08648",
-                    "href": "../search?query=Q08648"
+                    "title": "P02768",
+                    "href": "../search?query=P02768"
                 },
                 {
-                    "title": "kinase",
-                    "href": "../search?query=kinase"
+                    "title": "P35579",
+                    "href": "../search?query=P35579"
                 }
             ]
         },
@@ -68,18 +68,6 @@
                 "title": "Browse",
                 "href": "../browse",
                 "tooltip": "Browse PRIDE Proteomes data"
-            },
-            {
-                "selected": false,
-                "title": "Documentation",
-                "href": "/pride/help/proteomes",
-                "tooltip": "PRIDE Proteomes documentation"
-            },
-            {
-                "selected": false,
-                "title": "About PRIDE Proteomes",
-                "href": "/pride/help/proteomes/about",
-                "tooltip": "About PRIDE Proteomes"
             }
         ],
         "functionalTabs": [

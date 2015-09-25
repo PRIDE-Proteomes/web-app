@@ -63,6 +63,12 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @UiField
     HTMLPanel summaryPanel;
 
+    @UiField
+    HTMLPanel groupSummaryPanel;
+
+    @UiField
+    HTMLPanel proteinSummaryPanel;
+
     private HTMLPanel root;
     private ModuleContainer outerBox;
 
@@ -71,7 +77,7 @@ public class HeaderView implements HeaderPresenter.ThisView {
         Resources.INSTANCE.style().ensureInjected();
         root = ourUiBinder.createAndBindUi(this);
         //Disclosure panel
-        outerBox = ModuleContainerFactory.getModuleContainer("Protein " + "Summary");
+        outerBox = ModuleContainerFactory.getModuleContainer("Summary");
         outerBox.setWidth("100%");
         outerBox.setContent(panel);
         outerBox.setOpen(true);
@@ -146,6 +152,9 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @Override
     public void updateProperties(List<Pair<String, String>> links) {
         clearProperties();
+        summaryPanel.clear();
+        summaryPanel.add(groupSummaryPanel);
+
         for (Pair<String, String> link : links) {
             attributes.add(HyperlinkFactory.getInlineHyperLink(link.getA(), link.getB()));
             if (link != links.get(links.size() - 1)) {
@@ -157,6 +166,8 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @Override
     public void clearProperties() {
         attributes.clear();
+        summaryPanel.clear();
+        summaryPanel.add(proteinSummaryPanel);
     }
 
     @Override
