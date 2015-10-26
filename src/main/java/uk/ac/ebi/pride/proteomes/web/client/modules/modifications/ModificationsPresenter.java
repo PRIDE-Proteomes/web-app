@@ -58,7 +58,6 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
-        view.hideContent();
 
         final MultiSelectionModel<Multiset.Entry<String>> selectionModel = new
                 MultiSelectionModel<>();
@@ -105,6 +104,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
             }
             updateList(mods.entrySet());
             getView().loadList();
+            getView().showContent();
         }
     }
 

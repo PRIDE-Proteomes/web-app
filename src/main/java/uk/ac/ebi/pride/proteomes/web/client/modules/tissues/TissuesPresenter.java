@@ -58,7 +58,6 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
-        view.hideContent();
 
         final MultiSelectionModel<String> selectionModel = new MultiSelectionModel<>();
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -101,6 +100,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         if(!groups && event.getProteins().size() > 0) {
             updateList(event.getProteins().get(0).getTissues());
             getView().loadList();
+            getView().showContent();
         }
     }
 
