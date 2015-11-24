@@ -12,7 +12,17 @@ public interface Protein {
     public String getGene();
     public int getTaxonID();
     public String getSequence();
+
+    @Deprecated
     public String getDescription();
+
+    //Protein Description
+    public String getName();
+    public String getAlternativeName();
+    public String getSpecies();
+    public String getGeneSymbol();
+    public String getProteinEvidence();
+
     public List<ModifiedLocation> getModifiedLocations();
     public List<String> getTissues();
     public String getCoverage();
@@ -23,4 +33,6 @@ public interface Protein {
     public int getUniquePeptideToIsoformCount();
     public int getUniquePeptideToGeneCount();
     public int getNonUniquePeptidesCount();
+
+
 }

@@ -72,6 +72,10 @@
         <g:HTMLPanel ui:field="panel">
             <g:HTMLPanel ui:field="summaryPanel">
                 <g:HTMLPanel ui:field="groupSummaryPanel">
+                    <p>
+                        <g:InlineLabel addStyleNames="{style.label}">Description</g:InlineLabel>
+                        <g:InlineLabel ui:field="description"/>
+                    </p>
                     <h2>
                         <g:Label addStyleNames="{style.label}">Group members</g:Label>
                     </h2>

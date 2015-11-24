@@ -53,6 +53,9 @@ public class HeaderView implements HeaderPresenter.ThisView {
     Label geneSymbol;
     @UiField
     Label proteinEvidence;
+    @UiField
+    Label description;
+
 
     @UiField
     FlowPanel attributes;
@@ -141,12 +144,37 @@ public class HeaderView implements HeaderPresenter.ThisView {
     }
 
     @Override
-    public void updateDescription(HeaderPresenter.Description description) {
-        this.altId.setText(description.altId);
-        this.name.setText(description.name);
-        this.species.setText(description.species);
-        this.geneSymbol.setText(description.geneSymbol);
-        this.proteinEvidence.setText(description.proteinEvidence);
+    public void updateName(String name) {
+        this.name.setText(name);
+    }
+
+    @Override
+    public void updateGeneSymbol(String geneSymbol) {
+        this.geneSymbol.setText(geneSymbol);
+
+    }
+
+    @Override
+    public void updateAlternativeName(String alternativeName) {
+        this.altId.setText(alternativeName);
+
+    }
+
+    @Override
+    public void updateSpecies(String species) {
+        this.species.setText(species);
+
+    }
+
+    @Override
+    public void updateProteinEvidence(String proteinEvidence) {
+        this.proteinEvidence.setText(proteinEvidence);
+
+    }
+
+    @Override
+    public void updateDescription(String description) {
+        this.description.setText(description);
     }
 
     @Override
