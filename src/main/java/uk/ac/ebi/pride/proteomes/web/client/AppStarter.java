@@ -94,8 +94,7 @@ class AppStarter implements RunAsyncCallback {
         ListView<String> tissueView = new GridView<>("Tissues", "tissue");
         Presenter tissuePresenter = new TissuesPresenter(eventBus, tissueView);
 
-        ListView<Multiset.Entry<String>> modView = new
-                GridView<>("Modifications", "modification");
+        ListView<Multiset.Entry<String>> modView = new GridView<>("Modifications", "modification");
         Presenter modPresenter = new ModificationsPresenter(eventBus, modView);
 
         View coverageView = new CoverageView();
@@ -106,19 +105,15 @@ class AppStarter implements RunAsyncCallback {
         Presenter sequencePresenter = new SequencePresenter(eventBus,
                                           (SequencePresenter.ThisView) sequenceView);
 
-        ListView<PeptideMatch> peptideView =
-                new GridView<>("Peptides", "peptide");
+        ListView<PeptideMatch> peptideView = new GridView<>("Peptides", "peptide");
         Presenter peptidePresenter = new PeptidesPresenter(eventBus,
                 peptideView);
 
         ListView<Pair<String, List<String>>> groupPeptideView = new GridView<>("Peptides unique to the group", "peptide", true);
         Presenter groupPeptidePresenter = new GroupPeptidePresenter(eventBus, groupPeptideView);
 
-        ListView<Peptide> varianceView =
-                new GridView<>("Peptiforms",
-                        "variance");
-        Presenter variancePresenter = new VariancesPresenter(eventBus,
-                varianceView);
+        ListView<Peptide> varianceView = new GridView<>("Peptiforms", "variance");
+        Presenter variancePresenter = new VariancesPresenter(eventBus, varianceView);
 
         // Startup the main presenter, it's used as a container to hold the
         // rest of the widget-showing modules.

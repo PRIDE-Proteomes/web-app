@@ -54,8 +54,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
     public PeptidesPresenter(EventBus eventBus, ListView<PeptideMatch> view) {
         super(eventBus, view);
-        List<Column<PeptideMatch, ?>> columns = PeptideColumnProvider
-                                            .getSortingColumns(dataSorter);
+        List<Column<PeptideMatch, ?>> columns = PeptideColumnProvider.getSortingColumns(dataSorter);
         List<String> columnTitles = PeptideColumnProvider.getColumnTitles();
         List<String> columnWidths = PeptideColumnProvider.getColumnWidths();
 
@@ -67,8 +66,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         view.asWidget().setVisible(false);
 
         // We define how are the items selected here
-        final SingleSelectionModel<PeptideMatch> selectionModel = new
-                SingleSelectionModel<>();
+        final SingleSelectionModel<PeptideMatch> selectionModel = new SingleSelectionModel<>();
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
