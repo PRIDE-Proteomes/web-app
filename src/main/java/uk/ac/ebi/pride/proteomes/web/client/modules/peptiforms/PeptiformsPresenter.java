@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.proteomes.web.client.modules.variances;
+package uk.ac.ebi.pride.proteomes.web.client.modules.peptiforms;
 
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.view.client.ListDataProvider;
@@ -8,6 +8,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
@@ -26,10 +27,11 @@ import java.util.*;
  *         Date: 29/11/13
  *         Time: 14:46
  */
-public class VariancesPresenter extends Presenter<ListView<Peptide>>
+public class PeptiformsPresenter extends Presenter<ListView<Peptide>>
                                 implements ListUiHandler<Peptide>,
                                            ValidStateEvent.Handler,
                                            PeptideUpdateEvent.Handler,
+                                           ProteinRequestEvent.Handler,
                                            VarianceUpdateEvent.Handler {
     private final ListDataProvider<Peptide> dataProvider = new
                                         ListDataProvider<>();
@@ -40,13 +42,13 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
     private Collection<Peptide> selectedVariances = Collections.emptyList();
     private boolean selectionEventsDisabled = false;
 
-    public VariancesPresenter(EventBus eventBus, ListView<Peptide> view) {
+    public PeptiformsPresenter(EventBus eventBus, ListView<Peptide> view) {
         super(eventBus, view);
 
-        List<Column<Peptide, ?>> columns = VarianceColumnProvider
+        List<Column<Peptide, ?>> columns = PeptiformColumnProvider
                                             .getSortingColumns(dataSorter);
-        List<String> columnTitles = VarianceColumnProvider.getColumnTitles();
-        List<String> columnWidths = VarianceColumnProvider.getColumnWidths();
+        List<String> columnTitles = PeptiformColumnProvider.getColumnTitles();
+        List<String> columnWidths = PeptiformColumnProvider.getColumnWidths();
 
         dataSorter.setList(dataProvider.getList());
         view.addDataProvider(dataProvider);
@@ -71,9 +73,10 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
         });
 
         view.setSelectionModel(selectionModel);
-        view.setKeyboardSelectionPolicy(VarianceColumnProvider.getKeyboardSelectionPolicy());
+        view.setKeyboardSelectionPolicy(PeptiformColumnProvider.getKeyboardSelectionPolicy());
 
         eventBus.addHandler(ValidStateEvent.getType(), this);
+        eventBus.addHandler(ProteinRequestEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(VarianceUpdateEvent.getType(), this);
     }
@@ -88,6 +91,14 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
         else {
             groups = false;
             getView().asWidget().setVisible(true);
+        }
+    }
+
+    @Override
+    public void onProteinRequestEvent(ProteinRequestEvent event) {
+        // We should display that the list is being loaded
+        if(!groups) {
+            getView().loadLoadingMessage();
         }
     }
 
@@ -216,4 +227,5 @@ public class VariancesPresenter extends Presenter<ListView<Peptide>>
         dataSorter.repeatSort();
         dataProvider.flush();
     }
+
 }

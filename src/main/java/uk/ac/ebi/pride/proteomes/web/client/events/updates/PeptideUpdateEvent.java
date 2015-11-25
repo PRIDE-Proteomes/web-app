@@ -34,7 +34,7 @@ public class PeptideUpdateEvent extends GwtEvent<PeptideUpdateEvent.Handler> {
 
     /**
      *
-     * @return the variances of the peptides that got selected
+     * @return the peptiforms of the peptides that got selected
      */
     public List<PeptideWithVariances> getPeptides() {
         return peptideVariances;

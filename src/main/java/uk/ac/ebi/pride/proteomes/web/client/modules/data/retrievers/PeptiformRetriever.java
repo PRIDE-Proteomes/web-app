@@ -3,14 +3,14 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
 
 /**
- * This class retrieves the variances of a specified peptide sequence
+ * This class retrieves the peptiforms of a specified peptide sequence
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  *         Date: 29/10/13
  *         Time: 16:17
  */
 
-public class PeptideVarianceRetriever extends DataRetriever {
-    public PeptideVarianceRetriever(String webServiceRoot) {
+public class PeptiformRetriever extends DataRetriever {
+    public PeptiformRetriever(String webServiceRoot) {
         super(webServiceRoot);
     }
 

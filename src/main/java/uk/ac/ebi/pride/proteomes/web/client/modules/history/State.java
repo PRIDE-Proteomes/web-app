@@ -43,7 +43,7 @@ final class State {
      *                 separated with sepValues.
      * @param peptideIds String representing several peptides,
      *                 separated with sepValues.
-     * @param varianceIds String representing several peptide variances,
+     * @param peptiformIds String representing several peptiforms,
      *                 separated with sepValues.
      * @param modificationIds String representing several modifications,
      *                 separated with sepValues.
@@ -56,11 +56,11 @@ final class State {
      * so another check using all the data pointed in here must be made.
      */
     private State(String groupIds, String proteinIds, String regionIds,
-          String peptideIds, String varianceIds, String modificationIds,
+          String peptideIds, String peptiformIds, String modificationIds,
           String tissueIds)
              throws InconsistentStateException {
 
-        if(!isValid(groupIds, proteinIds, regionIds, peptideIds, varianceIds,
+        if(!isValid(groupIds, proteinIds, regionIds, peptideIds, peptiformIds,
                     modificationIds, tissueIds)) {
             throw new InconsistentStateException();
         }
@@ -79,8 +79,8 @@ final class State {
         if(!peptideIds.isEmpty()) {
             sBuild.append("peptide" + sepMaps).append(peptideIds).append(sepTypes);
         }
-        if(!varianceIds.isEmpty()) {
-            sBuild.append("variance" + sepMaps).append(varianceIds).append(sepTypes);
+        if(!peptiformIds.isEmpty()) {
+            sBuild.append("variance" + sepMaps).append(peptiformIds).append(sepTypes);
         }
         if(!modificationIds.isEmpty()) {
             sBuild.append("modification" + sepMaps).append(modificationIds).append(sepTypes);
@@ -105,7 +105,7 @@ final class State {
         selectedProteinIds = proteinIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(proteinIds.split(sepValues));
         selectedRegionIds = regionIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(regionIds.split(sepValues));
         selectedPeptideIds = peptideIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(peptideIds.split(sepValues));
-        selectedVarianceIds = varianceIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(varianceIds.split(sepValues));
+        selectedVarianceIds = peptiformIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(peptiformIds.split(sepValues));
         selectedModificationIds = modificationIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(modificationIds.split(sepValues));
         selectedTissueIds = tissueIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(tissueIds.split(sepValues));
     }
@@ -281,7 +281,7 @@ final class State {
      * @param proteinIds the url-encoded identifiers of the proteins
      * @param regionIds the url-encoded identifiers of the regions
      * @param peptideIds the url-encoded identifiers of the peptides
-     * @param varianceIds the url-encoded identifiers of the variances
+     * @param peptiformIds the url-encoded identifiers of the peptiforms
      * @param modificationIds the url-encoded identifiers of the modifications
      * @param tissueIds the url-encoded identifiers of the tissues
      * @return a new state with a state with removed properties to make it valid
@@ -289,10 +289,10 @@ final class State {
      */
     static State simplifyState(String groupIds, String proteinIds,
                                String regionIds, String peptideIds,
-                               String varianceIds, String modificationIds,
+                               String peptiformIds, String modificationIds,
                                String tissueIds)
                                        throws InconsistentStateException {
-        String newRegionIds = "", newPeptideIds = "", newVariancesIds = "",
+        String newRegionIds = "", newPeptideIds = "", newPeptiformIds = "",
                 newModIds = "", newTissueIds = "";
 
         if(!proteinIds.isEmpty()) {
@@ -301,7 +301,7 @@ final class State {
         }
 
         if(!newPeptideIds.isEmpty()) {
-            newVariancesIds = varianceIds;
+            newPeptiformIds = peptiformIds;
         }
 
         if(!proteinIds.isEmpty() || !groupIds.isEmpty()) {
@@ -310,7 +310,7 @@ final class State {
         }
 
         return new State(groupIds, proteinIds, newRegionIds, newPeptideIds,
-                         newVariancesIds, newModIds, newTissueIds);
+                         newPeptiformIds, newModIds, newTissueIds);
     }
 
     public static State getInvalidState() {

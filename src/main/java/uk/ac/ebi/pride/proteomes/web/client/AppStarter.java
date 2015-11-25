@@ -30,7 +30,7 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptidesPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequencePresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequenceView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissuesPresenter;
-import uk.ac.ebi.pride.proteomes.web.client.modules.variances.VariancesPresenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.peptiforms.PeptiformsPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower.WhistleBlower;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Pair;
 
@@ -113,7 +113,7 @@ class AppStarter implements RunAsyncCallback {
         Presenter groupPeptidePresenter = new GroupPeptidePresenter(eventBus, groupPeptideView);
 
         ListView<Peptide> varianceView = new GridView<>("Peptiforms", "variance");
-        Presenter variancePresenter = new VariancesPresenter(eventBus, varianceView);
+        Presenter variancePresenter = new PeptiformsPresenter(eventBus, varianceView);
 
         // Startup the main presenter, it's used as a container to hold the
         // rest of the widget-showing modules.

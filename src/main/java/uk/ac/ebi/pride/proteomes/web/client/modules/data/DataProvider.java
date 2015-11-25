@@ -3,7 +3,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.*;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.GroupRetriever;
-import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.PeptideVarianceRetriever;
+import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.PeptiformRetriever;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.ProteinRetriever;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Pair;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Triplet;
@@ -42,7 +42,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     private Map<Pair<String, String>, List<PeptideMatch>> peptideMatchCache = new HashMap<>();
     //the Map is <peptide sequence, protein acce>
     private List<Map<Triplet<String, Integer, String>, Boolean>> peptideVarianceRequests = new ArrayList<>();
-    private final PeptideVarianceRetriever peptideVarianceRetriever;
+    private final PeptiformRetriever peptiformRetriever;
 
     private Map<String, Peptide> peptideVarianceCache = new HashMap<>();
 
@@ -53,8 +53,8 @@ public class DataProvider implements DataServer, TransactionHandler {
         proteinRetriever = new ProteinRetriever(webServiceRoot);
         proteinRetriever.addHandler(this);
 
-        peptideVarianceRetriever = new PeptideVarianceRetriever(webServiceRoot);
-        peptideVarianceRetriever.addHandler(this);
+        peptiformRetriever = new PeptiformRetriever(webServiceRoot);
+        peptiformRetriever.addHandler(this);
     }
 
     @Override
@@ -215,7 +215,7 @@ public class DataProvider implements DataServer, TransactionHandler {
             if(!isPeptideCached(sequences.get(i), proteinIds.get(i), positions.get(i))) {
                 //Hack that allows to filter by species the peptiform. The species wasn't in the original design
                 // because it is implicit to the protein and symbolic peptides
-                peptideVarianceRetriever.retrieveData(sequences.get(i), speciesCache.get(proteinIds.get(i)));
+                peptiformRetriever.retrieveData(sequences.get(i), speciesCache.get(proteinIds.get(i)));
                 // we could also check whether there's a pending request or not
             }
             else {

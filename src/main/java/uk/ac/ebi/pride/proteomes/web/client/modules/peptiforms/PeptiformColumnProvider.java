@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.proteomes.web.client.modules.variances;
+package uk.ac.ebi.pride.proteomes.web.client.modules.peptiforms;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -20,7 +20,7 @@ import java.util.*;
  *         Date: 29/11/13
  *         Time: 14:46
  */
-class VarianceColumnProvider {
+class PeptiformColumnProvider {
     public static List<Column<Peptide, ?>> getSortingColumns(ListSorter<Peptide> sorter) {
         List<Column<Peptide, ?>> columns = new ArrayList<>();
 
