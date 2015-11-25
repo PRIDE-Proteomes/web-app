@@ -12,28 +12,28 @@ import java.util.List;
  *         Date: 04/11/13
  *         Time: 15:13
  */
-public class VarianceUpdateEvent extends GwtEvent<VarianceUpdateEvent.Handler> {
+public class PeptiformUpdateEvent extends GwtEvent<PeptiformUpdateEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onVarianceUpdateEvent(VarianceUpdateEvent event);
+        public void onPeptiformUpdateEvent(PeptiformUpdateEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();
 
-    private final List<Peptide> variances;
+    private final List<Peptide> peptiforms;
 
-    private VarianceUpdateEvent(List<Peptide> variances, HasHandlers source) {
+    private PeptiformUpdateEvent(List<Peptide> peptiforms, HasHandlers source) {
         super();
-        this.variances = variances;
+        this.peptiforms = peptiforms;
         setSource(source);
     }
 
-    public static void fire(HasHandlers source, List<Peptide> variances) {
-        VarianceUpdateEvent eventInstance = new VarianceUpdateEvent(variances, source);
+    public static void fire(HasHandlers source, List<Peptide> peptiforms) {
+        PeptiformUpdateEvent eventInstance = new PeptiformUpdateEvent(peptiforms, source);
         source.fireEvent(eventInstance);
     }
 
-    public List<Peptide> getVariances() {
-        return variances;
+    public List<Peptide> getPeptiforms() {
+        return peptiforms;
     }
 
     public static Type<Handler> getType() {
@@ -47,6 +47,6 @@ public class VarianceUpdateEvent extends GwtEvent<VarianceUpdateEvent.Handler> {
 
     @Override
     protected void dispatch(Handler handler) {
-        handler.onVarianceUpdateEvent(this);
+        handler.onPeptiformUpdateEvent(this);
     }
 }

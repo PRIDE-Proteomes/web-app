@@ -6,13 +6,13 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
-import uk.ac.ebi.pride.proteomes.web.client.events.updates.VarianceUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptiformUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
@@ -32,7 +32,7 @@ public class PeptiformsPresenter extends Presenter<ListView<Peptide>>
                                            ValidStateEvent.Handler,
                                            PeptideUpdateEvent.Handler,
                                            ProteinRequestEvent.Handler,
-                                           VarianceUpdateEvent.Handler {
+                                           PeptiformUpdateEvent.Handler {
     private final ListDataProvider<Peptide> dataProvider = new
                                         ListDataProvider<>();
     private final ListSorter<Peptide> dataSorter = new
@@ -78,7 +78,7 @@ public class PeptiformsPresenter extends Presenter<ListView<Peptide>>
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
-        eventBus.addHandler(VarianceUpdateEvent.getType(), this);
+        eventBus.addHandler(PeptiformUpdateEvent.getType(), this);
     }
 
     @Override
@@ -105,13 +105,13 @@ public class PeptiformsPresenter extends Presenter<ListView<Peptide>>
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
         if(!groups) {
-            PeptideWithVariances currentPeptide;
+            PeptideWithPeptiforms currentPeptide;
             if(event.getPeptides().size() > 0) {
                 currentPeptide = event.getPeptides().get(0);
                 getView().showContent();
             }
             else {
-                currentPeptide = PeptideWithVariances.emptyPeptideWithVariances();
+                currentPeptide = PeptideWithPeptiforms.emptyPeptideWithPeptiforms();
             }
             updateList(currentPeptide.getPeptideList());
             selectedVariances = new ArrayList<>();
@@ -120,13 +120,13 @@ public class PeptiformsPresenter extends Presenter<ListView<Peptide>>
     }
 
     @Override
-    public void onVarianceUpdateEvent(VarianceUpdateEvent event) {
+    public void onPeptiformUpdateEvent(PeptiformUpdateEvent event) {
         for(Peptide peptide : selectedVariances) {
             deselectItem(peptide);
         }
 
         selectedVariances = new ArrayList<>();
-        for(Peptide variance : event.getVariances()) {
+        for(Peptide variance : event.getPeptiforms()) {
             int peptidePosition = PeptideUtils.firstIndexWithId(dataProvider.getList(), variance.getId());
             if(peptidePosition > -1) {
                 selectedVariances.add(dataProvider.getList().get(peptidePosition));
@@ -161,13 +161,13 @@ public class PeptiformsPresenter extends Presenter<ListView<Peptide>>
         }
 
         changer = new StateChanger();
-        changer.addVarianceChange(variances);
+        changer.addPeptiformChange(variances);
 
         if(items.isEmpty()) {
-            action = new UserAction(UserAction.Type.variance, "Click Reset");
+            action = new UserAction(UserAction.Type.peptiform, "Click Reset");
         }
         else {
-            action = new UserAction(UserAction.Type.variance, "Click Set");
+            action = new UserAction(UserAction.Type.peptiform, "Click Set");
         }
         StateChangingActionEvent.fire(this, changer, action);
     }

@@ -112,8 +112,8 @@ class AppStarter implements RunAsyncCallback {
         ListView<Pair<String, List<String>>> groupPeptideView = new GridView<>("Peptides unique to the group", "peptide", true);
         Presenter groupPeptidePresenter = new GroupPeptidePresenter(eventBus, groupPeptideView);
 
-        ListView<Peptide> varianceView = new GridView<>("Peptiforms", "variance");
-        Presenter variancePresenter = new PeptiformsPresenter(eventBus, varianceView);
+        ListView<Peptide> peptiformView = new GridView<>("Peptiforms", "peptiform");
+        Presenter peptiformPresenter = new PeptiformsPresenter(eventBus, peptiformView);
 
         // Startup the main presenter, it's used as a container to hold the
         // rest of the widget-showing modules.
@@ -124,7 +124,7 @@ class AppStarter implements RunAsyncCallback {
         presenterList.add(tissuePresenter);
         presenterList.add(modPresenter);
         presenterList.add(peptidePresenter);
-        presenterList.add(variancePresenter);
+        presenterList.add(peptiformPresenter);
 
         for(Presenter p : presenterList) {
             placeHolderList.add(new SimplePanel());

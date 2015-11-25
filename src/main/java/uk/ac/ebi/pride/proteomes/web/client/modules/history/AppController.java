@@ -7,7 +7,7 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.History;
 import com.google.web.bindery.event.shared.EventBus;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.*;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.GroupRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.PeptideRequestEvent;
@@ -140,7 +140,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
     }
 
     @Override
-    public void onPeptideVarianceListsRetrieved(Collection<PeptideWithVariances>  peptides) {
+    public void onPeptiformListsRetrieved(Collection<PeptideWithPeptiforms>  peptides) {
         processStateQueue();
     }
 
@@ -298,8 +298,8 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                         peptiProteins.add(state.getSelectedProteins().get(0));
                     }
                 }
-                server.requestPeptideVariances(matchSequences, matchProteins, matchPositions);
-                server.requestPeptideVariances(peptiSequences, peptiProteins);
+                server.requestPeptiforms(matchSequences, matchProteins, matchPositions);
+                server.requestPeptiforms(peptiSequences, peptiProteins);
             }
         }
     }
@@ -479,7 +479,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         List<String> sequences = new ArrayList<>();
         List<String> proteins = new ArrayList<>();
         List<Integer> positions = new ArrayList<>();
-        List<PeptideWithVariances> peptideLists;
+        List<PeptideWithPeptiforms> peptideLists;
         for(String id : uncheckedState.getSelectedPeptides()) {
             String[] split = id.split(State.sepFields);
             sequences.add(split[0]);
@@ -490,10 +490,10 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             }
         }
         if(!positions.isEmpty()) {
-            peptideLists = server.getCachedPeptideVarianceLists(sequences, proteins, positions);
+            peptideLists = server.getCachedPeptiformLists(sequences, proteins, positions);
         }
         else {
-            peptideLists = server.getCachedPeptideVarianceLists(sequences, proteins);
+            peptideLists = server.getCachedPeptiformLists(sequences, proteins);
         }
 
         for(PeptideList peptideVariances : peptideLists) {
@@ -628,14 +628,14 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 }
             }
             if(!positions.isEmpty()) {
-                PeptideUpdateEvent.fire(this, server.getCachedPeptideVarianceLists(sequences, proteins, positions));
+                PeptideUpdateEvent.fire(this, server.getCachedPeptiformLists(sequences, proteins, positions));
             }
             else {
-                PeptideUpdateEvent.fire(this, server.getCachedPeptideVarianceLists(sequences, proteins));
+                PeptideUpdateEvent.fire(this, server.getCachedPeptiformLists(sequences, proteins));
             }
         }
         if(!newState.getSelectedVariances().equals(appState.getSelectedVariances())) {
-            VarianceUpdateEvent.fire(this, server.getCachedPeptideVariances(newState.getSelectedVariances()));
+            PeptiformUpdateEvent.fire(this, server.getCachedPeptideVariances(newState.getSelectedVariances()));
         }
         if(!newState.getSelectedModifications().equals(appState.getSelectedModifications())) {
             ModificationUpdateEvent.fire(this, newState.getSelectedModifications());

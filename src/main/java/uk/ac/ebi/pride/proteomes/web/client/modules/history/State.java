@@ -18,7 +18,7 @@ final class State {
     private  final List<String> selectedProteinIds;
     private  final List<String> selectedRegionIds;
     private  final List<String> selectedPeptideIds;
-    private  final List<String> selectedVarianceIds;
+    private  final List<String> selectedPeptiformIDs;
     private  final List<String> selectedModificationIds;
     private  final List<String> selectedTissueIds;
 
@@ -80,7 +80,7 @@ final class State {
             sBuild.append("peptide" + sepMaps).append(peptideIds).append(sepTypes);
         }
         if(!peptiformIds.isEmpty()) {
-            sBuild.append("variance" + sepMaps).append(peptiformIds).append(sepTypes);
+            sBuild.append("peptiform" + sepMaps).append(peptiformIds).append(sepTypes);
         }
         if(!modificationIds.isEmpty()) {
             sBuild.append("modification" + sepMaps).append(modificationIds).append(sepTypes);
@@ -105,7 +105,7 @@ final class State {
         selectedProteinIds = proteinIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(proteinIds.split(sepValues));
         selectedRegionIds = regionIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(regionIds.split(sepValues));
         selectedPeptideIds = peptideIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(peptideIds.split(sepValues));
-        selectedVarianceIds = peptiformIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(peptiformIds.split(sepValues));
+        selectedPeptiformIDs = peptiformIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(peptiformIds.split(sepValues));
         selectedModificationIds = modificationIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(modificationIds.split(sepValues));
         selectedTissueIds = tissueIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(tissueIds.split(sepValues));
     }
@@ -115,7 +115,7 @@ final class State {
         selectedProteinIds = Collections.emptyList();
         selectedRegionIds = Collections.emptyList();
         selectedPeptideIds = Collections.emptyList();
-        selectedVarianceIds = Collections.emptyList();
+        selectedPeptiformIDs = Collections.emptyList();
         selectedModificationIds = Collections.emptyList();
         selectedTissueIds = Collections.emptyList();
         historyToken = "";
@@ -131,7 +131,7 @@ final class State {
     public static State tokenize(String value) throws
             InconsistentStateException {
         String groupIds = "", proteinIds = "",  peptideIds = "",
-                varianceIds = "", regionIds = "", modificationIds = "",
+                peptiformIds = "", regionIds = "", modificationIds = "",
                 tissueIds = "";
 
         String[] tokens, dict;
@@ -156,7 +156,7 @@ final class State {
                                      break;
                 case "peptide":      peptideIds = dict[1];
                                      break;
-                case "variance":     varianceIds = dict[1];
+                case "peptiform":    peptiformIds = dict[1];
                                      break;
                 case "modification": modificationIds = dict[1];
                                      break;
@@ -166,7 +166,7 @@ final class State {
         }
 
         return new State(groupIds, proteinIds, regionIds, peptideIds,
-                varianceIds, modificationIds, tissueIds);
+                peptiformIds, modificationIds, tissueIds);
     }
 
     public List<String> getSelectedGroups() {
@@ -186,7 +186,7 @@ final class State {
     }
 
     public List<String> getSelectedVariances() {
-        return selectedVarianceIds;
+        return selectedPeptiformIDs;
     }
 
     public List<String> getSelectedModifications() {

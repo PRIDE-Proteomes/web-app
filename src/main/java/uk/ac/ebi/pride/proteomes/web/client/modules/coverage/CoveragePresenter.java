@@ -2,7 +2,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.coverage;
 
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
@@ -44,7 +44,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                                           RegionUpdateEvent.Handler,
                                           PeptideUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler,
-                                          VarianceUpdateEvent.Handler,
+                                          PeptiformUpdateEvent.Handler,
                                           TissueUpdateEvent.Handler {
 
 
@@ -68,11 +68,11 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     private List<String> currentModifications = Collections.emptyList();
     private List<String> currentTissues = Collections.emptyList();
 
-    private List<PeptideWithVariances> peptideMatchSelection = Collections.emptyList();
-    private List<Peptide> selectedVariances = Collections.emptyList();
+    private List<PeptideWithPeptiforms> peptideMatchSelection = Collections.emptyList();
+    private List<Peptide> selectedPeptiforms = Collections.emptyList();
 
     //Needed to maintain temporary state while doing a selection
-    private List<PeptideWithVariances> tempPeptides = Collections.emptyList();
+    private List<PeptideWithPeptiforms> tempPeptides = Collections.emptyList();
 
     public CoveragePresenter(EventBus eventBus, ThisView view) {
         super(eventBus, view);
@@ -87,7 +87,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(ModificationUpdateEvent.getType(), this);
         eventBus.addHandler(TissueUpdateEvent.getType(), this);
-        eventBus.addHandler(VarianceUpdateEvent.getType(), this);
+        eventBus.addHandler(PeptiformUpdateEvent.getType(), this);
     }
 
     // Callbacks that handle event bus events
@@ -183,8 +183,8 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     }
 
     @Override
-    public void onVarianceUpdateEvent(VarianceUpdateEvent event) {
-        selectedVariances = event.getVariances();
+    public void onPeptiformUpdateEvent(PeptiformUpdateEvent event) {
+        selectedPeptiforms = event.getPeptiforms();
     }
 
     /**
@@ -398,14 +398,14 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             // we stored.
 
             if (tempPeptides.size() !=
-                    PeptideUtils.filterPeptideWithVariancesNotIn(peptideMatchSelection, start, end).size()) {
-                tempPeptides = PeptideUtils.filterPeptideWithVariancesNotIn(peptideMatchSelection, start, end);
+                    PeptideUtils.filterPeptideWithPeptiformsNotIn(peptideMatchSelection, start, end).size()) {
+                tempPeptides = PeptideUtils.filterPeptideWithPeptiformsNotIn(peptideMatchSelection, start, end);
 
                 PeptideUpdateEvent.fire(this, tempPeptides);
 
-                // We should restore the variance IDs too in case they need to be reselected
+                // We should restore the peptiform IDs too in case they need to be reselected
                 if (tempPeptides.size() == peptideMatchSelection.size()) {
-                    VarianceUpdateEvent.fire(this, selectedVariances);
+                    PeptiformUpdateEvent.fire(this, selectedPeptiforms);
                 }
             }
         }
@@ -434,14 +434,14 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             // we stored.
 
             if (tempPeptides.size() !=
-                    PeptideUtils.filterPeptideWithVariancesNotIn(peptideMatchSelection, start, end).size()) {
-                tempPeptides = PeptideUtils.filterPeptideWithVariancesNotIn(peptideMatchSelection, start, end);
+                    PeptideUtils.filterPeptideWithPeptiformsNotIn(peptideMatchSelection, start, end).size()) {
+                tempPeptides = PeptideUtils.filterPeptideWithPeptiformsNotIn(peptideMatchSelection, start, end);
 
                 PeptideUpdateEvent.fire(this, tempPeptides);
 
-                // We should restore the variance IDs too in case they need to be reselected
+                // We should restore the peptiform IDs too in case they need to be reselected
                 if (tempPeptides.size() == peptideMatchSelection.size()) {
-                    VarianceUpdateEvent.fire(this, selectedVariances);
+                    PeptiformUpdateEvent.fire(this, selectedPeptiforms);
                 }
             }
         }
@@ -474,15 +474,15 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             }
         }
 
-        List<Peptide> variances = new ArrayList<>();
-        for (Peptide variance : selectedVariances) {
-            if (peptide.getSequence().equals(variance.getSequence())) {
-                variances.add(variance);
+        List<Peptide> peptiforms = new ArrayList<>();
+        for (Peptide peptiform : selectedPeptiforms) {
+            if (peptide.getSequence().equals(peptiform.getSequence())) {
+                peptiforms.add(peptiform);
             }
         }
 
-        if (!variances.containsAll(selectedVariances)) {
-            changer.addVarianceChange(variances);
+        if (!peptiforms.containsAll(selectedPeptiforms)) {
+            changer.addPeptiformChange(peptiforms);
         }
 
         boolean contained = false;

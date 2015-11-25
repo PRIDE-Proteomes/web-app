@@ -2,7 +2,7 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.sequence;
 
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
@@ -41,7 +41,7 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
                                           PeptideUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler {
     private boolean hiding = true;
-    private List<PeptideWithVariances> currentPeptides = Collections.emptyList();
+    private List<PeptideWithPeptiforms> currentPeptides = Collections.emptyList();
 
     public interface ThisView extends View, HasUiHandlers<SequenceUiHandler> {
         void updateProtein(ProteinAdapter proteinAdapter);

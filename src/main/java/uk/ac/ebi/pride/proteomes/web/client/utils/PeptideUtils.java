@@ -1,6 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.utils;
 
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
@@ -44,13 +44,13 @@ public class PeptideUtils {
      * @param end the end point of the region
      * @return a new list containing only the peptide matches inside the region
      */
-    static public List<PeptideWithVariances> filterPeptideWithVariancesNotIn(List<PeptideWithVariances> peptideMatches, int start, int end) {
-        List<PeptideWithVariances> filteredList = new ArrayList<>();
+    static public List<PeptideWithPeptiforms> filterPeptideWithPeptiformsNotIn(List<PeptideWithPeptiforms> peptideMatches, int start, int end) {
+        List<PeptideWithPeptiforms> filteredList = new ArrayList<>();
 
         if(start == end && start == 0) {
             return peptideMatches;
         }
-        for(PeptideWithVariances peptide : peptideMatches) {
+        for(PeptideWithPeptiforms peptide : peptideMatches) {
             if(inRange(peptide, start, end)) {
                 filteredList.add(peptide);
             }

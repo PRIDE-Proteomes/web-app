@@ -4,7 +4,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.view.client.*;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
@@ -36,7 +36,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
                                           PeptideUpdateEvent.Handler,
                                           TissueUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler,
-                                          VarianceUpdateEvent.Handler {
+                                          PeptiformUpdateEvent.Handler {
     private final ListDataProvider<PeptideMatch> dataProvider = new
                                             ListDataProvider<>();
     private final ListSorter<PeptideMatch> dataSorter = new
@@ -45,7 +45,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
     private boolean groups = true;
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
-    private List<PeptideWithVariances> selectedPeptidesMatches = Collections.emptyList();
+    private List<PeptideWithPeptiforms> selectedPeptidesMatches = Collections.emptyList();
     private List<String> currentTissues = Collections.emptyList();
     private List<String> currentModifications = Collections.emptyList();
     private List<Peptide> selectedVariances = Collections.emptyList();
@@ -86,7 +86,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
-        eventBus.addHandler(VarianceUpdateEvent.getType(), this);
+        eventBus.addHandler(PeptiformUpdateEvent.getType(), this);
         eventBus.addHandler(TissueUpdateEvent.getType(), this);
         eventBus.addHandler(ModificationUpdateEvent.getType(), this);
     }
@@ -155,8 +155,8 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
     }
 
     @Override
-    public void onVarianceUpdateEvent(VarianceUpdateEvent event) {
-        selectedVariances = event.getVariances();
+    public void onPeptiformUpdateEvent(PeptiformUpdateEvent event) {
+        selectedVariances = event.getPeptiforms();
     }
 
     @Override
@@ -223,7 +223,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
             peptideIds.add(peptide.getSequence());
         }
 
-        // we should change the variance selection if it doesn't fit the
+        // we should change the peptiform selection if it doesn't fit the
         // current peptide selection
 
         for(Peptide variance : selectedVariances) {
@@ -235,7 +235,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         changer = new StateChanger();
         changer.addPeptideChange(items);
         if(!variances.containsAll(selectedVariances)) {
-            changer.addVarianceChange(variances);
+            changer.addPeptiformChange(variances);
         }
 
         if(items.isEmpty()) {

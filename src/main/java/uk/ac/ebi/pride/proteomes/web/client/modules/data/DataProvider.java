@@ -1,6 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.data;
 
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithVariances;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.*;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.GroupRetriever;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.retrievers.PeptiformRetriever;
@@ -35,16 +35,16 @@ public class DataProvider implements DataServer, TransactionHandler {
     private final ProteinRetriever proteinRetriever;
 
     // We cache the PeptideLists retrieved as well as store the mapping between
-    // sequence and peptide matches, this way we can build PeptideWithVariances
+    // sequence and peptide matches, this way we can build PeptideWithPeptiforms
     // dynamically while avoid being a time hog.
-    private Map<String, PeptideList> peptideVarianceListCache = new HashMap<>();
+    private Map<String, PeptideList> peptiformListCache = new HashMap<>();
     // the pair represents <peptide sequence, protein accession>
     private Map<Pair<String, String>, List<PeptideMatch>> peptideMatchCache = new HashMap<>();
     //the Map is <peptide sequence, protein acce>
-    private List<Map<Triplet<String, Integer, String>, Boolean>> peptideVarianceRequests = new ArrayList<>();
+    private List<Map<Triplet<String, Integer, String>, Boolean>> peptiformRequests = new ArrayList<>();
     private final PeptiformRetriever peptiformRetriever;
 
-    private Map<String, Peptide> peptideVarianceCache = new HashMap<>();
+    private Map<String, Peptide> peptiformCache = new HashMap<>();
 
     public DataProvider(String webServiceRoot) {
         groupRetriever = new GroupRetriever(webServiceRoot);
@@ -103,11 +103,11 @@ public class DataProvider implements DataServer, TransactionHandler {
                         transaction.getRequestedName()));
                 return;
             }
-            peptideVarianceListCache.put(transaction.getRequestedName(), pepListReceived);
+            peptiformListCache.put(transaction.getRequestedName(), pepListReceived);
 
             // Search for the peptide match requested peptide in the request cache
             // and update the pending requests
-            for(Map<Triplet<String, Integer, String>, Boolean> batchRequest : peptideVarianceRequests) {
+            for(Map<Triplet<String, Integer, String>, Boolean> batchRequest : peptiformRequests) {
                 for(Map.Entry<Triplet<String, Integer, String>, Boolean> entry : batchRequest.entrySet()) {
                     if(transaction.getRequestedName().equals(entry.getKey().getA())) {
                         batchRequest.remove(entry.getKey());
@@ -121,12 +121,12 @@ public class DataProvider implements DataServer, TransactionHandler {
                 }
             }
 
-            // update the variance cache
-            for(Peptide variance : pepListReceived.getPeptideList()) {
-                peptideVarianceCache.put(variance.getId(), variance);
+            // update the peptiform cache
+            for(Peptide peptiform : pepListReceived.getPeptideList()) {
+                peptiformCache.put(peptiform.getId(), peptiform);
             }
 
-            dispatchPeptideVariances();
+            dispatchPeptiforms();
         }
         else if(transaction.getResponse() instanceof ErroneousResult) {
             onErroneousResult(((ErroneousResult) transaction.getResponse()));
@@ -164,12 +164,12 @@ public class DataProvider implements DataServer, TransactionHandler {
 
     @Override
     public boolean isAnyPeptideCached(String sequence) {
-        return peptideVarianceListCache.containsKey(sequence);
+        return peptiformListCache.containsKey(sequence);
     }
 
     @Override
-    public boolean isPeptideVarianceCached(String varianceId) {
-        return peptideVarianceCache.containsKey(varianceId);
+    public boolean isPeptiformCached(String varianceId) {
+        return peptiformCache.containsKey(varianceId);
     }
 
     @Override
@@ -206,7 +206,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public void requestPeptideVariances(List<String> sequences, List<String> proteinIds, List<Integer> positions) {
+    public void requestPeptiforms(List<String> sequences, List<String> proteinIds, List<Integer> positions) {
         Map<Triplet<String, Integer, String>, Boolean> request = new HashMap<>();
 
         for(int i = 0; i < sequences.size() && i < proteinIds.size() && i < positions.size(); i++) {
@@ -219,18 +219,18 @@ public class DataProvider implements DataServer, TransactionHandler {
                 // we could also check whether there's a pending request or not
             }
             else {
-                dispatchPeptideVariances();
+                dispatchPeptiforms();
             }
         }
 
-        peptideVarianceRequests.add(request);
+        peptiformRequests.add(request);
     }
 
     @Override
-    public void requestPeptideVariances(List<String> sequences, List<String> proteinIds) {
+    public void requestPeptiforms(List<String> sequences, List<String> proteinIds) {
         List<Integer> positions = new ArrayList<>(sequences.size());
         while(positions.size() < sequences.size()) positions.add(-1);
-        requestPeptideVariances(sequences, proteinIds, positions);
+        requestPeptiforms(sequences, proteinIds, positions);
     }
 
     @Override
@@ -252,19 +252,19 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public List<PeptideWithVariances> getCachedPeptideVarianceLists(List<String> sequences, List<String> proteinIds, List<Integer> positions) {
-        List<PeptideWithVariances> peptideVarianceLists = new ArrayList<>();
+    public List<PeptideWithPeptiforms> getCachedPeptiformLists(List<String> sequences, List<String> proteinIds, List<Integer> positions) {
+        List<PeptideWithPeptiforms> peptideVarianceLists = new ArrayList<>();
         for(int i = 0; i < sequences.size() && i < proteinIds.size() && i < positions.size(); i++) {
-            peptideVarianceLists.add(getCachedPeptideVarianceList(sequences.get(i), proteinIds.get(i), positions.get(i)));
+            peptideVarianceLists.add(getCachedPeptiformList(sequences.get(i), proteinIds.get(i), positions.get(i)));
         }
         return peptideVarianceLists;
     }
 
     @Override
-    public List<PeptideWithVariances> getCachedPeptideVarianceLists(List<String> sequences, List<String> proteinIds) {
-        List<PeptideWithVariances> peptideVarianceLists = new ArrayList<>();
+    public List<PeptideWithPeptiforms> getCachedPeptiformLists(List<String> sequences, List<String> proteinIds) {
+        List<PeptideWithPeptiforms> peptideVarianceLists = new ArrayList<>();
         for(int i = 0; i < sequences.size() && i < proteinIds.size(); i++) {
-            peptideVarianceLists.add(getCachedPeptideVarianceList(sequences.get(i), proteinIds.get(i)));
+            peptideVarianceLists.add(getCachedPeptiformList(sequences.get(i), proteinIds.get(i)));
         }
         return peptideVarianceLists;
     }
@@ -273,7 +273,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     public List<Peptide> getCachedPeptideVariances(List<String> varianceId) {
         List<Peptide> varianceList = new ArrayList<>();
         for (String id : varianceId) {
-            varianceList.add(getCachedPeptideVariance(id));
+            varianceList.add(getCachedPeptiform(id));
         }
         return varianceList;
     }
@@ -289,7 +289,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public PeptideWithVariances getCachedPeptideVarianceList(String sequence, String proteinId, int position) {
+    public PeptideWithPeptiforms getCachedPeptiformList(String sequence, String proteinId, int position) {
         PeptideMatch match = null;
 
         for(PeptideMatch peptideMatch : peptideMatchCache.get(new Pair<>(sequence, proteinId))) {
@@ -298,18 +298,18 @@ public class DataProvider implements DataServer, TransactionHandler {
                 break;
             }
         }
-        return new PeptideWithVariances(match, peptideVarianceListCache.get(sequence));
+        return new PeptideWithPeptiforms(match, peptiformListCache.get(sequence));
     }
 
     @Override
-    public PeptideWithVariances getCachedPeptideVarianceList(String sequence, String proteinId) {
+    public PeptideWithPeptiforms getCachedPeptiformList(String sequence, String proteinId) {
         PeptideMatch match = peptideMatchCache.get(new Pair<>(sequence, proteinId)).isEmpty() ? null : peptideMatchCache.get(new Pair<>(sequence, proteinId)).get(0);
-        return new PeptideWithVariances(match, peptideVarianceListCache.get(sequence));
+        return new PeptideWithPeptiforms(match, peptiformListCache.get(sequence));
     }
 
     @Override
-    public Peptide getCachedPeptideVariance(String varianceId) {
-        return peptideVarianceCache.get(varianceId);
+    public Peptide getCachedPeptiform(String varianceId) {
+        return peptiformCache.get(varianceId);
     }
 
     private void onErroneousResult(ErroneousResult error) {
@@ -354,10 +354,10 @@ public class DataProvider implements DataServer, TransactionHandler {
         client.onProteinsRetrieved(proteins);
     }
 
-    private void dispatchPeptideVariances() {
+    private void dispatchPeptiforms() {
         List<Map<Triplet<String, Integer, String>, Boolean>> toRemove = new ArrayList<>();
-        List<PeptideWithVariances> peptideVariances = new ArrayList<>();
-        for(Map<Triplet<String, Integer, String>, Boolean> batchRequest : peptideVarianceRequests) {
+        List<PeptideWithPeptiforms> peptiforms = new ArrayList<>();
+        for(Map<Triplet<String, Integer, String>, Boolean> batchRequest : peptiformRequests) {
             if(!batchRequest.containsValue(false)) {
                 toRemove.add(batchRequest);
 
@@ -370,13 +370,13 @@ public class DataProvider implements DataServer, TransactionHandler {
                             break;
                         }
                     }
-                    peptideVariances.add(new PeptideWithVariances(match, peptideVarianceListCache.get(entry.getKey().getA())));
+                    peptiforms.add(new PeptideWithPeptiforms(match, peptiformListCache.get(entry.getKey().getA())));
                 }
             }
         }
         for(Map<Triplet<String, Integer, String>, Boolean> batchRequest : toRemove) {
-            peptideVarianceRequests.remove(batchRequest);
+            peptiformRequests.remove(batchRequest);
         }
-        client.onPeptideVarianceListsRetrieved(peptideVariances);
+        client.onPeptiformListsRetrieved(peptiforms);
     }
 }

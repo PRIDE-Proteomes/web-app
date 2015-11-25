@@ -42,6 +42,8 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @UiField
     Label proteinEvidence;
     @UiField
+    Label genes;
+    @UiField
     Label description;
     @UiField
     FlowPanel attributes;
@@ -93,11 +95,12 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @Override
     public void updateGeneGroupLink(String geneGroupId) {
         if (geneGroupId != null && !geneGroupId.isEmpty()) {
-            this.geneGroupLink.setHref("#group=" + geneGroupId);
-            this.geneGroupLink.setText("Gene");
-            this.geneGroupLink.setTitle("Go To Gene of the Protein");
+            geneGroupLink.setHref("#group=" + geneGroupId);
+            geneGroupLink.setText("Gene");
+            geneGroupLink.setTitle("Go To Gene of the Protein");
+            uniqueToGeneBox.setVisible(true);
         } else {
-            this.geneGroupLink.setVisible(false);
+            geneGroupLink.setVisible(false);
             uniqueToGeneBox.setVisible(false);
         }
     }
@@ -105,7 +108,8 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @Override
     public void updateUniquePeptideToProteinCount(int count) {
         if (count != 0) {
-            this.uniquePeptideToProteinCount.setText(String.valueOf(count));
+            uniquePeptideToProteinCount.setText(String.valueOf(count));
+            uniqueToProteinBox.setVisible(true);
         } else {
             uniqueToProteinBox.setVisible(false);
         }
@@ -114,7 +118,8 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @Override
     public void updateUniquePeptideToGeneCount(int count) {
         if (count != 0) {
-            this.uniquePeptideToGeneCount.setText(String.valueOf(count));
+            uniquePeptideToGeneCount.setText(String.valueOf(count));
+            uniqueToGeneBox.setVisible(true);
         } else {
             uniqueToGeneBox.setVisible(false);
         }
@@ -123,7 +128,8 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @Override
     public void updateNonUniquePeptidesCount(int count) {
         if (count != 0) {
-            this.nonUniquePeptidesCount.setText(String.valueOf(count));
+            nonUniquePeptidesCount.setText(String.valueOf(count));
+            nonUniqueBox.setVisible(true);
         } else {
             nonUniqueBox.setVisible(false);
         }
@@ -137,25 +143,21 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @Override
     public void updateGeneSymbol(String geneSymbol) {
         this.geneSymbol.setText(geneSymbol);
-
     }
 
     @Override
     public void updateAlternativeName(String alternativeName) {
         this.altId.setText(alternativeName);
-
     }
 
     @Override
     public void updateSpecies(String species) {
         this.species.setText(species);
-
     }
 
     @Override
     public void updateProteinEvidence(String proteinEvidence) {
         this.proteinEvidence.setText(proteinEvidence);
-
     }
 
     @Override

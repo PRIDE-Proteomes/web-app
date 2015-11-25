@@ -95,11 +95,15 @@
                             <g:InlineLabel addStyleNames="{style.label}">Species</g:InlineLabel>
                             <g:InlineLabel ui:field="species"/>
                             <br/>
-                            <g:InlineLabel addStyleNames="{style.label}">Gene (UniProtKB)</g:InlineLabel>
+                            <g:InlineLabel addStyleNames="{style.label}">Gene Name (UniProtKB)</g:InlineLabel>
                             <g:InlineLabel ui:field="geneSymbol"/>
                             <br/>
                             <g:InlineLabel addStyleNames="{style.label}">UniProtKB Protein Evidence</g:InlineLabel>
                             <g:InlineLabel ui:field="proteinEvidence"/>
+                            <br/>
+                            <g:InlineLabel addStyleNames="{style.label}">Genome annotation</g:InlineLabel>
+                            <g:InlineLabel ui:field="genes"/>
+
                         </p>
                     </g:HTMLPanel>
 

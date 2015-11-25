@@ -13,26 +13,26 @@ import java.util.Set;
  *         Date: 17/01/14
  *         Time: 11:51
  */
-public class PeptideWithVariances implements PeptideMatch, PeptideList {
-    private static class EmptyPeptideWithVariances {
-        private static final PeptideWithVariances instance = new PeptideWithVariances();
+public class PeptideWithPeptiforms implements PeptideMatch, PeptideList {
+    private static class EmptyPeptideWithPeptiforms {
+        private static final PeptideWithPeptiforms instance = new PeptideWithPeptiforms();
     }
 
     private final PeptideMatch match;
     private final PeptideList list;
 
-    public PeptideWithVariances(PeptideMatch match, PeptideList list) {
+    public PeptideWithPeptiforms(PeptideMatch match, PeptideList list) {
         this.match = match;
         this.list = list;
     }
 
-    private PeptideWithVariances() {
+    private PeptideWithPeptiforms() {
         this.match = EmptyPeptideMatch.getInstance();
         this.list = new EmptyPeptideList();
     }
 
-    public static PeptideWithVariances emptyPeptideWithVariances() {
-        return EmptyPeptideWithVariances.instance;
+    public static PeptideWithPeptiforms emptyPeptideWithPeptiforms() {
+        return EmptyPeptideWithPeptiforms.instance;
     }
 
     @Override

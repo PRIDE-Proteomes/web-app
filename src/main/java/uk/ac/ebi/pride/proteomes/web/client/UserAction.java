@@ -12,7 +12,7 @@ public class UserAction {
     private final Type type;
 
     public enum Type {
-        group, protein, region, peptide, modification, tissue, variance, none
+        group, protein, region, peptide, modification, tissue, peptiform, none
     }
 
     public UserAction(Type type, String name) {

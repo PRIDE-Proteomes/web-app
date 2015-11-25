@@ -42,7 +42,7 @@ public class StateChanger {
     }
 
     private enum Type {
-        Group, Protein, Region, Peptide, Variance, Modification, Tissue
+        Group, Protein, Region, Peptide, Peptiform, Modification, Tissue
     }
 
     private Queue<Change> orderedChanges = new LinkedList<>();
@@ -83,13 +83,13 @@ public class StateChanger {
                                       State.getToken(peptideIds)));
     }
 
-    public void addVarianceChange(Collection<Peptide> varianceSelection) {
-        Collection<String> varianceIDs = new ArrayList<>();
-        for(Peptide variance : varianceSelection) {
-            varianceIDs.add(variance.getId());
+    public void addPeptiformChange(Collection<Peptide> peptiformSelection) {
+        Collection<String> peptiformIDs = new ArrayList<>();
+        for(Peptide variance : peptiformSelection) {
+            peptiformIDs.add(variance.getId());
         }
-        orderedChanges.add(new Change(Type.Variance,
-                                      State.getToken(varianceIDs)));
+        orderedChanges.add(new Change(Type.Peptiform,
+                                      State.getToken(peptiformIDs)));
     }
 
     public void addModificationChange(Collection<String> modificationSelection) {
@@ -134,7 +134,7 @@ public class StateChanger {
                     changesToApply.get(Type.Protein, oldProteins),
                     changesToApply.get(Type.Region, oldRegions),
                     changesToApply.get(Type.Peptide, oldPeptides),
-                    changesToApply.get(Type.Variance, oldVariances),
+                    changesToApply.get(Type.Peptiform, oldVariances),
                     changesToApply.get(Type.Modification, oldModifications),
                     changesToApply.get(Type.Tissue, oldTissues));
         }
@@ -160,8 +160,8 @@ public class StateChanger {
         sb.append(changesToApply.containsKey(Type.Peptide) ?
                     "peptide=" + changesToApply.get(Type.Peptide) + State.sepTypes:
                     "");
-        sb.append(changesToApply.containsKey(Type.Variance) ?
-                    "variance=" + changesToApply.get(Type.Variance) + State.sepTypes:
+        sb.append(changesToApply.containsKey(Type.Peptiform) ?
+                    "peptiform=" + changesToApply.get(Type.Peptiform) + State.sepTypes:
                     "");
         sb.append(changesToApply.containsKey(Type.Modification) ?
                     "modification=" + changesToApply.get(Type.Modification) + State.sepTypes:
