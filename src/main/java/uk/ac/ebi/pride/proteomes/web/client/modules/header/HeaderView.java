@@ -20,29 +20,17 @@ import java.util.List;
  */
 public class HeaderView implements HeaderPresenter.ThisView {
 
-    @UiTemplate("HeaderView.ui.xml")
-    interface HeaderUiBinder extends UiBinder<HTMLPanel, HeaderView> {
-    }
-
     private static HeaderUiBinder ourUiBinder = GWT.create(HeaderUiBinder.class);
-
     @UiField
     Anchor title;
-
-    @UiField
-    Anchor upGroupLink;
     @UiField
     Anchor geneGroupLink;
-
     @UiField
     InlineLabel uniquePeptideToProteinCount;
-    @UiField
-    InlineLabel uniquePeptideToIsoformCount;
     @UiField
     InlineLabel uniquePeptideToGeneCount;
     @UiField
     InlineLabel nonUniquePeptidesCount;
-
     @UiField
     Label altId;
     @UiField
@@ -55,22 +43,22 @@ public class HeaderView implements HeaderPresenter.ThisView {
     Label proteinEvidence;
     @UiField
     Label description;
-
-
     @UiField
     FlowPanel attributes;
-
     @UiField
     HTMLPanel panel;
-
     @UiField
     HTMLPanel summaryPanel;
-
     @UiField
     HTMLPanel groupSummaryPanel;
-
     @UiField
     HTMLPanel proteinSummaryPanel;
+    @UiField
+    HTMLPanel uniqueToProteinBox;
+    @UiField
+    HTMLPanel uniqueToGeneBox;
+    @UiField
+    HTMLPanel nonUniqueBox;
 
     private HTMLPanel root;
     private ModuleContainer outerBox;
@@ -103,44 +91,42 @@ public class HeaderView implements HeaderPresenter.ThisView {
     }
 
     @Override
-    public void updateUpGroupLink(String upGroupId) {
-        if (upGroupId.contains("-")) {
-            upGroupId = upGroupId.substring(0, upGroupId.indexOf("-"));
-        }
-        this.upGroupLink.setHref("#group=" + upGroupId);
-        this.upGroupLink.setText("Isoforms of the Protein");
-        this.upGroupLink.setTitle("Go To Isoforms of the Protein");
-
-    }
-
-    @Override
     public void updateGeneGroupLink(String geneGroupId) {
         if (geneGroupId != null && !geneGroupId.isEmpty()) {
             this.geneGroupLink.setHref("#group=" + geneGroupId);
             this.geneGroupLink.setText("Gene");
             this.geneGroupLink.setTitle("Go To Gene of the Protein");
-        } else
+        } else {
             this.geneGroupLink.setVisible(false);
+            uniqueToGeneBox.setVisible(false);
+        }
     }
 
     @Override
     public void updateUniquePeptideToProteinCount(int count) {
-        this.uniquePeptideToProteinCount.setText(String.valueOf(count));
-    }
-
-    @Override
-    public void updateUniquePeptideToIsoformCount(int count) {
-        this.uniquePeptideToIsoformCount.setText(String.valueOf(count));
+        if (count != 0) {
+            this.uniquePeptideToProteinCount.setText(String.valueOf(count));
+        } else {
+            uniqueToProteinBox.setVisible(false);
+        }
     }
 
     @Override
     public void updateUniquePeptideToGeneCount(int count) {
-        this.uniquePeptideToGeneCount.setText(String.valueOf(count));
+        if (count != 0) {
+            this.uniquePeptideToGeneCount.setText(String.valueOf(count));
+        } else {
+            uniqueToGeneBox.setVisible(false);
+        }
     }
 
     @Override
     public void updateNonUniquePeptidesCount(int count) {
-        this.nonUniquePeptidesCount.setText(String.valueOf(count));
+        if (count != 0) {
+            this.nonUniquePeptidesCount.setText(String.valueOf(count));
+        } else {
+            nonUniqueBox.setVisible(false);
+        }
     }
 
     @Override
@@ -222,5 +208,9 @@ public class HeaderView implements HeaderPresenter.ThisView {
     @Override
     public void displayLoadingMessage() {
         outerBox.setContent(ModuleContainer.getLoadingPanel());
+    }
+
+    @UiTemplate("HeaderView.ui.xml")
+    interface HeaderUiBinder extends UiBinder<HTMLPanel, HeaderView> {
     }
 }

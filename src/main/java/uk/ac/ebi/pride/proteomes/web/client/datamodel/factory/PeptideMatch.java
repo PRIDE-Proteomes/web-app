@@ -8,10 +8,13 @@ import java.util.Set;
  *         Time: 16:52
  */
 public interface PeptideMatch extends Peptide {
+
     public Integer getPosition();
+
     public Integer getUniqueness();
+
     public Set<String> getSharedProteins();
-    public Set<String> getSharedUpEntries();
+
     public Set<String> getSharedGenes();
 
 }

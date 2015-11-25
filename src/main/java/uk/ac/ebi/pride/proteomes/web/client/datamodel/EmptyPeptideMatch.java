@@ -23,16 +23,11 @@ public class EmptyPeptideMatch implements PeptideMatch{
 
     @Override
     public Integer getUniqueness() {
-        return 0;
+        return 0;  //NON_UNIQUE
     }
 
     @Override
     public Set<String> getSharedProteins() {
-        return Collections.emptySet();
-    }
-
-    @Override
-    public Set<String> getSharedUpEntries() {
         return Collections.emptySet();
     }
 

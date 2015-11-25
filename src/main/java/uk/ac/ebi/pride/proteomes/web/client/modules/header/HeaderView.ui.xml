@@ -104,7 +104,7 @@
                     </g:HTMLPanel>
 
                     <g:FlowPanel addStyleNames="{style.horizontal} {style.summary}">
-                        <g:HTMLPanel addStyleNames="{style.item} {resources.style.uniqueToProteinBox}">
+                        <g:HTMLPanel ui:field="uniqueToProteinBox" addStyleNames="{style.item} {resources.style.uniqueToProteinBox}">
                             <g:SimplePanel addStyleNames="{style.text}">
                                 <g:InlineLabel>Unique Peptides to the Protein</g:InlineLabel>
                             </g:SimplePanel>
@@ -114,20 +114,9 @@
                                 </g:FlowPanel>
                             </g:FlowPanel>
                         </g:HTMLPanel>
-                        <g:HTMLPanel addStyleNames="{style.item} {resources.style.uniqueToUpEntryBox}">
+                        <g:HTMLPanel ui:field="uniqueToGeneBox" addStyleNames="{style.item} {resources.style.uniqueToGeneBox}">
                             <g:HTMLPanel addStyleNames="{style.text}">
-                                <g:InlineLabel>Shared Peptides with</g:InlineLabel>
-                                <g:Anchor ui:field="upGroupLink"/>
-                            </g:HTMLPanel>
-                            <g:FlowPanel addStyleNames="{style.circle}">
-                                <g:FlowPanel addStyleNames="{style.content}">
-                                    <g:InlineLabel ui:field="uniquePeptideToIsoformCount"/>
-                                </g:FlowPanel>
-                            </g:FlowPanel>
-                        </g:HTMLPanel>
-                        <g:HTMLPanel addStyleNames="{style.item} {resources.style.uniqueToGeneBox}">
-                            <g:HTMLPanel addStyleNames="{style.text}">
-                                <g:InlineLabel>Shared Peptides with Proteins Encoded by the same</g:InlineLabel>
+                                <g:InlineLabel>Unique Peptides to the Proteins Encoded by the same</g:InlineLabel>
                                 <g:Anchor ui:field="geneGroupLink"/>
                             </g:HTMLPanel>
                             <g:FlowPanel addStyleNames="{style.circle}">
@@ -136,7 +125,7 @@
                                 </g:FlowPanel>
                             </g:FlowPanel>
                         </g:HTMLPanel>
-                        <g:HTMLPanel addStyleNames="{style.item} {resources.style.nonUniquePeptideBox}">
+                        <g:HTMLPanel ui:field="nonUniqueBox" addStyleNames="{style.item} {resources.style.nonUniquePeptideBox}">
                             <g:SimplePanel addStyleNames="{style.text}">
                                 <g:InlineLabel>Shared Peptides</g:InlineLabel>
                             </g:SimplePanel>

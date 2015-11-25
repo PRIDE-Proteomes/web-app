@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface Protein {
     public String getAccession();
-    public String getGene();
+    public List<String> getGenes();
     public int getTaxonID();
     public String getSequence();
 
@@ -30,7 +30,6 @@ public interface Protein {
     public List<PeptideMatch> getPeptides();
     public List<Feature> getFeatures();
     public int getUniquePeptideToProteinCount();
-    public int getUniquePeptideToIsoformCount();
     public int getUniquePeptideToGeneCount();
     public int getNonUniquePeptidesCount();
 

@@ -14,12 +14,8 @@ public interface Resources extends ClientBundle {
 
     interface PeptideStyle extends CssResource {
 
-
         @ClassName("unique-to-gene-color")
         String uniqueToGeneColor();
-
-        @ClassName("unique-to-up-entry-color")
-        String uniqueToUpEntryColor();
 
         @ClassName("unique-to-protein-color")
         String uniqueToProteinColor();
@@ -33,12 +29,8 @@ public interface Resources extends ClientBundle {
         @ClassName("unique-to-gene-box")
         String uniqueToGeneBox();
 
-        @ClassName("unique-to-up–entry–box")
-        String uniqueToUpEntryBox();
-
         @ClassName("non-unique-peptide-box")
         String nonUniquePeptideBox();
-
 
     }
 

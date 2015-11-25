@@ -50,7 +50,7 @@ class ProteinModificationAdapter implements ProteinModificationHandler {
 
     @Override
     public Integer getUniqueness() {
-        return 0; // what is exactly this "uniqueness"?
+        return 0; //Uniqueness.NON_UNIQUE
     }
 
     @Override

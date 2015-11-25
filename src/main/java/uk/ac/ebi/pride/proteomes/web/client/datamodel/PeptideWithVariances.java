@@ -51,11 +51,6 @@ public class PeptideWithVariances implements PeptideMatch, PeptideList {
     }
 
     @Override
-    public Set<String> getSharedUpEntries() {
-        return match.getSharedUpEntries();
-    }
-
-    @Override
     public Set<String> getSharedGenes() {
         return match.getSharedGenes();
     }

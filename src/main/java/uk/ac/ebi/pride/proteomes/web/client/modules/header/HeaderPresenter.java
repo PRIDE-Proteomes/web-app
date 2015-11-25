@@ -31,10 +31,8 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
 
     public interface ThisView extends View {
         public void updateTitle(String title, String accession, String link);
-        public void updateUpGroupLink(String upGroupId);
         public void updateGeneGroupLink(String geneGroupId);
         public void updateUniquePeptideToProteinCount(int count);
-        public void updateUniquePeptideToIsoformCount(int count);
         public void updateUniquePeptideToGeneCount(int count);
         public void updateNonUniquePeptidesCount(int count);
         public void updateName(String name);
@@ -102,22 +100,28 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
     @Override
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
         List<Protein> proteins = event.getProteins();
+        String gene = null;
+
         if (!hiding && event.getProteins().size() > 0) {
 
             if (!groupView) {
+                final Protein protein = proteins.get(0);
+
                 getView().clearTitle();
-                getView().updateTitle(proteins.get(0).getName() + " (" + proteins.get(0).getAccession() + ")", proteins.get(0).getAccession(), UNIPROTKB_URL);
-                getView().updateUpGroupLink(proteins.get(0).getAccession());
-                getView().updateGeneGroupLink(proteins.get(0).getGene());
-                getView().updateUniquePeptideToProteinCount(proteins.get(0).getUniquePeptideToProteinCount());
-                getView().updateUniquePeptideToIsoformCount(proteins.get(0).getUniquePeptideToIsoformCount());
-                getView().updateUniquePeptideToGeneCount(proteins.get(0).getUniquePeptideToGeneCount());
-                getView().updateNonUniquePeptidesCount(proteins.get(0).getNonUniquePeptidesCount());
-                getView().updateName(proteins.get(0).getName());
-                getView().updateAlternativeName(proteins.get(0).getAlternativeName());
-                getView().updateSpecies(proteins.get(0).getSpecies());
-                getView().updateGeneSymbol(proteins.get(0).getGeneSymbol());
-                getView().updateProteinEvidence(proteins.get(0).getProteinEvidence());
+                getView().updateTitle(protein.getName() + " (" + protein.getAccession() + ")", protein.getAccession(), UNIPROTKB_URL);
+                if(protein.getGenes()!= null && !protein.getGenes().isEmpty() && protein.getGenes().size()==1){
+                    gene = protein.getGenes().get(0);
+                }
+
+                getView().updateGeneGroupLink(gene);
+                getView().updateUniquePeptideToProteinCount(protein.getUniquePeptideToProteinCount());
+                getView().updateUniquePeptideToGeneCount(protein.getUniquePeptideToGeneCount());
+                getView().updateNonUniquePeptidesCount(protein.getNonUniquePeptidesCount());
+                getView().updateName(protein.getName());
+                getView().updateAlternativeName(protein.getAlternativeName());
+                getView().updateSpecies(protein.getSpecies());
+                getView().updateGeneSymbol(protein.getGeneSymbol());
+                getView().updateProteinEvidence(protein.getProteinEvidence());
 
                 //For groups
                 getView().clearProperties();

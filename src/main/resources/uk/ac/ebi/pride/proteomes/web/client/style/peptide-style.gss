@@ -3,12 +3,10 @@
 
 /*@import "peptide-colours.gss";*/
 @def UNIQUE_TO_PROTEIN  eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_PROTEIN_COLOR");
-@def UNIQUE_TO_UP_ENTRY eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_UP_ENTRY_COLOR");
 @def UNIQUE_TO_GENE eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_GENE_COLOR");
 @def NON_UNIQUE_PEPTIDE eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.NON_UNIQUE_PEPTIDE_COLOR");
 
 @def UNIQUE_TO_PROTEIN_DARKER  eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_PROTEIN_DARKER_COLOR");
-@def UNIQUE_TO_UP_ENTRY_DARKER eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_UP_ENTRY_DARKER_COLOR");
 @def UNIQUE_TO_GENE_DARKER eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.UNIQUE_TO_GENE_DARKER_COLOR");
 @def NON_UNIQUE_PEPTIDE_DARKER eval("uk.ac.ebi.pride.widgets.client.protein.constants.Colors.NON_UNIQUE_PEPTIDE_DARKER_COLOR");
 
@@ -20,10 +18,6 @@
 
 .unique-to-gene-color {
     background-color: UNIQUE_TO_GENE;
-}
-
-.unique-to-up-entry-color {
-    background-color: UNIQUE_TO_UP_ENTRY;
 }
 
 .unique-to-protein-color {
@@ -46,20 +40,6 @@
     /* @alternate */ background-image: -webkit-linear-gradient(UNIQUE_TO_PROTEIN, UNIQUE_TO_PROTEIN_DARKER);
     /* @alternate */ background-image: linear-gradient(top,UNIQUE_TO_PROTEIN, UNIQUE_TO_PROTEIN_DARKER);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='UNIQUE_TO_PROTEIN', EndColorStr='UNIQUE_TO_PROTEIN_DARKER');
-}
-
-.unique-to-up–entry–box {
-    color: TEXT_LIGHT_COLOR;
-    text-shadow: TEXT_SHADOW_COLOR 1px 1px;
-    border: 1px solid BORDER_COLOR;
-    border-right-color: BORDER_RIGHT_COLOR;
-    border-bottom-color: BORDER_BOTTOM_COLOR;
-    background-color: UNIQUE_TO_UP_ENTRY;
-    background-image: -moz-linear-gradient(top, UNIQUE_TO_UP_ENTRY, UNIQUE_TO_UP_ENTRY_DARKER);
-    /* @alternate */ background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, UNIQUE_TO_UP_ENTRY), color-stop(1, UNIQUE_TO_UP_ENTRY_DARKER));
-    /* @alternate */ background-image: -webkit-linear-gradient(UNIQUE_TO_UP_ENTRY, UNIQUE_TO_UP_ENTRY_DARKER);
-    /* @alternate */ background-image: linear-gradient(top, UNIQUE_TO_UP_ENTRY, UNIQUE_TO_UP_ENTRY_DARKER);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='UNIQUE_TO_UP_ENTRY', EndColorStr='UNIQUE_TO_UP_ENTRY_DARKER');
 }
 
 .unique-to-gene-box {

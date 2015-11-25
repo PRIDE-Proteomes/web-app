@@ -85,11 +85,6 @@ public class PeptideAdapter implements PeptideHandler, PeptideMatch {
     }
 
     @Override
-    public Set<String> getSharedUpEntries() {
-        return peptide.getSharedUpEntries();
-    }
-
-    @Override
     public Set<String> getSharedGenes() {
         return peptide.getSharedGenes();
     }
