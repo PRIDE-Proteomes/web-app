@@ -5,7 +5,7 @@
     <parent>
         <groupId>uk.ac.ebi.pride.proteomes.maven</groupId>
         <artifactId>parent</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
 
     <name>PRIDE Proteomes Web Application</name>
