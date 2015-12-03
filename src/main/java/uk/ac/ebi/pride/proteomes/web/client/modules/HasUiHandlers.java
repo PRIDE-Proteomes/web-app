@@ -9,5 +9,5 @@ import java.util.Collection;
  */
 public interface HasUiHandlers<H extends UiHandler> {
     Collection<H> getUiHandlers();
-    public void addUiHandler(H handler);
+    void addUiHandler(H handler);
 }

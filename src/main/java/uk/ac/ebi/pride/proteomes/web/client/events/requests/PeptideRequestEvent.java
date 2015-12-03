@@ -11,7 +11,7 @@ import com.google.gwt.event.shared.HasHandlers;
  */
 public class PeptideRequestEvent extends GwtEvent<PeptideRequestEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onPeptideRequestEvent(PeptideRequestEvent event);
+        void onPeptideRequestEvent(PeptideRequestEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

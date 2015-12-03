@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class RegionUpdateEvent extends GwtEvent<RegionUpdateEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onRegionUpdateEvent(RegionUpdateEvent event);
+        void onRegionUpdateEvent(RegionUpdateEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

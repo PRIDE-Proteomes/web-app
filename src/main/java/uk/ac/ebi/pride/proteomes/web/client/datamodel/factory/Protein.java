@@ -8,30 +8,30 @@ import java.util.List;
  *         Time: 15:59
  */
 public interface Protein {
-    public String getAccession();
-    public List<String> getGenes();
-    public int getTaxonID();
-    public String getSequence();
+    String getAccession();
+    List<String> getGenes();
+    int getTaxonID();
+    String getSequence();
 
     @Deprecated
-    public String getDescription();
+    String getDescription();
 
     //Protein Description
-    public String getName();
-    public String getAlternativeName();
-    public String getSpecies();
-    public String getGeneSymbol();
-    public String getProteinEvidence();
+    String getName();
+    String getAlternativeName();
+    String getSpecies();
+    String getGeneSymbol();
+    String getProteinEvidence();
 
-    public List<ModifiedLocation> getModifiedLocations();
-    public List<String> getTissues();
-    public String getCoverage();
-    public List<List<Integer>> getRegions();
-    public List<PeptideMatch> getPeptides();
-    public List<Feature> getFeatures();
-    public int getUniquePeptideToProteinCount();
-    public int getUniquePeptideToGeneCount();
-    public int getNonUniquePeptidesCount();
+    List<ModifiedLocation> getModifiedLocations();
+    List<String> getTissues();
+    String getCoverage();
+    List<List<Integer>> getRegions();
+    List<PeptideMatch> getPeptides();
+    List<Feature> getFeatures();
+    int getUniquePeptideToProteinCount();
+    int getUniquePeptideToGeneCount();
+    int getNonUniquePeptidesCount();
 
 
 }

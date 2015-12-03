@@ -49,15 +49,15 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
 
 
     public interface ThisView extends View, HasUiHandlers<CoverageUiHandler> {
-        public void updateProtein(ProteinAdapter protein);
-        public void updateRegionSelection(int start, int end);
-        public void resetRegionSelection();
-        public void updatePeptideSelection(List<PeptideAdapter> peptideSelection);
-        public void resetPeptideSelection();
-        public void updateModificationHighlight(ModificationAdapter mod);
-        public void updateModificationHighlight(int start, int end);
-        public void resetModificationHighlight();
-        public void displayLoadingMessage();
+        void updateProtein(ProteinAdapter protein);
+        void updateRegionSelection(int start, int end);
+        void resetRegionSelection();
+        void updatePeptideSelection(List<PeptideAdapter> peptideSelection);
+        void resetPeptideSelection();
+        void updateModificationHighlight(ModificationAdapter mod);
+        void updateModificationHighlight(int start, int end);
+        void resetModificationHighlight();
+        void displayLoadingMessage();
     }
 
     /* TODO optimize the events that are doing the same to avoid triggering more that one the same event */

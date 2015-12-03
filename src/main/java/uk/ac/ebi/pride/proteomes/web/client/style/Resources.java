@@ -10,7 +10,7 @@ import com.google.gwt.resources.client.CssResource;
  */
 public interface Resources extends ClientBundle {
 
-    public static final Resources INSTANCE =  GWT.create(Resources.class);
+    Resources INSTANCE =  GWT.create(Resources.class);
 
     interface PeptideStyle extends CssResource {
 

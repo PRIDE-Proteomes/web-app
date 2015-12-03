@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class GroupUpdateEvent extends GwtEvent<GroupUpdateEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onGroupUpdateEvent(GroupUpdateEvent event);
+        void onGroupUpdateEvent(GroupUpdateEvent event);
     }
 
     private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<>();

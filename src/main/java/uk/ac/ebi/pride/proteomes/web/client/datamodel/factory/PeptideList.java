@@ -8,5 +8,5 @@ import java.util.List;
  *         Time: 14:17
  */
 public interface PeptideList {
-    public List<Peptide> getPeptideList();
+    List<Peptide> getPeptideList();
 }

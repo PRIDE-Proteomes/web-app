@@ -11,7 +11,7 @@ import com.google.gwt.event.shared.HasHandlers;
  */
 public class GroupRequestEvent extends GwtEvent<GroupRequestEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onGroupRequestEvent(GroupRequestEvent event);
+        void onGroupRequestEvent(GroupRequestEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

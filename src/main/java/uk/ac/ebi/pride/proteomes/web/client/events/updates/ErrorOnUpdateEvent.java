@@ -11,7 +11,7 @@ import com.google.gwt.event.shared.HasHandlers;
  */
 public class ErrorOnUpdateEvent extends GwtEvent<ErrorOnUpdateEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onUpdateErrorEvent(ErrorOnUpdateEvent event);
+        void onUpdateErrorEvent(ErrorOnUpdateEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

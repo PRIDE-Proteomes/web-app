@@ -11,7 +11,7 @@ import com.google.gwt.event.shared.HasHandlers;
  */
 public class LoadingDataEvent extends GwtEvent<LoadingDataEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onLoadingDataEvent(LoadingDataEvent event);
+        void onLoadingDataEvent(LoadingDataEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

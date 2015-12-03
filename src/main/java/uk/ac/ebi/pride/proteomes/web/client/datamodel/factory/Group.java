@@ -9,10 +9,10 @@ import java.util.Map;
  *         Time: 15:59
  */
 public interface Group {
-    public String getId();
-    public int getTaxonId();
-    public String getDescription();
-    public List<String> getTissues();
-    public List<String> getMemberProteins();
-    public Map<String, List<String>> getUniquePeptides();
+    String getId();
+    int getTaxonId();
+    String getDescription();
+    List<String> getTissues();
+    List<String> getMemberProteins();
+    Map<String, List<String>> getUniquePeptides();
 }

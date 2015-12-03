@@ -8,12 +8,12 @@ import java.util.List;
  *         Time: 09:52
  */
 public interface Peptide {
-    public String getId();
-    public boolean getSymbolic();
-    public String getSequence();
-    public int getTaxonID();
-    public List<ModifiedLocation> getModifiedLocations();
-    public List<String> getTissues();
-    public List<String> getAssays();
-    public List<String> getClusters();
+    String getId();
+    boolean getSymbolic();
+    String getSequence();
+    int getTaxonID();
+    List<ModifiedLocation> getModifiedLocations();
+    List<String> getTissues();
+    List<String> getAssays();
+    List<String> getClusters();
 }

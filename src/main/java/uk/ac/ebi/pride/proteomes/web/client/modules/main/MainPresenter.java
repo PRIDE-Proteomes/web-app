@@ -26,10 +26,10 @@ public class MainPresenter extends Presenter<MainPresenter.ThisView>
 
 
     public interface ThisView extends View {
-        public void hideMessage();
-        public void showLoadingMessage();
-        public void showInfoMessage(String message);
-        public AcceptsOneWidget getPlaceHolder(int i);
+        void hideMessage();
+        void showLoadingMessage();
+        void showInfoMessage(String message);
+        AcceptsOneWidget getPlaceHolder(int i);
     }
 
     private final List<Presenter> presenterList;

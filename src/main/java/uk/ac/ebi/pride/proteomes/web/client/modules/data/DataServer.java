@@ -19,41 +19,41 @@ import java.util.List;
  *         Time: 15:05
  */
 public interface DataServer {
-    public interface DataClient {
-        public void onGroupsRetrieved(Collection<Group> groups);
-        public void onProteinsRetrieved(Collection<Protein> proteins);
-        public void onPeptiformListsRetrieved(Collection<PeptideWithPeptiforms> peptides);
+    interface DataClient {
+        void onGroupsRetrieved(Collection<Group> groups);
+        void onProteinsRetrieved(Collection<Protein> proteins);
+        void onPeptiformListsRetrieved(Collection<PeptideWithPeptiforms> peptides);
 
-        public void onRetrievalError(ErroneousResult invalidResponse);
+        void onRetrievalError(ErroneousResult invalidResponse);
     }
-    public interface ErroneousResult {
-        public Class getRequestedType();
-        public String getRequestedIdentifier();
-        public String getErrorDescription();
+    interface ErroneousResult {
+        Class getRequestedType();
+        String getRequestedIdentifier();
+        String getErrorDescription();
     }
 
-    public void bind(DataClient client);
+    void bind(DataClient client);
 
-    public boolean isGroupCached(String id);
-    public boolean isProteinCached(String accession);
-    public boolean isPeptideCached(String sequence, String proteinId, int position);
-    public boolean isAnyPeptideCached(String sequence);
-    public boolean isPeptiformCached(String varianceId);
+    boolean isGroupCached(String id);
+    boolean isProteinCached(String accession);
+    boolean isPeptideCached(String sequence, String proteinId, int position);
+    boolean isAnyPeptideCached(String sequence);
+    boolean isPeptiformCached(String varianceId);
 
-    public void requestGroups(List<String> ids);
-    public void requestProteins(List<String> accessions);
-    public void requestPeptiforms(List<String> sequences, List<String> proteinIds, List<Integer> positions);
-    public void requestPeptiforms(List<String> sequences, List<String> proteinIds);
+    void requestGroups(List<String> ids);
+    void requestProteins(List<String> accessions);
+    void requestPeptiforms(List<String> sequences, List<String> proteinIds, List<Integer> positions);
+    void requestPeptiforms(List<String> sequences, List<String> proteinIds);
 
-    public List<Group> getCachedGroups(List<String> groupIds);
-    public List<Protein> getCachedProteins(List<String> proteinIds);
-    public List<PeptideWithPeptiforms> getCachedPeptiformLists(List<String> sequences, List<String> proteinIds, List<Integer> positions);
-    public List<PeptideWithPeptiforms> getCachedPeptiformLists(List<String> sequences, List<String> proteinIds);
-    public List<Peptide> getCachedPeptideVariances(List<String> varianceId);
+    List<Group> getCachedGroups(List<String> groupIds);
+    List<Protein> getCachedProteins(List<String> proteinIds);
+    List<PeptideWithPeptiforms> getCachedPeptiformLists(List<String> sequences, List<String> proteinIds, List<Integer> positions);
+    List<PeptideWithPeptiforms> getCachedPeptiformLists(List<String> sequences, List<String> proteinIds);
+    List<Peptide> getCachedPeptideVariances(List<String> varianceId);
 
-    public Group getCachedGroup(String ids);
-    public Protein getCachedProtein(String accessions);
-    public PeptideWithPeptiforms getCachedPeptiformList(String sequence, String proteinId, int position);
-    public PeptideWithPeptiforms getCachedPeptiformList(String sequence, String proteinIds);
-    public Peptide getCachedPeptiform(String varianceId);
+    Group getCachedGroup(String ids);
+    Protein getCachedProtein(String accessions);
+    PeptideWithPeptiforms getCachedPeptiformList(String sequence, String proteinId, int position);
+    PeptideWithPeptiforms getCachedPeptiformList(String sequence, String proteinIds);
+    Peptide getCachedPeptiform(String varianceId);
 }

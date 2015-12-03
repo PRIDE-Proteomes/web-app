@@ -15,7 +15,7 @@ public class StateChangingActionEvent extends
         GwtEvent<StateChangingActionEvent.Handler> {
 
     public interface Handler extends EventHandler {
-        public void onStateChangingActionEvent(StateChangingActionEvent event);
+        void onStateChangingActionEvent(StateChangingActionEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

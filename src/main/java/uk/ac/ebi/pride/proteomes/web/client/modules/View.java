@@ -13,6 +13,6 @@ import com.google.gwt.user.client.ui.IsWidget;
  *         Time: 13:59
  */
 public interface View extends IsWidget {
-    public void bindToContainer(AcceptsOneWidget container);
-    public void setVisible(boolean visible);
+    void bindToContainer(AcceptsOneWidget container);
+    void setVisible(boolean visible);
 }

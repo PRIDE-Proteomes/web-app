@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class ModificationUpdateEvent extends GwtEvent<ModificationUpdateEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onModificationUpdateEvent(ModificationUpdateEvent event);
+        void onModificationUpdateEvent(ModificationUpdateEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

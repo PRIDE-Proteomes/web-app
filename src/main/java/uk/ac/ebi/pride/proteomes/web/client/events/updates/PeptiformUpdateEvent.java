@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class PeptiformUpdateEvent extends GwtEvent<PeptiformUpdateEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onPeptiformUpdateEvent(PeptiformUpdateEvent event);
+        void onPeptiformUpdateEvent(PeptiformUpdateEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

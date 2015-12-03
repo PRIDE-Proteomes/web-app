@@ -11,7 +11,7 @@ import com.google.gwt.event.shared.HasHandlers;
  */
 public class InvalidStateEvent extends GwtEvent<InvalidStateEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onInvalidStateEvent(InvalidStateEvent event);
+        void onInvalidStateEvent(InvalidStateEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

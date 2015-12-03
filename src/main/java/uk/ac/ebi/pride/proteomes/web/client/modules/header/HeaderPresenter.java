@@ -30,21 +30,21 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
 
 
     public interface ThisView extends View {
-        public void updateTitle(String title, String accession, String link);
-        public void updateGeneGroupLink(String geneGroupId);
-        public void updateUniquePeptideToProteinCount(int count);
-        public void updateUniquePeptideToGeneCount(int count);
-        public void updateNonUniquePeptidesCount(int count);
-        public void updateName(String name);
-        public void updateGeneSymbol(String geneSymbol);
-        public void updateAlternativeName(String alternativeName);
-        public void updateProteinEvidence(String proteinEvidence);
-        public void updateDescription(String description);
-        public void updateSpecies(String species);
-        public void updateProperties(List<Pair<String, String>> links);
-        public void clearProperties();
-        public void clearTitle();
-        public void displayLoadingMessage();
+        void updateTitle(String title, String accession, String link);
+        void updateGeneGroupLink(String geneGroupId);
+        void updateUniquePeptideToProteinCount(int count);
+        void updateUniquePeptideToGeneCount(int count);
+        void updateNonUniquePeptidesCount(int count);
+        void updateName(String name);
+        void updateGeneSymbol(String geneSymbol);
+        void updateAlternativeName(String alternativeName);
+        void updateProteinEvidence(String proteinEvidence);
+        void updateDescription(String description);
+        void updateSpecies(String species);
+        void updateProperties(List<Pair<String, String>> links);
+        void clearProperties();
+        void clearTitle();
+        void displayLoadingMessage();
 
     }
 

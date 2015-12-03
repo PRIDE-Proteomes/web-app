@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class TissueUpdateEvent extends GwtEvent<TissueUpdateEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onTissueUpdateEvent(TissueUpdateEvent event);
+        void onTissueUpdateEvent(TissueUpdateEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

@@ -11,7 +11,7 @@ import com.google.gwt.event.shared.HasHandlers;
  */
 public class EmptyViewEvent extends GwtEvent<EmptyViewEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onEmptyViewEvent(EmptyViewEvent event);
+        void onEmptyViewEvent(EmptyViewEvent event);
     }
 
     private static final Type<Handler> TYPE = new Type<>();

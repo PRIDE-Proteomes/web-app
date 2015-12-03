@@ -9,12 +9,12 @@ import java.util.Set;
  */
 public interface PeptideMatch extends Peptide {
 
-    public Integer getPosition();
+    Integer getPosition();
 
-    public Integer getUniqueness();
+    Integer getUniqueness();
 
-    public Set<String> getSharedProteins();
+    Set<String> getSharedProteins();
 
-    public Set<String> getSharedGenes();
+    Set<String> getSharedGenes();
 
 }

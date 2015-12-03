@@ -9,7 +9,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public abstract class FrontierIcons {
 
-    public static enum Type {
+    public enum Type {
         CLOSE('x', "icon icon-functional", "Close"),
         COLLAPSE('w', "icon icon-functional", "Collapse"),
         EXPAND('u', "icon icon-functional", "Expand"),
@@ -21,7 +21,7 @@ public abstract class FrontierIcons {
         protected final String styleName;
         protected final String tooltip;
 
-        private Type(char c, String styleName, String tooltip) {
+        Type(char c, String styleName, String tooltip) {
             this.c = c;
             this.styleName = styleName;
             this.tooltip = tooltip;

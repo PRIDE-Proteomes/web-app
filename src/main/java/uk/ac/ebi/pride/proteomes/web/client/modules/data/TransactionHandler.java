@@ -18,9 +18,9 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.data;
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  */
 public interface TransactionHandler {
-    public interface DataRetriever {
-        public void retrieveData(String query, Integer taxonId);
-        public void addHandler(TransactionHandler handler);
+    interface DataRetriever {
+        void retrieveData(String query, Integer taxonId);
+        void addHandler(TransactionHandler handler);
     }
 
     void onTransactionFinished(Transaction transaction);

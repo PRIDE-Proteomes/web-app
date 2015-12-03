@@ -11,10 +11,10 @@ import com.google.gwt.event.shared.HasHandlers;
  */
 public class ValidStateEvent extends GwtEvent<ValidStateEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onValidStateEvent(ValidStateEvent event);
+        void onValidStateEvent(ValidStateEvent event);
     }
 
-    public static enum ViewType {
+    public enum ViewType {
         Group, Protein
     }
 

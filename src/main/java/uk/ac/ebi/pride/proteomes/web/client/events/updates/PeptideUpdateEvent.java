@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class PeptideUpdateEvent extends GwtEvent<PeptideUpdateEvent.Handler> {
     public interface Handler extends EventHandler {
-        public void onPeptideUpdateEvent(PeptideUpdateEvent event);
+        void onPeptideUpdateEvent(PeptideUpdateEvent event);
     }
 
     private static final GwtEvent.Type<Handler> TYPE = new GwtEvent.Type<>();
