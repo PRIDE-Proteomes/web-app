@@ -59,9 +59,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
 
-        final MultiSelectionModel<Multiset.Entry<String>> selectionModel = new
-                MultiSelectionModel<>();
-
+        final MultiSelectionModel<Multiset.Entry<String>> selectionModel = new MultiSelectionModel<>();
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
@@ -75,6 +73,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
 
         view.setSelectionModel(selectionModel);
         view.setKeyboardSelectionPolicy(ModificationColumnProvider.getKeyboardSelectionPolicy());
+
         eventBus.addHandler(ValidStateEvent.getType(), this);
         eventBus.addHandler(ProteinUpdateEvent.getType(), this);
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
@@ -201,8 +200,8 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
         setList(new ArrayList<>(mods));
 
         selectedModifications.retainAll(mods);
-        for(Multiset.Entry<String> tissue : selectedModifications) {
-            selectItem(tissue);
+        for(Multiset.Entry<String> mod : selectedModifications) {
+            selectItem(mod);
         }
     }
 
