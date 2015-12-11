@@ -29,6 +29,8 @@ public interface ListView<T> extends View, HasUiHandlers<ListUiHandler<T>> {
     void showContent();
     void hideContent();
 
+    void setHeight(String height);
+
     // Used to inject the list displayed in the view,
     // this frees the view from the list manipulation, e.g. sorting.
     void addDataProvider(ListDataProvider<T> dataProvider);
