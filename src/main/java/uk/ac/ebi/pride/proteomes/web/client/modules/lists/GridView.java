@@ -73,8 +73,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
         selection = new HashSet<>();
 
         grid.addRowCountChangeHandler(this);
-        grid.setEmptyTableWidget(new Label("No " +
-                baseType + "s match the selection."));
+        grid.setEmptyTableWidget(new Label("No " + baseType + "s match the selection."));
 
         grid.setWidth("99%");
         grid.setHeight("150px");
@@ -179,6 +178,11 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
     }
 
     @Override
+    public void setHeight(String height) {
+        grid.setHeight(height);
+    }
+
+    @Override
     public void bindToContainer(AcceptsOneWidget container) {
         container.setWidget(frame);
     }
@@ -202,6 +206,8 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
     public void onOpen(OpenEvent<DisclosurePanel> event) {
         grid.redraw();
     }
+
+
 
     @Override
     public void setSelectionModel(SelectionModel<? super T> selectionModel) {
