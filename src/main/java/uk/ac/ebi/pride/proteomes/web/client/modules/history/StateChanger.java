@@ -85,8 +85,8 @@ public class StateChanger {
 
     public void addPeptiformChange(Collection<Peptide> peptiformSelection) {
         Collection<String> peptiformIDs = new ArrayList<>();
-        for(Peptide variance : peptiformSelection) {
-            peptiformIDs.add(variance.getId());
+        for(Peptide peptiform : peptiformSelection) {
+            peptiformIDs.add(peptiform.getId());
         }
         orderedChanges.add(new Change(Type.Peptiform,
                                       State.getToken(peptiformIDs)));
@@ -124,7 +124,7 @@ public class StateChanger {
             String oldGroups = State.getToken(oldState.getSelectedGroups());
             String oldProteins = State.getToken(oldState.getSelectedProteins());
             String oldPeptides = State.getToken(oldState.getSelectedPeptides());
-            String oldVariances = State.getToken(oldState.getSelectedVariances());
+            String oldPeptiforms = State.getToken(oldState.getSelectedPeptiforms());
             String oldRegions = State.getToken(oldState.getSelectedRegions());
             String oldModifications = State.getToken(oldState.getSelectedModifications());
             String oldTissues = State.getToken(oldState.getSelectedTissues());
@@ -134,7 +134,7 @@ public class StateChanger {
                     changesToApply.get(Type.Protein, oldProteins),
                     changesToApply.get(Type.Region, oldRegions),
                     changesToApply.get(Type.Peptide, oldPeptides),
-                    changesToApply.get(Type.Peptiform, oldVariances),
+                    changesToApply.get(Type.Peptiform, oldPeptiforms),
                     changesToApply.get(Type.Modification, oldModifications),
                     changesToApply.get(Type.Tissue, oldTissues));
         }

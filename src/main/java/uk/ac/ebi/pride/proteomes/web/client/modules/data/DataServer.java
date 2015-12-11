@@ -49,7 +49,7 @@ public interface DataServer {
     List<Protein> getCachedProteins(List<String> proteinIds);
     List<PeptideWithPeptiforms> getCachedPeptiformLists(List<String> sequences, List<String> proteinIds, List<Integer> positions);
     List<PeptideWithPeptiforms> getCachedPeptiformLists(List<String> sequences, List<String> proteinIds);
-    List<Peptide> getCachedPeptideVariances(List<String> varianceId);
+    List<Peptide> getCachedPeptiforms(List<String> varianceId);
 
     Group getCachedGroup(String ids);
     Protein getCachedProtein(String accessions);

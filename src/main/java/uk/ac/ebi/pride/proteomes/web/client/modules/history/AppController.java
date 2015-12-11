@@ -634,8 +634,8 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 PeptideUpdateEvent.fire(this, server.getCachedPeptiformLists(sequences, proteins));
             }
         }
-        if(!newState.getSelectedVariances().equals(appState.getSelectedVariances())) {
-            PeptiformUpdateEvent.fire(this, server.getCachedPeptideVariances(newState.getSelectedVariances()));
+        if(!newState.getSelectedPeptiforms().equals(appState.getSelectedPeptiforms())) {
+            PeptiformUpdateEvent.fire(this, server.getCachedPeptiforms(newState.getSelectedPeptiforms()));
         }
         if(!newState.getSelectedModifications().equals(appState.getSelectedModifications())) {
             ModificationUpdateEvent.fire(this, newState.getSelectedModifications());

@@ -270,7 +270,7 @@ public class DataProvider implements DataServer, TransactionHandler {
     }
 
     @Override
-    public List<Peptide> getCachedPeptideVariances(List<String> varianceId) {
+    public List<Peptide> getCachedPeptiforms(List<String> varianceId) {
         List<Peptide> varianceList = new ArrayList<>();
         for (String id : varianceId) {
             varianceList.add(getCachedPeptiform(id));

@@ -155,7 +155,7 @@ class PeptideColumnProvider {
 
     public static List<String> getColumnWidths() {
         List<String> widths = new ArrayList<>();
-        Collections.addAll(widths, "30%", "10%", "30%", "30%");
+        Collections.addAll(widths, "30%", "9%", "15%", "46%");
         return widths;
     }
 

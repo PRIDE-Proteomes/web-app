@@ -63,6 +63,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
+        view.setHeight("300px");
         view.asWidget().setVisible(false);
 
         // We define how are the items selected here

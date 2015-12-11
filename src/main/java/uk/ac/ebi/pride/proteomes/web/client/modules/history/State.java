@@ -185,7 +185,7 @@ final class State {
         return selectedPeptideIds;
     }
 
-    public List<String> getSelectedVariances() {
+    public List<String> getSelectedPeptiforms() {
         return selectedPeptiformIDs;
     }
 

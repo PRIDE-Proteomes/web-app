@@ -57,6 +57,9 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         void updateModificationHighlight(ModificationAdapter mod);
         void updateModificationHighlight(int start, int end);
         void resetModificationHighlight();
+        void updatePeptideHighlight(List<PeptideAdapter> peptideSelection);
+        void updatePeptideHighlight(PeptideAdapter peptideSelection);
+        void resetPeptideHighlight();
         void displayLoadingMessage();
     }
 
@@ -195,9 +198,14 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
+
         currentModifications = event.getModifications();
-        if (!event.getModifications().isEmpty()) {
-            for (String mod : event.getModifications()) {
+        getView().resetPeptideHighlight();
+        getView().resetModificationHighlight();
+
+        //This bit updates the modification triangles in the proteinCoverage part
+        if (!currentModifications.isEmpty()) {
+            for (String mod : currentModifications) {
                 try {
                     int position = Integer.parseInt(mod);
 
@@ -206,16 +214,21 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                     getView().updateModificationHighlight(new ModificationAdapter(mod));
                 }
             }
-        } else {
-            getView().resetModificationHighlight();
         }
+
+        updatePeptideHighlight();
     }
+
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
-        currentTissues = event.getTissues();
-    }
 
+        currentTissues = event.getTissues();
+        getView().resetPeptideHighlight();
+        getView().resetModificationHighlight();
+
+        updatePeptideHighlight();
+    }
 
     // Callbacks that handle user events from the view.
 
@@ -559,5 +572,24 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         }
     }
 
+
+    private void updatePeptideHighlight() {
+        List<PeptideMatch> peptides;
+        List<PeptideAdapter> selectionAdapters;
+
+        if(!currentTissues.isEmpty() || !currentModifications.isEmpty()) {
+            peptides = PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(), currentTissues, currentModifications);
+
+            if (peptides.size() > 0) {
+                selectionAdapters = new ArrayList<>();
+
+                for (PeptideMatch match : peptides) {
+                    selectionAdapters.add(new PeptideAdapter(match));
+                }
+
+                getView().updatePeptideHighlight(selectionAdapters);
+            }
+        }
+    }
 
 }

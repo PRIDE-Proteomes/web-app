@@ -9,6 +9,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.ViewWithUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.modules.legend.LegendView;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
+import uk.ac.ebi.pride.widgets.client.common.handler.PeptideHandler;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 import uk.ac.ebi.pride.widgets.client.feature.client.FeatureViewer;
 import uk.ac.ebi.pride.widgets.client.feature.events.FeatureAreaHighlightEvent;
@@ -23,6 +24,7 @@ import uk.ac.ebi.pride.widgets.client.protein.client.ProteinViewer;
 import uk.ac.ebi.pride.widgets.client.protein.events.*;
 import uk.ac.ebi.pride.widgets.client.protein.handlers.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,12 +143,28 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
 
     @Override
     public void updateModificationHighlight(int start, int end) {
-        coverageViewer.selectModificationsBetween(start, end);
+        coverageViewer.highlightModificationsBetween(start, end);
     }
 
     @Override
     public void resetModificationHighlight() {
         coverageViewer.resetModificationHighlight();
+    }
+
+
+    @Override
+    public void updatePeptideHighlight(List<PeptideAdapter> peptides) {
+        coverageViewer.setHighlightedPeptides(new ArrayList<PeptideHandler>(peptides));
+    }
+
+    @Override
+    public void updatePeptideHighlight(PeptideAdapter peptide) {
+        coverageViewer.setHighlightedPeptide(peptide);
+    }
+
+    @Override
+    public void resetPeptideHighlight() {
+        coverageViewer.resetPeptideHighlight();
     }
 
     @Override
@@ -280,7 +298,6 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
         viewer.addProteinRegionHighlightedHandler(this);
 
         viewer.addPeptideSelectedHandler(this);
-
         viewer.addModificationSelectedHandler(this);
     }
 
@@ -292,4 +309,5 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
         viewer.addFeatureAreaHighlightedHandler(this);
 
     }
+
 }

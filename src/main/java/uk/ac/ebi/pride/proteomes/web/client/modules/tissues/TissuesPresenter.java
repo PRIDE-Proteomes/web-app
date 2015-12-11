@@ -1,15 +1,18 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.tissues;
 
+import com.google.common.collect.Lists;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.MultiSelectionModel;
+import com.google.gwt.view.client.OrderedMultiSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.events.updates.ModificationUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.TissueUpdateEvent;
@@ -18,11 +21,9 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
+import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -35,16 +36,20 @@ public class TissuesPresenter extends Presenter<ListView<String>>
                                          ProteinUpdateEvent.Handler,
                                          ProteinRequestEvent.Handler,
                                          PeptideUpdateEvent.Handler,
-                                         TissueUpdateEvent.Handler {
+                                         TissueUpdateEvent.Handler,
+                                         ModificationUpdateEvent.Handler {
 
     private final ListDataProvider<String> dataProvider = new ListDataProvider<>();
-    private final ListSorter<String> dataSorter = new
-                                        ListSorter<>(new ArrayList<String>());
+    private final ListSorter<String> dataSorter = new ListSorter<>(new ArrayList<String>());
 
     private boolean groups = true;
-    private Collection<String> selectedTissues = Collections.emptyList();
-    private Collection<? extends PeptideMatch> selectedPeptides = Collections.emptyList();
     private boolean selectionEventsDisabled = false;
+
+
+    private Protein currentProtein;
+    private List<String> selectedModifications = Collections.emptyList();
+    private List<String> selectedTissues = Collections.emptyList();
+    private List<? extends PeptideMatch> selectedPeptides = Collections.emptyList();
 
     public TissuesPresenter(EventBus eventBus, ListView<String> view) {
         super(eventBus, view);
@@ -59,7 +64,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         view.addUiHandler(this);
         view.asWidget().setVisible(false);
 
-        final MultiSelectionModel<String> selectionModel = new MultiSelectionModel<>();
+        final OrderedMultiSelectionModel<String> selectionModel = new OrderedMultiSelectionModel<>();
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
@@ -79,6 +84,8 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         eventBus.addHandler(ProteinRequestEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(TissueUpdateEvent.getType(), this);
+        eventBus.addHandler(ModificationUpdateEvent.getType(), this);
+
 
     }
 
@@ -98,7 +105,9 @@ public class TissuesPresenter extends Presenter<ListView<String>>
     @Override
     public void onProteinUpdateEvent(ProteinUpdateEvent event) {
         if(!groups && event.getProteins().size() > 0) {
-            updateList(event.getProteins().get(0).getTissues());
+            currentProtein = event.getProteins().get(0);
+
+            updateList(currentProtein.getTissues());
             getView().loadList();
             getView().showContent();
         }
@@ -124,14 +133,58 @@ public class TissuesPresenter extends Presenter<ListView<String>>
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
+        // Reset selection
         for(String tissue : selectedTissues) {
             deselectItem(tissue);
         }
 
-        selectedTissues = new ArrayList<>();
-        for(String item : event.getTissues()) {
-            selectItem(item);
-            selectedTissues.add(item);
+        selectedTissues = event.getTissues();
+        // Update the list with new possible values
+        //We collect only the possible moodifications available in the peptides after filtering by selected tissue and selected mods
+        List<PeptideMatch> peptides = PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(), selectedTissues, selectedModifications);
+        if (!peptides.isEmpty()) {
+            Set<String> filteredTissues = new TreeSet<>();
+
+            for (PeptideMatch peptide : peptides) {
+                filteredTissues.addAll(peptide.getTissues());
+            }
+
+            // We calculate the set to remove possible tissues
+            // present in the peptides but not in the protein
+            filteredTissues.retainAll(currentProtein.getTissues());
+            updateList(Lists.newArrayList(filteredTissues));
+        }
+
+
+//
+//        //Update the selection if it is possible
+//        for(String item : selectedTissues) {
+//            selectItem(item);
+//        }
+    }
+
+    @Override
+    public void onModificationUpdateEvent(ModificationUpdateEvent event) {
+
+        // Reset selection
+        for(String tissue : selectedTissues) {
+            deselectItem(tissue);
+        }
+
+        selectedModifications = event.getModifications();
+        //We collect only the possible tissues available in the peptides after filtering
+        List<PeptideMatch> peptides = PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(), selectedTissues, selectedModifications);
+        if (!peptides.isEmpty()) {
+            Set<String> filteredTissues = new TreeSet<>();
+
+            for (PeptideMatch peptide : peptides) {
+                filteredTissues.addAll(peptide.getTissues());
+            }
+
+            // We calculate the set to remove possible tissues
+            // present in the peptides but not in the protein
+            filteredTissues.retainAll(currentProtein.getTissues());
+            updateList(Lists.newArrayList(filteredTissues));
         }
     }
 
@@ -152,7 +205,6 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         }
 
         filteredPeptides = new ArrayList<>();
-
         for(PeptideMatch pep : selectedPeptides) {
             // If the collections are disjoint means the peptide doesn't have
             // any tissue in items. If this happens, we filter it out.
@@ -177,9 +229,6 @@ public class TissuesPresenter extends Presenter<ListView<String>>
     }
 
     private void updateList(List<String> tissues) {
-        for(String tissue : selectedTissues) {
-            deselectItem(tissue);
-        }
 
         setList(tissues);
 
@@ -212,5 +261,6 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         dataProvider.getList().addAll(list);
         dataSorter.repeatSort();
         dataProvider.flush();
+        getView().loadList();
     }
 }

@@ -1,14 +1,14 @@
 package uk.ac.ebi.pride.proteomes.web.client.utils;
 
+import com.google.common.collect.Lists;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -59,8 +59,7 @@ public class PeptideUtils {
         return filteredList;
     }
 
-    public static List<PeptideMatch> filterPeptidesNotInTissues
-            (List<PeptideMatch> peptideMatches, List<String> tissues) {
+    public static List<PeptideMatch> filterPeptidesNotInTissues(List<? extends PeptideMatch> peptideMatches, List<String> tissues) {
         List<PeptideMatch> filteredList;
         List<String> properTissues = new ArrayList<>();
 
@@ -71,17 +70,14 @@ public class PeptideUtils {
         }
 
         if(properTissues.isEmpty()) {
-            return peptideMatches;
+            return (List<PeptideMatch>) peptideMatches;
         }
 
         filteredList = new ArrayList<>();
 
-        for(PeptideMatch peptide : peptideMatches) {
-            for(String tissue : properTissues) {
-                if(peptide.getTissues().contains(tissue)) {
-                    filteredList.add(peptide);
-                    break;
-                }
+        for (PeptideMatch peptide : peptideMatches) {
+            if (peptide.getTissues().containsAll(properTissues)) {
+                filteredList.add(peptide);
             }
         }
 
@@ -122,19 +118,25 @@ public class PeptideUtils {
 
         filteredList = new ArrayList<>();
 
+
         for(PeptideMatch peptide : peptideMatches) {
-            modLoc:
-            for(ModifiedLocation modLoc : peptide.getModifiedLocations()) {
-                for(String mod : properModifications) {
-                    if(modLoc.getModification().equals(mod)) {
-                        filteredList.add(peptide);
-                        break modLoc;
-                    }
-                }
+            Collection<String> mods = extractModifications(peptide);
+            if(mods.containsAll(properModifications)){
+                filteredList.add(peptide);
+
             }
         }
 
         return filteredList;
+    }
+
+    public static List<String> extractModifications(PeptideMatch peptide) {
+        Set<String> mods = new HashSet<>();
+
+        for (ModifiedLocation modLoc : peptide.getModifiedLocations()) {
+            mods.add(modLoc.getModification());
+        }
+        return Lists.newArrayList(mods);
     }
 
     static public int firstIndexWithId(List<? extends Peptide> peptides, String id) {
@@ -183,6 +185,17 @@ public class PeptideUtils {
                         filterPeptideMatchesNotIn(
                                 peptides,
                                 start, end),
+                        tissues),
+                mods);
+    }
+
+    public static List<PeptideMatch> filterPeptideMatches(List<PeptideMatch> peptides,
+                                                          List<String> tissues,
+                                                          List<String> mods) {
+
+        return filterPeptideMatchesWithoutAnyModifications(
+                filterPeptidesNotInTissues(
+                        peptides,
                         tissues),
                 mods);
     }
