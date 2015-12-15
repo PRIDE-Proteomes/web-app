@@ -35,7 +35,7 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
         void updateUniquePeptideToProteinCount(int count);
         void updateUniquePeptideToGeneCount(int count);
         void updateNonUniquePeptidesCount(int count);
-        void updateName(String name);
+//        void updateName(String name);
         void updateGeneSymbol(String geneSymbol);
         void updateAlternativeName(String alternativeName);
         void updateProteinEvidence(String proteinEvidence);
@@ -117,7 +117,7 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
                 getView().updateUniquePeptideToProteinCount(protein.getUniquePeptideToProteinCount());
                 getView().updateUniquePeptideToGeneCount(protein.getUniquePeptideToGeneCount());
                 getView().updateNonUniquePeptidesCount(protein.getNonUniquePeptidesCount());
-                getView().updateName(protein.getName());
+//                getView().updateName(protein.getName());
                 getView().updateAlternativeName(protein.getAlternativeName());
                 getView().updateSpecies(protein.getSpecies());
                 getView().updateGeneSymbol(protein.getGeneSymbol());

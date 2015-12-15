@@ -62,6 +62,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
+        view.setHeight("220px");
         view.asWidget().setVisible(false);
 
         final OrderedMultiSelectionModel<String> selectionModel = new OrderedMultiSelectionModel<>();

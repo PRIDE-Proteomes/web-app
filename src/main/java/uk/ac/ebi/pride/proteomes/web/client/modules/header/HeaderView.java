@@ -33,8 +33,8 @@ public class HeaderView implements HeaderPresenter.ThisView {
     InlineLabel nonUniquePeptidesCount;
     @UiField
     Label altId;
-    @UiField
-    Label name;
+//    @UiField
+//    Label name;
     @UiField
     Label species;
     @UiField
@@ -135,10 +135,10 @@ public class HeaderView implements HeaderPresenter.ThisView {
         }
     }
 
-    @Override
-    public void updateName(String name) {
-        this.name.setText(name);
-    }
+//    @Override
+//    public void updateName(String name) {
+//        this.name.setText(name);
+//    }
 
     @Override
     public void updateGeneSymbol(String geneSymbol) {

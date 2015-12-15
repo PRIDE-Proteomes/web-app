@@ -10,7 +10,7 @@
         }
 
         .description {
-            width: 73%;
+            width: 80%;
         }
 
         .summary {
@@ -63,11 +63,6 @@
 
 
     <g:HTMLPanel>
-        <g:HTMLPanel>
-            <h1>
-                <g:Anchor ui:field="title"/>
-            </h1>
-        </g:HTMLPanel>
 
         <g:HTMLPanel ui:field="panel">
             <g:HTMLPanel ui:field="summaryPanel">
@@ -86,7 +81,7 @@
                 <g:HTMLPanel ui:field="proteinSummaryPanel">
                     <g:HTMLPanel addStyleNames="{style.horizontal} {style.description}">
                         <h2>
-                            <g:Label ui:field="name"/>
+                            <g:Anchor ui:field="title"/>
                         </h2>
                         <p>
                             <g:InlineLabel addStyleNames="{style.label}">UniProtKB Name</g:InlineLabel>

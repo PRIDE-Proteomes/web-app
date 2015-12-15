@@ -67,6 +67,7 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
+        view.setHeight("120px");
         view.asWidget().setVisible(false);
 
         final OrderedMultiSelectionModel<Multiset.Entry<String>> selectionModel = new OrderedMultiSelectionModel<>();

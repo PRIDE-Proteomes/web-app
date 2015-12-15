@@ -76,7 +76,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
         grid.setEmptyTableWidget(new Label("No " + baseType + "s match the selection."));
 
         grid.setWidth("99%");
-        grid.setHeight("150px");
+        grid.setHeight("200px");
         grid.setSkipRowHoverCheck(skipRowHoverStyleUpdate);
 
         // This allows for the data grid to show up to 4096 peptides in the

@@ -27,10 +27,10 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.main.MainView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.modifications.ModificationsPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.peptides.PeptidesPresenter;
+import uk.ac.ebi.pride.proteomes.web.client.modules.peptiforms.PeptiformsPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequencePresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.sequence.SequenceView;
 import uk.ac.ebi.pride.proteomes.web.client.modules.tissues.TissuesPresenter;
-import uk.ac.ebi.pride.proteomes.web.client.modules.peptiforms.PeptiformsPresenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.whistleblower.WhistleBlower;
 import uk.ac.ebi.pride.proteomes.web.client.utils.Pair;
 
