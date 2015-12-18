@@ -8,6 +8,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.ViewWithUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
+import uk.ac.ebi.pride.widgets.client.common.handler.PeptideHandler;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 import uk.ac.ebi.pride.widgets.client.sequence.client.SequenceViewer;
 import uk.ac.ebi.pride.widgets.client.sequence.events.ProteinRegionHighlightedEvent;
@@ -17,6 +18,7 @@ import uk.ac.ebi.pride.widgets.client.sequence.handlers.ProteinRegionSelectedHan
 import uk.ac.ebi.pride.widgets.client.sequence.type.Pride;
 import uk.ac.ebi.pride.widgets.client.sequence.type.SequenceType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,8 +119,28 @@ public class SequenceView extends ViewWithUiHandlers<SequenceUiHandler>
     }
 
     @Override
+    public void updateModificationHighlight(int modPosition) {
+        sequence.highlightModification(modPosition);
+    }
+
+    @Override
     public void resetModificationHighlight() {
         sequence.resetModification();
+    }
+
+    @Override
+    public void updatePeptideHighlight(List<PeptideAdapter> peptides) {
+        sequence.setHighlightedPeptides(new ArrayList<PeptideHandler>(peptides));
+    }
+
+    @Override
+    public void updatePeptideHighlight(PeptideAdapter peptide) {
+        sequence.setHighlightedPeptide(peptide);
+    }
+
+    @Override
+    public void resetPeptideHighlight() {
+        sequence.resetVisiblePeptides();
     }
 
     @Override
@@ -154,7 +176,6 @@ public class SequenceView extends ViewWithUiHandlers<SequenceUiHandler>
             handler.onRegionSelected(e);
         }
     }
-
 
     private void bindViewer(SequenceViewer viewer) {
         viewer.addProteinRegionSelectedHandler(this);

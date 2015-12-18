@@ -155,13 +155,6 @@ public class TissuesPresenter extends Presenter<ListView<String>>
             filteredTissues.retainAll(currentProtein.getTissues());
             updateList(Lists.newArrayList(filteredTissues));
         }
-
-
-//
-//        //Update the selection if it is possible
-//        for(String item : selectedTissues) {
-//            selectItem(item);
-//        }
     }
 
     @Override

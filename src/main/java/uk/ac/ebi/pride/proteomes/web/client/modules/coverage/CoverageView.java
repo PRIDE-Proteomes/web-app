@@ -79,7 +79,6 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
         //The duration of the initial animation of the coverageViewer widget
         ProteinViewer.setAnimationDuration(1000);
         FeatureViewer.setAnimationDuration(1000);
-
     }
 
     @Override
@@ -155,11 +154,6 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
     @Override
     public void updatePeptideHighlight(List<PeptideAdapter> peptides) {
         coverageViewer.setHighlightedPeptides(new ArrayList<PeptideHandler>(peptides));
-    }
-
-    @Override
-    public void updatePeptideHighlight(PeptideAdapter peptide) {
-        coverageViewer.setHighlightedPeptide(peptide);
     }
 
     @Override

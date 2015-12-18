@@ -1,13 +1,15 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.peptides;
 
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.view.client.*;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
@@ -181,20 +183,29 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-        currentModifications = new ArrayList<>();
-        for(String mod : event.getModifications()) {
-            if(!mod.equals("")) {
-                try {
-                    Integer.parseInt(mod);
-                }
-                catch(NumberFormatException e) {
-                    currentModifications.add(mod);
+        currentModifications = event.getModifications();
+        if (!currentModifications.isEmpty()) {
+            for (String mod : currentModifications) {
+                if (!mod.equals("")) {
+                    try {
+                        //Modification selected by position in coverage view
+                        int position = Integer.parseInt(mod);
+                        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
+                                position, position,
+                                currentTissues, currentModifications));
+                    } catch (NumberFormatException e) {
+                        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
+                                currentRegion.getStart(), currentRegion.getEnd(),
+                                currentTissues, currentModifications));
+                    }
                 }
             }
+        } else {
+            updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
+                    currentRegion.getStart(), currentRegion.getEnd(),
+                    currentTissues, currentModifications));
         }
-        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
-                currentRegion.getStart(), currentRegion.getEnd(),
-                currentTissues, currentModifications));
+
     }
 
     @Override

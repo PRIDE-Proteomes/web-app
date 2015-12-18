@@ -80,9 +80,9 @@
                 </g:HTMLPanel>
                 <g:HTMLPanel ui:field="proteinSummaryPanel">
                     <g:HTMLPanel addStyleNames="{style.horizontal} {style.description}">
-                        <h2>
+                        <h1>
                             <g:Anchor ui:field="title"/>
-                        </h2>
+                        </h1>
                         <p>
                             <g:InlineLabel addStyleNames="{style.label}">UniProtKB Name</g:InlineLabel>
                             <g:InlineLabel ui:field="altId"/>

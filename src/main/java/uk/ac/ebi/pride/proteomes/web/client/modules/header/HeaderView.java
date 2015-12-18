@@ -160,6 +160,21 @@ public class HeaderView implements HeaderPresenter.ThisView {
         this.proteinEvidence.setText(proteinEvidence);
     }
 
+
+    @Override
+    public void updateGenomeAnnotation(List<String> genes)
+    {
+        StringBuilder builder = new StringBuilder();
+        for (String gene : genes) {
+            builder.append(gene);
+            if (!gene.equalsIgnoreCase(genes.get(genes.size() - 1))) {
+                builder.append(", ");
+            }
+        }
+
+        this.genes.setText(builder.toString());
+    }
+
     @Override
     public void updateDescription(String description) {
         this.description.setText(description);

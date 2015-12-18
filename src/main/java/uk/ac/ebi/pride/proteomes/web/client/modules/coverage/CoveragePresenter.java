@@ -27,9 +27,7 @@ import uk.ac.ebi.pride.widgets.client.feature.events.FeatureRegionHighlightEvent
 import uk.ac.ebi.pride.widgets.client.feature.events.FeatureRegionSelectionEvent;
 import uk.ac.ebi.pride.widgets.client.protein.events.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -58,7 +56,6 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         void updateModificationHighlight(int start, int end);
         void resetModificationHighlight();
         void updatePeptideHighlight(List<PeptideAdapter> peptideSelection);
-        void updatePeptideHighlight(PeptideAdapter peptideSelection);
         void resetPeptideHighlight();
         void displayLoadingMessage();
     }
@@ -124,17 +121,17 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         Region region;
         List<PeptideAdapter> selectionAdapters;
 
-        if (event.getSource() == this) {
-            return;
-        }
+//        if (event.getSource() == this) {
+//            return;
+//        }
 
         if (event.getRegions().size() > 0) {
             region = event.getRegions().get(0);
             currentRegion = region;
             getView().updateRegionSelection(region.getStart(), region.getEnd());
-            if (region.getLength() == 1) {
-                getView().updateModificationHighlight(region.getStart(), region.getEnd());
-            }
+//            if (region.getLength() == 1) {
+//                getView().updateModificationHighlight(region.getStart(), region.getEnd());
+//            }
         } else {
             currentRegion = Region.emptyRegion();
             getView().resetRegionSelection();
@@ -210,13 +207,14 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                     int position = Integer.parseInt(mod);
 
                     getView().updateModificationHighlight(position, position);
+                    updatePeptideHighlight(position,position);
                 } catch (NumberFormatException e) {
                     getView().updateModificationHighlight(new ModificationAdapter(mod));
+                    updatePeptideHighlight(currentRegion.getStart(),currentRegion.getEnd());
                 }
             }
         }
 
-        updatePeptideHighlight();
     }
 
 
@@ -227,61 +225,19 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         getView().resetPeptideHighlight();
         getView().resetModificationHighlight();
 
-        updatePeptideHighlight();
+        updatePeptideHighlight(currentRegion.getStart(),currentRegion.getEnd());
     }
 
     // Callbacks that handle user events from the view.
 
     @Override
     public void onRegionClickSelected(ProteinRegionSelectionEvent event) {
-        StateChanger changer = new StateChanger();
-        List<Region> region = new ArrayList<>();
-        List<PeptideMatch> peptides;
-
-        try {
-            region.add(new Region(event.getStart(), event.getStart() + event
-                    .getLength() - 1));
-            changer.addRegionChange(region);
-
-            peptides = PeptideUtils.filterPeptideMatchesNotIn(peptideMatchSelection,
-                    event.getStart(), event.getStart() + event.getLength() - 1);
-
-            if (peptides.size() != peptideMatchSelection.size()) {
-                changer.addPeptideChange(peptides);
-            }
-
-            UserAction action = new UserAction(UserAction.Type.region, "Click Set");
-            StateChangingActionEvent.fire(this, changer, action);
-        } catch (IllegalRegionValueException e) {
-            // This is probably because of an empty selection,
-            // we don't send any event
-        }
+        onRegionClickSelected(event.getStart(), event.getLength());
     }
 
     @Override
     public void onRegionClickSelected(FeatureRegionSelectionEvent event) {
-        StateChanger changer = new StateChanger();
-        List<Region> region = new ArrayList<>();
-        List<PeptideMatch> peptides;
-
-        try {
-            region.add(new Region(event.getStart(), event.getStart() + event
-                    .getLength() - 1));
-            changer.addRegionChange(region);
-
-            peptides = PeptideUtils.filterPeptideMatchesNotIn(peptideMatchSelection,
-                    event.getStart(), event.getStart() + event.getLength() - 1);
-
-            if (peptides.size() != peptideMatchSelection.size()) {
-                changer.addPeptideChange(peptides);
-            }
-
-            UserAction action = new UserAction(UserAction.Type.region, "Click Set");
-            StateChangingActionEvent.fire(this, changer, action);
-        } catch (IllegalRegionValueException e) {
-            // This is probably because of an empty selection,
-            // we don't send any event
-        }
+        onRegionClickSelected(event.getStart(), event.getLength());
     }
 
     @Override
@@ -295,15 +251,177 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     }
     @Override
     public void onRegionDragSelected(ProteinAreaSelectedEvent event) {
+        onRegionDragSelected(event.getStart(), event.getEnd());
+    }
+
+    @Override
+    public void onRegionDragSelected(FeatureAreaSelectionEvent event) {
+        onRegionDragSelected(event.getStart(), event.getEnd());
+    }
+
+
+    @Override
+    public void onRegionDragHighlighted(ProteinAreaHighlightEvent event) {
+        onRegionDragHighlighted(event.getStart(), event.getEnd());
+    }
+
+    @Override
+    public void onRegionDragHighlighted(FeatureAreaHighlightEvent event) {
+        onRegionDragHighlighted(event.getStart(), event.getEnd());
+    }
+
+    @Override
+    public void onPeptideSelected(PeptideSelectedEvent event) {
+        StateChanger changer = new StateChanger();
+        List<Region> regions = new ArrayList<>();
+        List<PeptideMatch> peptides = new ArrayList<>();
+        UserAction action = new UserAction(UserAction.Type.peptide,
+                "Click Set");
+
+        //Peptides
+        PeptideAdapter peptide = (PeptideAdapter) event.getPeptide();
+        peptides.add(peptide);
+        changer.addPeptideChange(peptides);
+
+        //Regions
+        //With the selection we reset the region to avoid confunsing to the user clicking outside of the region and moving it
+        changer.addRegionChange(regions);
+
+        //Peptiforms
+        List<Peptide> peptiforms = new ArrayList<>();
+        for (Peptide peptiform : selectedPeptiforms) {
+            if (peptide.getSequence().equals(peptiform.getSequence())) {
+                peptiforms.add(peptiform);
+            }
+        }
+
+        if (!peptiforms.containsAll(selectedPeptiforms)) {
+            changer.addPeptiformChange(peptiforms);
+        }
+
+        //Modifications
+        List<String> correctMods = new ArrayList<>();
+        for (ModifiedLocation modLoc : peptide.getModifiedLocations()) {
+            for (String mod : currentModifications) {
+                try {
+                    int postion = Integer.parseInt(mod);
+                    if (modLoc.getPosition() == postion) {
+                        correctMods.add(mod);
+                    }
+                } catch (NumberFormatException e) {
+                    if (modLoc.getModification().equals(mod)) {
+                        correctMods.add(mod);
+                    }
+                }
+            }
+        }
+
+        if (!correctMods.containsAll(currentModifications)) {
+            changer.addModificationChange(correctMods);
+        }
+
+        //Tissues
+        List<String> tissues = peptide.getTissues();
+        tissues.retainAll(currentTissues);
+        if (!tissues.containsAll(currentTissues)) {
+            changer.addTissueChange(tissues);
+        }
+
+        StateChangingActionEvent.fire(this, changer, action);
+    }
+
+    @Override
+    public void onModificationSelected(ModificationSelectedEvent event) {
+        StateChanger changer = new StateChanger();
+        List<Region> regions = new ArrayList<>();
+        List<String> modifications = new ArrayList<>();
+        UserAction action = new UserAction(UserAction.Type.modification,
+                "Click Set");
+
+        //Regions
+        //With the selection we reset the region to avoid confunsing to the user clicking outside of the region and moving it
+        changer.addRegionChange(regions);
+
+        // Terminal modifications are ignored for now
+        if (event.getSite() > 0 && event.getSite() < currentProtein.getSequence().length() + 1) {
+            if(peptideMatchSelection.size() > 0) {
+                Set<PeptideMatch>  peptides = new HashSet<>();
+                for(PeptideMatch peptide : peptideMatchSelection) {
+                    if(PeptideUtils.inRange(peptide, event.getSite(), event.getSite())) {
+                        peptides.add(peptide);
+                    }
+                }
+
+                changer.addPeptideChange(peptides);
+            }
+
+            modifications.add(event.getSite().toString());
+            changer.addModificationChange(modifications);
+            StateChangingActionEvent.fire(this, changer, action);
+        }
+    }
+
+    private void updatePeptideHighlight(int regionStart, int regionEnd) {
+        List<PeptideMatch> peptides;
+        List<PeptideAdapter> selectionAdapters;
+
+        if(!currentTissues.isEmpty() || !currentModifications.isEmpty()) {
+            peptides = PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
+                    regionStart, regionEnd,
+                    currentTissues, currentModifications);
+
+            if (peptides.size() > 0) {
+                selectionAdapters = new ArrayList<>();
+
+                for (PeptideMatch match : peptides) {
+                    selectionAdapters.add(new PeptideAdapter(match));
+                }
+
+                getView().updatePeptideHighlight(selectionAdapters);
+            }
+        }
+    }
+
+    private void onRegionClickSelected(int eventRegionStart, int evenRegionLength){
+
+        StateChanger changer = new StateChanger();
+        List<Region> region = new ArrayList<>();
+        List<PeptideMatch> peptides;
+
+        // if the selection is done right to left then start > end
+        int start = eventRegionStart;
+        int end = eventRegionStart + evenRegionLength - 1;
+
+        try {
+            region.add(new Region(start, end));
+            changer.addRegionChange(region);
+
+            peptides = PeptideUtils.filterPeptideMatchesNotIn(peptideMatchSelection,
+                    start, end);
+
+            if (peptides.size() != peptideMatchSelection.size()) {
+                changer.addPeptideChange(peptides);
+            }
+
+            UserAction action = new UserAction(UserAction.Type.region, "Click Set");
+            StateChangingActionEvent.fire(this, changer, action);
+        } catch (IllegalRegionValueException e) {
+            // This is probably because of an empty selection,
+            // we don't send any event
+        }
+    }
+
+    private void onRegionDragSelected(int eventRegionStart, int evenRegionEnd) {
         StateChanger changer = new StateChanger();
         List<Region> regions = new ArrayList<>();
         UserAction action = UserAction.emptyAction();
         List<PeptideMatch> peptides;
+
         Region region;
 
         // if the selection is done right to left then start > end
-        int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
-        int end = event.getStart() + event.getEnd() - start;
+        int start = eventRegionStart < evenRegionEnd ? eventRegionStart : evenRegionEnd;
+        int end = eventRegionStart + evenRegionEnd - start;
 
         try {
             region = new Region(start, end);
@@ -314,6 +432,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                 // we want to reset the selection
                 action = new UserAction(UserAction.Type.region, "Drag Reset");
                 region = Region.emptyRegion();
+                changer.addModificationChange(Collections.<String>emptyList());
             } else {
                 action = new UserAction(UserAction.Type.region, "Drag Set");
                 justHighlighted = false;
@@ -328,6 +447,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                 changer.addPeptideChange(peptides);
             }
 
+
         } catch (IllegalRegionValueException e) {
             action = new UserAction(UserAction.Type.region, "Drag Reset");
             region = Region.emptyRegion();
@@ -338,63 +458,12 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         }
     }
 
-    @Override
-    public void onRegionDragSelected(FeatureAreaSelectionEvent event) {
-        StateChanger changer = new StateChanger();
-        List<Region> regions = new ArrayList<>();
-        UserAction action = UserAction.emptyAction();
-        List<PeptideMatch> peptides;
-        Region region;
-
-        // if the selection is done right to left then start > end
-        int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
-        int end = event.getStart() + event.getEnd() - start;
-
-        try {
-            region = new Region(start, end);
-            // We have to check if a highlight has been done just before to
-            // know if the user wants to reset or want to select a 1-site region
-            if (region.getLength() == 0 && !justHighlighted) {
-                //we don't want to select a single aminoacid,
-                // we want to reset the selection
-                action = new UserAction(UserAction.Type.region,
-                        "Drag Reset");
-                region = Region.emptyRegion();
-            } else {
-                action = new UserAction(UserAction.Type.region,
-                        "Drag Set");
-                justHighlighted = false;
-            }
-
-            regions.add(region);
-
-            peptides = PeptideUtils.filterPeptideMatchesNotIn(peptideMatchSelection,
-                    start, end);
-
-            if (peptides.size() != peptideMatchSelection.size()) {
-                changer.addPeptideChange(peptides);
-            }
-
-
-        } catch (IllegalRegionValueException e) {
-            action = new UserAction(UserAction.Type.region,
-                    "Drag Reset");
-            region = Region.emptyRegion();
-            regions.add(region);
-        } finally {
-            changer.addRegionChange(regions);
-            StateChangingActionEvent.fire(this, changer, action);
-        }
-    }
-
-
-    @Override
-    public void onRegionDragHighlighted(ProteinAreaHighlightEvent event) {
+    private void onRegionDragHighlighted(int eventRegionStart, int evenRegionEnd) {
         List<Region> regions = new ArrayList<>();
 
         // if the selection is done right to left then start > end
-        int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
-        int end = event.getStart() + event.getEnd() - start;
+        int start = eventRegionStart < evenRegionEnd ? eventRegionStart : evenRegionEnd;
+        int end = eventRegionStart + evenRegionEnd - start;
 
         try {
             regions.add(new Region(start, end));
@@ -423,173 +492,4 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             }
         }
     }
-
-    @Override
-    public void onRegionDragHighlighted(FeatureAreaHighlightEvent event) {
-        List<Region> regions = new ArrayList<>();
-
-        // if the selection is done right to left then start > end
-        int start = event.getStart() < event.getEnd() ? event.getStart() : event.getEnd();
-        int end = event.getStart() + event.getEnd() - start;
-
-        try {
-            regions.add(new Region(start, end));
-            justHighlighted = true;
-        } catch (IllegalRegionValueException e) {
-            regions.add(Region.emptyRegion());
-        } finally {
-            RegionUpdateEvent.fire(this, regions);
-
-            // We have to send an update list of peptides that are selected with
-            // the new list otherwise other widget might get desyncronized,
-            // that's not good, this can be detected when the filtered list
-            // has a different the size compared with the last temporary list
-            // we stored.
-
-            if (tempPeptides.size() !=
-                    PeptideUtils.filterPeptideWithPeptiformsNotIn(peptideMatchSelection, start, end).size()) {
-                tempPeptides = PeptideUtils.filterPeptideWithPeptiformsNotIn(peptideMatchSelection, start, end);
-
-                PeptideUpdateEvent.fire(this, tempPeptides);
-
-                // We should restore the peptiform IDs too in case they need to be reselected
-                if (tempPeptides.size() == peptideMatchSelection.size()) {
-                    PeptiformUpdateEvent.fire(this, selectedPeptiforms);
-                }
-            }
-        }
-    }
-
-
-    @Override
-    public void onPeptideSelected(PeptideSelectedEvent event) {
-        StateChanger changer = new StateChanger();
-        List<Region> regions = new ArrayList<>();
-        List<PeptideMatch> peptides = new ArrayList<>();
-        UserAction action = new UserAction(UserAction.Type.peptide,
-                "Click Set");
-
-        PeptideAdapter peptide = (PeptideAdapter) event.getPeptide();
-        peptides.add(peptide);
-        changer.addPeptideChange(peptides);
-
-        // If the peptide doesn't fit the region that's selected we ought to
-        // change the region too.
-        if (!currentRegion.isEmpty() &&
-                !PeptideUtils.inRange(peptide, currentRegion.getStart(),
-                        currentRegion.getEnd())) {
-            try {
-                regions.add(new Region(peptide.getSite(), peptide.getEnd()));
-                changer.addRegionChange(regions);
-            } catch (IllegalRegionValueException e) {
-                // this shouldn't happen, unless the peptide is somehow empty.
-                e.printStackTrace();
-            }
-        }
-
-        List<Peptide> peptiforms = new ArrayList<>();
-        for (Peptide peptiform : selectedPeptiforms) {
-            if (peptide.getSequence().equals(peptiform.getSequence())) {
-                peptiforms.add(peptiform);
-            }
-        }
-
-        if (!peptiforms.containsAll(selectedPeptiforms)) {
-            changer.addPeptiformChange(peptiforms);
-        }
-
-        boolean contained = false;
-        for (ModifiedLocation modLoc : peptide.getModifiedLocations()) {
-            for (String mod : currentModifications) {
-                try {
-                    Integer.parseInt(mod);
-                } catch (NumberFormatException e) {
-                    if (modLoc.getModification().equals(mod)) {
-                        contained = true;
-                        break;
-                    }
-                }
-            }
-        }
-        if (!contained) {
-            // We need to remove all filtering modifications
-            List<String> correctMods = new ArrayList<>();
-            for (String mod : currentModifications) {
-                try {
-                    Integer.parseInt(mod);
-                    correctMods.add(mod);
-
-                } catch (NumberFormatException ignore) {
-                }
-            }
-
-            if (correctMods.size() < currentModifications.size()) {
-                changer.addModificationChange(correctMods);
-            }
-        }
-        contained = false;
-        for (String pepTissue : peptide.getTissues()) {
-            for (String tissue : currentTissues) {
-                if (tissue.equals(pepTissue)) {
-                    contained = true;
-                    break;
-                }
-            }
-        }
-        if (!contained) {
-            if (!currentTissues.isEmpty()) {
-                changer.addTissueChange(new ArrayList<String>());
-            }
-        }
-
-        StateChangingActionEvent.fire(this, changer, action);
-    }
-
-    @Override
-    public void onModificationSelected(ModificationSelectedEvent event) {
-        StateChanger changer = new StateChanger();
-        List<Region> regions = new ArrayList<>();
-        List<String> modifications = new ArrayList<>();
-        UserAction action = new UserAction(UserAction.Type.modification,
-                "Click Set");
-
-        // Terminal modifications are ignored for now
-        if (event.getSite() > 0 && event.getSite() < currentProtein
-                .getSequence().length() + 1) {
-            if (event.getSite() < currentRegion.getStart() ||
-                    event.getSite() > currentRegion.getEnd()) {
-                try {
-                    regions.add(new Region(event.getSite(), event.getSite()));
-                    changer.addRegionChange(regions);
-                } catch (IllegalRegionValueException e) {
-                    // this shouldn't happen, at all.
-                    e.printStackTrace();
-                }
-            }
-            modifications.add(event.getSite().toString());
-            changer.addModificationChange(modifications);
-            StateChangingActionEvent.fire(this, changer, action);
-        }
-    }
-
-
-    private void updatePeptideHighlight() {
-        List<PeptideMatch> peptides;
-        List<PeptideAdapter> selectionAdapters;
-
-        if(!currentTissues.isEmpty() || !currentModifications.isEmpty()) {
-            peptides = PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(), currentTissues, currentModifications);
-
-            if (peptides.size() > 0) {
-                selectionAdapters = new ArrayList<>();
-
-                for (PeptideMatch match : peptides) {
-                    selectionAdapters.add(new PeptideAdapter(match));
-                }
-
-                getView().updatePeptideHighlight(selectionAdapters);
-            }
-        }
-    }
-
 }

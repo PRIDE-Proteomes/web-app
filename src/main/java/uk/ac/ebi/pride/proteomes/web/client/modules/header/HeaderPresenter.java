@@ -39,6 +39,7 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
         void updateGeneSymbol(String geneSymbol);
         void updateAlternativeName(String alternativeName);
         void updateProteinEvidence(String proteinEvidence);
+        void updateGenomeAnnotation(List<String> genes);
         void updateDescription(String description);
         void updateSpecies(String species);
         void updateProperties(List<Pair<String, String>> links);
@@ -109,6 +110,7 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
 
                 getView().clearTitle();
                 getView().updateTitle(protein.getName() + " (" + protein.getAccession() + ")", protein.getAccession(), UNIPROTKB_URL);
+                // TODO Review
                 if(protein.getGenes()!= null && !protein.getGenes().isEmpty() && protein.getGenes().size()==1){
                     gene = protein.getGenes().get(0);
                 }
@@ -122,6 +124,7 @@ public class HeaderPresenter extends Presenter<HeaderPresenter.ThisView>
                 getView().updateSpecies(protein.getSpecies());
                 getView().updateGeneSymbol(protein.getGeneSymbol());
                 getView().updateProteinEvidence(protein.getProteinEvidence());
+                getView().updateGenomeAnnotation(protein.getGenes());
 
                 //For groups
                 getView().clearProperties();
