@@ -22,6 +22,11 @@ th {
     color: #ffffff !important;
     text-shadow: #29292f 1px 1px 0 !important;
 }
+
+section img {
+    margin: 0;
+}
+
 /** Most GWT widgets already have a style name defined */
 .gwt-DialogBox {
   width: 400px;
@@ -41,6 +46,72 @@ th {
     border-radius: 5px;
     background: rgba(255, 255, 255, 1.0);
     z-index: 101;
+}
+
+
+/** gwt Button **/
+.gwt-PushButton{
+    float: right;
+    margin: 3px;
+
+}
+.gwt-PushButton-up,
+.gwt-PushButton-up-hovering,
+.gwt-PushButton-up-disabled,
+.gwt-PushButton-down,
+.gwt-PushButton-down-hovering,
+.gwt-PushButton-down-disabled {
+    text-decoration: none;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+}
+.gwt-PushButton-up,
+.gwt-PushButton-up-hovering,
+.gwt-PushButton-up-disabled {
+    padding: 3px 3px 3px 3px;
+}
+.gwt-PushButton-up {
+    border:1px solid #bbb;
+    border-bottom: 1px solid #a0a0a0;
+    cursor: pointer;
+    cursor: hand;
+}
+.gwt-PushButton-up-hovering {
+    border: 1px solid;
+    border-color: #939393;
+    cursor: pointer;
+    cursor: hand;
+}
+.gwt-PushButton-up-disabled {
+    border: 1px solid #bbb;
+    cursor: default;
+    opacity: .5;
+    filter: alpha(opacity=45);
+    zoom: 1;
+}
+.gwt-PushButton-down,
+.gwt-PushButton-down-hovering,
+.gwt-PushButton-down-disabled {
+    padding: 3px 3px 3px 3px;
+    outline:none;
+}
+.gwt-PushButton-down {
+    border: 1px inset #666;
+    cursor: pointer;
+    cursor: hand;
+}
+.gwt-PushButton-down-hovering {
+    border: 1px solid #939393;
+    border-top: 1px solid #333333;
+    cursor: pointer;
+    cursor: hand;
+}
+.gwt-PushButton-down-disabled {
+    border: 1px outset #ccc;
+    cursor: default;
+    opacity: 0.5;
+    filter: alpha(opacity=45);
+    zoom: 1;
 }
 
 .displayInline {

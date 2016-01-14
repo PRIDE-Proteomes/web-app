@@ -4,6 +4,12 @@
         "javascriptList": [
             {
                 "url": "WebApp/WebApp.nocache.js"
+            },
+            {
+                "url": "static/js/FileSaver.js"
+            },
+            {
+                "url": "static/js/Blob.js"
             }
         ],
         "breadcrumbItems": [{

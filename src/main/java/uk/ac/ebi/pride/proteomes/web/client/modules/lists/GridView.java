@@ -2,15 +2,15 @@ package uk.ac.ebi.pride.proteomes.web.client.modules.lists;
 
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.DisclosurePanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.*;
+import uk.ac.ebi.pride.proteomes.web.client.images.FileImages;
 import uk.ac.ebi.pride.proteomes.web.client.modules.ViewWithUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
@@ -37,6 +37,8 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
 
     private DataGridWithScroll<T> grid;
     private ModuleContainer frame;
+    private PushButton downloadBtn;
+    private FlowPanel flowPanel;
     private Set<T> selection;
 
     private final String baseType;
@@ -66,16 +68,16 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
         this(title, typeName, false);
     }
 
-    public GridView(String title, String typeName, boolean skipRowHoverStyleUpdate) {
-        frame = ModuleContainerFactory.getModuleContainer(title);
-        grid = new DataGridWithScroll<>();
+    public GridView(final String title, String typeName, boolean skipRowHoverStyleUpdate) {
+
         baseType = typeName;
         selection = new HashSet<>();
 
+        grid = new DataGridWithScroll<>();
         grid.addRowCountChangeHandler(this);
         grid.setEmptyTableWidget(new Label("No " + baseType + "s match the selection."));
 
-        grid.setWidth("99%");
+        grid.setWidth("100%");
         grid.setHeight("200px");
         grid.setSkipRowHoverCheck(skipRowHoverStyleUpdate);
 
@@ -84,8 +86,22 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
         // number of peptides.
         grid.setPageSize(4096);
 
+        downloadBtn =  new PushButton(new Image(FileImages.INSTANCE.tsvPngFile()), new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                download(createTsvFile(), title + ".tsv");
+            }
+        });
+
+//        downloadBtn.setStyleName("export-Button");
+        downloadBtn.setTitle("Click here to export the data as a .tsv file");
+
+        flowPanel = new FlowPanel();
+        flowPanel.add(downloadBtn);
+        flowPanel.add(grid);
+
+        frame = ModuleContainerFactory.getModuleContainer(title);
         frame.setWidth("100%");
-        frame.setContent(grid);
+        frame.setContent(flowPanel);
 
         frame.addOpenHandler(this);
     }
@@ -142,9 +158,8 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
 
     @Override
     public void loadList() {
-        frame.setContent(grid);
+        frame.setContent(flowPanel);
         frame.clearPrimaryMessage();
-        updateItemCount(grid.getRowCount());
     }
 
     @Override
@@ -208,7 +223,6 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
     }
 
 
-
     @Override
     public void setSelectionModel(SelectionModel<? super T> selectionModel) {
         grid.setSelectionModel(selectionModel, selectionManager);
@@ -232,5 +246,60 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
 
     private void updateItemCount(int number) {
         frame.setSecondaryMessage(StringUtils.getCount(baseType, number));
+        grid.setRowCount(number);
+    }
+
+
+    /**
+     * Uses files in resources/public to enable download.
+     * @param text from grid
+     * @param fileName customize for the download
+     *
+     * The JavaScript for download is FileSaver. This one (sometimes) needs Blob as
+     * the standard W3C File API Blob interface is not available in all browsers.
+     * Blob.js is a cross-browser Blob implementation that solves this.
+     * https://github.com/eligrey/FileSaver.js/blob/master/README.md
+     */
+    public static native void download(String text, String fileName) /*-{
+        $wnd.saveAs(
+            new Blob(
+                [text]
+                , {type: "text/plain;charset=utf-8;"}
+            )
+            , fileName
+        );
+    }-*/;
+
+    /**
+     * This method transforms the model to plane text to be exported with FileSaver
+     *
+     * @return the content for the file as string
+     */
+    private String createTsvFile() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        int numColumns = grid.getColumnCount();
+        for (int i = 0; i < numColumns; i++) {
+            stringBuilder.append(grid.getHeader(i).getValue());
+            if (i < numColumns - 1) {
+                stringBuilder.append("\t");
+            } else {
+                stringBuilder.append("\n");
+            }
+        }
+
+        int numRows = grid.getRowCount();
+        for (int j = 0; j < numRows; j++) {
+            for (int i = 0; i < numColumns; i++) {
+                stringBuilder.append(grid.getRowElement(j).getCells().getItem(i).getInnerText());
+                if (i < numColumns - 1) {
+                    stringBuilder.append("\t");
+                } else {
+                    stringBuilder.append("\n");
+                }
+            }
+        }
+
+        return stringBuilder.toString();
     }
 }
