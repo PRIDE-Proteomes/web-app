@@ -5,8 +5,9 @@ import com.google.gwt.user.client.Window;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.events.SnoopingEventBus;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
-import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 import uk.ac.ebi.pride.proteomes.web.googleanalytics.client.GATracker;
+
+import java.util.logging.Logger;
 
 /**
  * The reporter sends information about the user interacting with the
@@ -20,6 +21,9 @@ import uk.ac.ebi.pride.proteomes.web.googleanalytics.client.GATracker;
  *         Time: 16:06
  */
 public class Reporter implements StateChangingActionEvent.Handler {
+
+    private static Logger logger = Logger.getLogger(Reporter.class.getName());
+
     private final EventBus eventBus;
     private boolean trackingIsEnabled = false;
 
@@ -37,8 +41,8 @@ public class Reporter implements StateChangingActionEvent.Handler {
             }
         }
 
-        if(!trackingIsEnabled && Console.VERBOSE) {
-            Console.info("(GAnalytics): Tracking is disabled, " +
+        if(!trackingIsEnabled) {
+            logger.finer("(GAnalytics): Tracking is disabled, " +
                          "will output to console instead.");
         }
 
@@ -56,10 +60,9 @@ public class Reporter implements StateChangingActionEvent.Handler {
         if(trackingIsEnabled) {
             GATracker.trackEvent(category, action, module);
         }
-        if(Console.VERBOSE) {
-            Console.info("(GAnalytics): " + getIndentation() + action + "(\"" +
-                    category + "\") <- " + module);
-        }
+        logger.finer("(GAnalytics): " + getIndentation() + action + "(\"" +
+                category + "\") <- " + module);
+
     }
 
     private String simpleName(String className) {

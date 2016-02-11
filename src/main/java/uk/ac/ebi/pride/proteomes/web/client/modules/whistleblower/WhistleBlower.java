@@ -6,8 +6,10 @@ import uk.ac.ebi.pride.proteomes.web.client.events.state.InvalidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ErrorOnUpdateEvent;
-import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
+import uk.ac.ebi.pride.proteomes.web.client.modules.googleanalytics.Reporter;
 import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
+
+import java.util.logging.Logger;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -15,10 +17,11 @@ import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
  *         Time: 15:27
  */
 public class WhistleBlower implements StateChangingActionEvent.Handler,
-                                      ErrorOnUpdateEvent.Handler,
-                                      ValidStateEvent.Handler,
-                                      InvalidStateEvent.Handler
-{
+        ErrorOnUpdateEvent.Handler,
+        ValidStateEvent.Handler,
+        InvalidStateEvent.Handler {
+
+    private static Logger logger = Logger.getLogger(Reporter.class.getName());
     private EventBus eventBus = null;
 
     public WhistleBlower(EventBus eventBus) {
@@ -32,65 +35,60 @@ public class WhistleBlower implements StateChangingActionEvent.Handler,
 
     @Override
     public void onStateChangingActionEvent(StateChangingActionEvent event) {
-        if(Console.VERBOSE) {
-            String clName = StringUtils.getShortName(event.getSource().getClass());
-            String evName = StringUtils.getShortName(event.getClass());
-            String vType = event.getChanger().toString();
+        String clName = StringUtils.getShortName(event.getSource().getClass());
+        String evName = StringUtils.getShortName(event.getClass());
+        String vType = event.getChanger().toString();
 
-            Console.info("(Whistler):   " + getIndentation() + evName +
-                    "(\"" + vType.replace("\n", " ") + "\")" + " <- " + clName);
-        }
+        logger.finest("(Whistler):   " + getIndentation() + evName +
+                "(\"" + vType.replace("\n", " ") + "\")" + " <- " + clName);
+
     }
 
     @Override
     public void onUpdateErrorEvent(ErrorOnUpdateEvent event) {
-        if(Console.VERBOSE) {
-            String clName = StringUtils.getShortName(event.getSource().getClass());
-            String evName = StringUtils.getShortName(event.getClass());
+        String clName = StringUtils.getShortName(event.getSource().getClass());
+        String evName = StringUtils.getShortName(event.getClass());
 
-            Console.info("(Whistler):   " + getIndentation() + evName +
-                    "(\"" + event.getMessage() + "\")" + " <- " + clName);
-        }
+        logger.finest("(Whistler):   " + getIndentation() + evName +
+                "(\"" + event.getMessage() + "\")" + " <- " + clName);
+
     }
 
     @Override
     public void onValidStateEvent(ValidStateEvent event) {
-        if(Console.VERBOSE) {
-            String clName = StringUtils.getShortName(event.getSource().getClass());
-            String evName = StringUtils.getShortName(event.getClass());
-            String vType = "";
-            switch(event.getViewType()){
-                case Group:
-                    vType = "Group View";
-                    break;
-                case Protein:
-                    vType = "Protein View";
-                    break;
-            }
-
-            Console.info("(Whistler):   " + getIndentation() + evName +
-                         "(\"" + vType + "\")" + " <- " + clName);
+        String clName = StringUtils.getShortName(event.getSource().getClass());
+        String evName = StringUtils.getShortName(event.getClass());
+        String vType = "";
+        switch (event.getViewType()) {
+            case Group:
+                vType = "Group View";
+                break;
+            case Protein:
+                vType = "Protein View";
+                break;
         }
+
+        logger.finest("(Whistler):   " + getIndentation() + evName +
+                "(\"" + vType + "\")" + " <- " + clName);
+
     }
 
     @Override
     public void onInvalidStateEvent(InvalidStateEvent event) {
-        if(Console.VERBOSE) {
-            String clName = StringUtils.getShortName(event.getSource().getClass());
-            String evName = StringUtils.getShortName(event.getClass());
-            String vType = event.getState();
+        String clName = StringUtils.getShortName(event.getSource().getClass());
+        String evName = StringUtils.getShortName(event.getClass());
+        String vType = event.getState();
 
-            Console.info("(Whistler):   " + getIndentation() + evName +
-                    "(\"" + vType + "\")" + " <- " + clName);
-        }
+        logger.finest("(Whistler):   " + getIndentation() + evName +
+                "(\"" + vType + "\")" + " <- " + clName);
+
     }
 
     private String getIndentation() {
-        if(eventBus instanceof SnoopingEventBus) {
+        if (eventBus instanceof SnoopingEventBus) {
             String indent = ((SnoopingEventBus) eventBus).getIndentation();
             return indent.substring(0, indent.length() - 2);
-        }
-        else {
+        } else {
             return "";
         }
     }

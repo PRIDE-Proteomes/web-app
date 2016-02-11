@@ -1,9 +1,9 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.modifications;
 
-import com.google.common.collect.Multiset;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 
 import java.util.ArrayList;
@@ -17,49 +17,52 @@ import java.util.List;
  *         Time: 10:53
  */
 class ModificationColumnProvider {
-    public static List<Column<Multiset.Entry<String>, ?>> getSortingColumns
-            (ListSorter<Multiset.Entry<String>> sorter) {
-        List<Column<Multiset.Entry<String>, ?>> columns = new ArrayList<>();
+        public static List<Column<ModificationWithPosition, ?>> getSortingColumns(ListSorter<ModificationWithPosition> sorter) {
+            List<Column<ModificationWithPosition, ?>> columns = new ArrayList<>();
 
-        TextColumn<Multiset.Entry<String>> nameColumn = new TextColumn<Multiset.Entry<String>>() {
-            @Override
-            public String getValue(Multiset.Entry<String> object) {
-                return object.getElement();
-            }
-        };
+            TextColumn<ModificationWithPosition> nameColumn = new TextColumn<ModificationWithPosition>() {
+                @Override
+                public String getValue(ModificationWithPosition object) {
+                    if(object != null) {
+                        return object.getModification();
 
-        nameColumn.setSortable(true);
-        sorter.setComparator(nameColumn, new Comparator<Multiset.Entry<String>>() {
-            @Override
-            public int compare(Multiset.Entry<String> o1, Multiset.Entry<String> o2) {
-                return o1.getElement().compareTo(o2.getElement());
-            }
-        });
+                    }
+                    return "PEPE";
+                }
+            };
 
-        TextColumn<Multiset.Entry<String>> countColumn = new TextColumn<Multiset.Entry<String>>() {
-            @Override
-            public String getValue(Multiset.Entry<String> object) {
-                return String.valueOf(object.getCount());
-            }
-        };
+            nameColumn.setSortable(true);
+            sorter.setComparator(nameColumn, new Comparator<ModificationWithPosition>() {
+                @Override
+                public int compare(ModificationWithPosition o1, ModificationWithPosition o2) {
+                    return o1.getModification().compareTo(o2.getModification());
+                }
+            });
 
-        countColumn.setSortable(true);
-        sorter.setComparator(countColumn, new Comparator<Multiset.Entry<String>>() {
-            @Override
-            public int compare(Multiset.Entry<String> o1, Multiset.Entry<String> o2) {
-                return new Integer(o1.getCount()).compareTo(o2.getCount());
-            }
-        });
+            TextColumn<ModificationWithPosition> positionColumn = new TextColumn<ModificationWithPosition>() {
+                @Override
+                public String getValue(ModificationWithPosition object) {
+                    return String.valueOf(object.getPosition());
+                }
+            };
+            positionColumn.setSortable(true);
+            sorter.setComparator(positionColumn, new Comparator<ModificationWithPosition>() {
+                @Override
+                public int compare(ModificationWithPosition o1, ModificationWithPosition o2) {
+                    return new Integer(o1.getPosition()).compareTo(o2.getPosition());
+                }
+            });
 
-        columns.add(nameColumn);
-        columns.add(countColumn);
+            columns.add(nameColumn);
+            columns.add(positionColumn);
 
-        return columns;
-    }
+            return columns;
+        }
+
 
     public static List<String> getColumnTitles() {
         List<String> titles = new ArrayList<>();
-        Collections.addAll(titles, "Name", "Count");
+        Collections.addAll(titles, "Name", "Position");
         return titles;
     }
 
@@ -68,6 +71,7 @@ class ModificationColumnProvider {
         Collections.addAll(widths, "70%", "30%");
         return widths;
     }
+
 
     public static HasKeyboardSelectionPolicy.KeyboardSelectionPolicy getKeyboardSelectionPolicy() {
         return HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.ENABLED;

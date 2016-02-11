@@ -3,6 +3,7 @@ package uk.ac.ebi.pride.proteomes.web.client.events.updates;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
 
 import java.util.List;
 
@@ -18,20 +19,20 @@ public class ModificationUpdateEvent extends GwtEvent<ModificationUpdateEvent.Ha
 
     private static final Type<Handler> TYPE = new Type<>();
 
-    private final List<String> modifications;
+    private final List<ModificationWithPosition> modifications;
 
-    private ModificationUpdateEvent(List<String> modifications, HasHandlers source) {
+    private ModificationUpdateEvent(List<ModificationWithPosition> modifications, HasHandlers source) {
         super();
         this.modifications = modifications;
         setSource(source);
     }
 
-    public static void fire(HasHandlers source, List<String> modifications) {
+    public static void fire(HasHandlers source, List<ModificationWithPosition> modifications) {
         ModificationUpdateEvent eventInstance = new ModificationUpdateEvent(modifications, source);
         source.fireEvent(eventInstance);
     }
 
-    public List<String> getModifications() {
+    public List<ModificationWithPosition> getModifications() {
         return modifications;
     }
 

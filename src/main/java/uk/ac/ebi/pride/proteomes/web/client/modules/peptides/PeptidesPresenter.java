@@ -6,6 +6,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
@@ -23,6 +24,7 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
 import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -39,6 +41,9 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
                                           TissueUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler,
                                           PeptiformUpdateEvent.Handler {
+
+    private static Logger logger = Logger.getLogger(PeptidesPresenter.class.getName());
+
     private final ListDataProvider<PeptideMatch> dataProvider = new
                                             ListDataProvider<>();
     private final ListSorter<PeptideMatch> dataSorter = new
@@ -49,7 +54,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
     private Region currentRegion = Region.emptyRegion();
     private List<PeptideWithPeptiforms> selectedPeptidesMatches = Collections.emptyList();
     private List<String> currentTissues = Collections.emptyList();
-    private List<String> currentModifications = Collections.emptyList();
+    private List<ModificationWithPosition> currentModifications = Collections.emptyList();
     private List<Peptide> selectedVariances = Collections.emptyList();
 
     private boolean selectionEventsDisabled = false;
@@ -65,7 +70,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
         view.addUiHandler(this);
-        view.setHeight("300px");
+        view.setHeight("150px");
         view.asWidget().setVisible(false);
 
         // We define how are the items selected here
@@ -140,7 +145,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
         updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
-                currentTissues, currentModifications));
+                currentTissues, currentModifications, currentProtein.getSequence().length()));
     }
 
     @Override
@@ -164,15 +169,11 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
-        currentTissues = new ArrayList<>();
-        for(String tissue : event.getTissues()) {
-            if(!tissue.equals("")) {
-                currentTissues.add(tissue);
-            }
-        }
+        currentTissues = event.getTissues();
+
         updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
-                currentTissues, currentModifications));
+                currentTissues, currentModifications, currentProtein.getSequence().length()));
     }
 
     /**
@@ -183,28 +184,12 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
+
         currentModifications = event.getModifications();
-        if (!currentModifications.isEmpty()) {
-            for (String mod : currentModifications) {
-                if (!mod.equals("")) {
-                    try {
-                        //Modification selected by position in coverage view
-                        int position = Integer.parseInt(mod);
-                        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
-                                position, position,
-                                currentTissues, currentModifications));
-                    } catch (NumberFormatException e) {
-                        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
-                                currentRegion.getStart(), currentRegion.getEnd(),
-                                currentTissues, currentModifications));
-                    }
-                }
-            }
-        } else {
-            updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
-                    currentRegion.getStart(), currentRegion.getEnd(),
-                    currentTissues, currentModifications));
-        }
+
+        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
+                currentRegion.getStart(), currentRegion.getEnd(),
+                currentTissues, currentModifications, currentProtein.getSequence().length()));
 
     }
 
@@ -249,6 +234,10 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         if(!variances.containsAll(selectedVariances)) {
             changer.addPeptiformChange(variances);
         }
+
+        //Regions
+        //With the selection we reset the region to avoid confusing to the user clicking outside of the region and moving it
+//        changer.addRegionChange(new ArrayList<Region>());
 
         if(items.isEmpty()) {
             action = new UserAction(UserAction.Type.peptide, "Click Reset");

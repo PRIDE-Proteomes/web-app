@@ -1,14 +1,13 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.modifications;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.TreeMultiset;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.OrderedMultiSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
@@ -19,22 +18,25 @@ import uk.ac.ebi.pride.proteomes.web.client.events.updates.ModificationUpdateEve
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.PeptideUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.ProteinUpdateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.TissueUpdateEvent;
+import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalModificationPositionException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
+import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
  *         Date: 26/11/13
  *         Time: 10:35
  */
-public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<String>>>
-        implements ListUiHandler<Multiset.Entry<String>>,
+public class ModificationsPresenter extends Presenter<ListView<ModificationWithPosition>>
+        implements ListUiHandler<ModificationWithPosition>,
         ValidStateEvent.Handler,
         ProteinUpdateEvent.Handler,
         ProteinRequestEvent.Handler,
@@ -42,24 +44,26 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
         TissueUpdateEvent.Handler,
         ModificationUpdateEvent.Handler {
 
-    private final ListDataProvider<Multiset.Entry<String>> dataProvider = new ListDataProvider<>();
-    private final ListSorter<Multiset.Entry<String>> dataSorter = new ListSorter<>(new ArrayList<Multiset.Entry<String>>());
+    private static Logger logger = Logger.getLogger(ModificationsPresenter.class.getName());
+    private final ListDataProvider<ModificationWithPosition> dataProvider = new ListDataProvider<>();
+    private final ListSorter<ModificationWithPosition> dataSorter = new ListSorter<>(new ArrayList<ModificationWithPosition>());
 
     private boolean groups = true;
     private boolean selectionEventsDisabled = false;
 
 
     private Protein currentProtein;
-    private Collection<Multiset.Entry<String>> selectedModifications = Collections.emptyList();
+    private List<ModificationWithPosition> selectedModifications = Collections.emptyList();
     private List<String> selectedTissues = Collections.emptyList();
-    private Collection<? extends PeptideMatch> selectedPeptides = Collections.emptyList();
+    private List<? extends PeptideMatch> selectedPeptides = Collections.emptyList();
 
-    //Biological modifications extraced from the peptides. It takes into account the number of times that a modification appear
-    private Multiset<String> peptidesMods = TreeMultiset.create();
+    // Biological modifications extracted from all the peptides of the protein.
+    // It takes into account the number of times that a modification appear
+    private List<ModificationWithPosition> proteinMods = new ArrayList<>();
 
-    public ModificationsPresenter(EventBus eventBus, ListView<Multiset.Entry<String>> view) {
+    public ModificationsPresenter(EventBus eventBus, ListView<ModificationWithPosition> view) {
         super(eventBus, view);
-        List<Column<Multiset.Entry<String>, ?>> columns = ModificationColumnProvider.getSortingColumns(dataSorter);
+        List<Column<ModificationWithPosition, ?>> columns = ModificationColumnProvider.getSortingColumns(dataSorter);
         List<String> columnTitles = ModificationColumnProvider.getColumnTitles();
         List<String> columnWidths = ModificationColumnProvider.getColumnWidths();
 
@@ -70,12 +74,12 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
         view.setHeight("120px");
         view.asWidget().setVisible(false);
 
-        final OrderedMultiSelectionModel<Multiset.Entry<String>> selectionModel = new OrderedMultiSelectionModel<>();
+        final OrderedMultiSelectionModel<ModificationWithPosition> selectionModel = new OrderedMultiSelectionModel<>();
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
                 if (!selectionEventsDisabled) {
-                    for (ListUiHandler<Multiset.Entry<String>> handler : getView().getUiHandlers()) {
+                    for (ListUiHandler<ModificationWithPosition> handler : getView().getUiHandlers()) {
                         handler.onSelectionChanged(selectionModel.getSelectedSet());
                     }
                 }
@@ -111,30 +115,18 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
         if (!groups && event.getProteins().size() > 0) {
             currentProtein = event.getProteins().get(0);
 
-            Multiset<String> proteinMods = TreeMultiset.create();
-            for (ModifiedLocation loc : currentProtein.getModifiedLocations()) {
-                proteinMods.add(loc.getModification());
-            }
-
-            //This code could be remove and replace by updateList() as soon as the
-            // peptides don't contain non biological modifications or a flag no filter them.
-            final List<PeptideMatch> peptides = currentProtein.getPeptides();
-            if (!peptides.isEmpty()) {
-                for (PeptideMatch peptide : peptides) {
-                    for (ModifiedLocation item : peptide.getModifiedLocations()) {
-                        peptidesMods.add(item.getModification());
-                    }
+//            proteinMods = currentProtein.getModifiedLocations();
+            for (ModifiedLocation modifiedLocation : currentProtein.getModifiedLocations()) {
+                try {
+                    proteinMods.add(new ModificationWithPosition(modifiedLocation.getModification(), modifiedLocation.getPosition()));
+                } catch (IllegalModificationPositionException e) {
+                    logger.info("Error while converting modifications");
                 }
-                // We calculate the set to remove non biological modifications
-                // present in the peptides but not in the protein
-                peptidesMods.retainAll(proteinMods);
             }
+            // Biological modifications extracted from all the peptides of the protein.
+            // It takes into account the number of times that a modification appear
 
-            setList(peptidesMods.entrySet());
-            selectModifications(peptidesMods);
-
-            getView().loadList();
-            getView().showContent();
+            updateList(proteinMods);
         }
     }
 
@@ -158,47 +150,36 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
         // Reset selection
-        for (Multiset.Entry<String> mod : selectedModifications) {
-            deselectItem(mod);
+        for (ModificationWithPosition selectedModification : selectedModifications) {
+            deselectItem(selectedModification);
         }
 
-        //Update the selection if it is possible
-        selectedModifications = new ArrayList<>();
-        for (String item : event.getModifications()) {
-            for (Multiset.Entry<String> entry : dataProvider.getList()) {
-                if (entry.getElement().equals(item)) {
-                    selectedModifications.add(entry);
-                    break;
-                }
-            }
-        }
+        selectedModifications = event.getModifications();
 
-        // We collect only the possible moodifications available in the peptides after filtering by selected tissue and selected mods
-        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
-                selectedTissues, event.getModifications()));
+        updateModifications();
     }
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
-
-        selectedTissues = event.getTissues();
-
-        for (Multiset.Entry<String> selectedModification : selectedModifications) {
+        // Reset selection
+        for (ModificationWithPosition selectedModification : selectedModifications) {
             deselectItem(selectedModification);
         }
 
+        selectedTissues = event.getTissues();
+        updateModifications();
 
-        //We collect only the possible moodifications available in the peptides after filtering by tissue
-        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
-                selectedTissues, extractModifications(selectedModifications)));
     }
 
-
     @Override
-    public void onSelectionChanged(Collection<Multiset.Entry<String>> items) {
+    public void onSelectionChanged(Collection<ModificationWithPosition> items) {
         StateChanger changer;
         UserAction action;
         List<PeptideMatch> filteredPeptides;
+
+        for (ModificationWithPosition modificationWithPosition : dataProvider.getList()) {
+            Console.info(modificationWithPosition.toString());
+        }
 
         // an empty selection is represented by a list with a null item,
         // we represent that with an empty list, so we have to add an
@@ -211,112 +192,94 @@ public class ModificationsPresenter extends Presenter<ListView<Multiset.Entry<St
             items = Collections.emptyList();
         }
 
-        Collection<String> selection = extractModifications(items);
-
         filteredPeptides = new ArrayList<>();
-        for (PeptideMatch pep : selectedPeptides) {
+        for (PeptideMatch peptide : selectedPeptides) {
+
+            Collection<ModificationWithPosition> filteredModifications = new TreeSet<>();
+            filteredModifications.addAll(PeptideUtils.extractModifications(peptide, currentProtein.getSequence().length()));
+            filteredModifications.retainAll(proteinMods);
+
             // If the collections are disjoint means the peptide doesn't have
             // any modifications in items. If this happens, we filter it out.
-            if (!Collections.disjoint(PeptideUtils.extractModifications(pep), selection) || selection.isEmpty()) {
-                filteredPeptides.add(pep);
+            if (!Collections.disjoint(filteredModifications, items) || items.isEmpty()) {
+                filteredPeptides.add(peptide);
             }
         }
 
         changer = new StateChanger();
-        changer.addModificationChange(selection);
+        changer.addModificationChange(items);
         if (filteredPeptides.size() < selectedPeptides.size()) {
             changer.addPeptideChange(filteredPeptides);
         }
-        if (selection.isEmpty()) {
+        if (items.isEmpty()) {
             action = new UserAction(UserAction.Type.modification, "Click Reset");
         } else {
             action = new UserAction(UserAction.Type.modification, "Click Set");
         }
         StateChangingActionEvent.fire(this, changer, action);
-    }
 
-    private List<String> extractModifications(Collection<Multiset.Entry<String>> selectedModifications) {
-        Set<String> result = new TreeSet<>();
-        for (Multiset.Entry<String> selectedModification : selectedModifications) {
-            result.add(selectedModification.getElement());
+        for (ModificationWithPosition modificationWithPosition : dataProvider.getList()) {
+            Console.info(modificationWithPosition.toString());
         }
-
-        return  Lists.newArrayList(result);
     }
 
-    private void updateList(Collection<PeptideMatch> peptides) {
+
+    private void updateModifications() {
+        //We collect only the possible modifications available in the peptides after filtering by selected tissue and selected mods
+        List<PeptideMatch> peptides = PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
+                selectedTissues, selectedModifications, currentProtein.getSequence().length());
+
         if (!peptides.isEmpty()) {
-            Multiset<String> filteredModifications = TreeMultiset.create();
+            Set<ModificationWithPosition> filteredModifications = new TreeSet<>();
 
             for (PeptideMatch peptide : peptides) {
-                filteredModifications.addAll(PeptideUtils.extractModifications(peptide));
+                filteredModifications.addAll(PeptideUtils.extractModifications(peptide, currentProtein.getSequence().length()));
             }
-            // We calculate the set to remove non biological modifications
+
+            // We calculate the set to remove possible modifications
             // present in the peptides but not in the protein
-            filteredModifications.retainAll(peptidesMods);
-            setList(filteredModifications.entrySet());
-            selectModifications(filteredModifications);
+            filteredModifications.retainAll(proteinMods);
+            updateList(Lists.newArrayList(filteredModifications));
         }
     }
 
-    private void selectModifications(Multiset<String> modifications) {
-        for (Multiset.Entry<String> item : modifications.entrySet()) {
-            for (Multiset.Entry<String> entry : selectedModifications) {
-                if (entry.getElement().equals(item.getElement())) {
-                    selectItem(entry);
-                    break;
-                }
-            }
+    private void updateList(List<? extends ModificationWithPosition> modifications) {
+
+        setList(modifications);
+        for (ModificationWithPosition modification : selectedModifications) {
+            selectItem(modification);
         }
     }
 
-
-    private void selectItem(Multiset.Entry<String> mod) {
-        int modPosition = -1;
-        for (int i = 0; i < dataProvider.getList().size(); i++) {
-            Multiset.Entry<String> entry = dataProvider.getList().get(i);
-            if (entry.getElement().equals(mod.getElement())) {
-                modPosition = i;
-                break;
-            }
-        }
-
-        if (modPosition > -1) {
-            selectionEventsDisabled = true;
-            getView().selectItemOn(modPosition);
-            getView().focusItemOn(modPosition);
-            selectionEventsDisabled = false;
-        }
+    private void selectItem(ModificationWithPosition modification) {
+        selectionEventsDisabled = true;
+        getView().selectItemOn(dataProvider.getList().indexOf(modification));
+        getView().focusItemOn(dataProvider.getList().indexOf(modification));
+        selectionEventsDisabled = false;
     }
 
-    private void deselectItem(Multiset.Entry<String> mod) {
-        int modPosition = -1;
-        for (int i = 0; i < dataProvider.getList().size(); i++) {
-            Multiset.Entry<String> entry = dataProvider.getList().get(i);
-            if (entry.getElement().equals(mod.getElement())) {
-                modPosition = i;
-                break;
-            }
-        }
-
-        if (modPosition > -1) {
-            selectionEventsDisabled = true;
-            getView().deselectItemOn(modPosition);
-            selectionEventsDisabled = false;
-        }
+    private void deselectItem(ModificationWithPosition modification) {
+        selectionEventsDisabled = true;
+        getView().deselectItemOn(dataProvider.getList().indexOf(modification));
+        selectionEventsDisabled = false;
     }
 
     /**
      * This method is used whenever a new list is set as the model of the view.
-     *
+     * <p/>
      * We clear the list and repopulate it because if we simply reset the
      * data provider and data sorter references to the list it won't work.
      */
-    private void setList(final Collection<Multiset.Entry<String>> list) {
+    private void setList(final List<? extends ModificationWithPosition> list) {
         dataProvider.getList().clear();
         dataProvider.getList().addAll(list);
         dataSorter.repeatSort();
         dataProvider.flush();
         getView().loadList();
+        getView().showContent();
+
+        for (ModificationWithPosition modificationWithPosition : dataProvider.getList()) {
+            Console.info(modificationWithPosition.toString());
+        }
     }
 }

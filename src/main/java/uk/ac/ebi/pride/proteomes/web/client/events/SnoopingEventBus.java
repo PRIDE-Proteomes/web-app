@@ -2,8 +2,9 @@ package uk.ac.ebi.pride.proteomes.web.client.events;
 
 import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.SimpleEventBus;
-import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
+
+import java.util.logging.Logger;
 
 
 /**
@@ -14,6 +15,9 @@ import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
  *         Time: 16:12
  */
 public class SnoopingEventBus extends SimpleEventBus {
+
+    private static Logger logger = Logger.getLogger(SnoopingEventBus.class.getName());
+
     private int depth = 0;
 
     public SnoopingEventBus() {
@@ -26,11 +30,9 @@ public class SnoopingEventBus extends SimpleEventBus {
 
     @Override
     public void fireEvent(Event<?> event) {
-        if(Console.VERBOSE){
-            String evName = StringUtils.getShortName(event.getClass());
+        String evName = StringUtils.getShortName(event.getClass());
+        logger.finer("(Event Bus):  " + getIndentation() + evName);
 
-            Console.info("(Event Bus):  " + getIndentation() + evName);
-        }
 
         depth++;
         super.fireEvent(event);
@@ -39,12 +41,11 @@ public class SnoopingEventBus extends SimpleEventBus {
 
     @Override
     public void fireEventFromSource(Event<?> event, Object source) {
-        if(Console.VERBOSE) {
-            String clName = StringUtils.getShortName(event.getSource().getClass());
-            String evName = StringUtils.getShortName(event.getClass());
+        String clName = StringUtils.getShortName(event.getSource().getClass());
+        String evName = StringUtils.getShortName(event.getClass());
 
-            Console.info("(Event Bus):  " + getIndentation() + evName + " <- " + clName);
-        }
+        logger.finer("(Event Bus):  " + getIndentation() + evName + " <- " + clName);
+
 
         depth++;
         super.fireEventFromSource(event, source);

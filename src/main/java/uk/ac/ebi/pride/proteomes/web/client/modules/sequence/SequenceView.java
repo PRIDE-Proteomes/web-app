@@ -9,6 +9,7 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.ViewWithUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
 import uk.ac.ebi.pride.widgets.client.common.handler.PeptideHandler;
+import uk.ac.ebi.pride.widgets.client.common.handler.PrideModificationHandler;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
 import uk.ac.ebi.pride.widgets.client.sequence.client.SequenceViewer;
 import uk.ac.ebi.pride.widgets.client.sequence.events.ProteinRegionHighlightedEvent;
@@ -114,8 +115,20 @@ public class SequenceView extends ViewWithUiHandlers<SequenceUiHandler>
     }
 
     @Override
+    public void highlightModificationsInPeptides(List<ModificationAdapter> modifications, List<PeptideAdapter> peptides){
+        sequence.setHighlightedModifications(
+                new ArrayList<PrideModificationHandler>(modifications),
+                new ArrayList<PeptideHandler>(peptides));
+    }
+
+    @Override
     public void updateModificationHighlight(ModificationAdapter mod) {
         sequence.filterModification(mod);
+    }
+
+    @Override
+    public void updateModificationHighlightBetween(ModificationAdapter mod, int start, int end) {
+        sequence.highlightModificationBeetween(mod, start, end);
     }
 
     @Override

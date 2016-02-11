@@ -1,6 +1,5 @@
 package uk.ac.ebi.pride.proteomes.web.client;
 
-import com.google.common.collect.Multiset;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.History;
@@ -8,6 +7,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.web.bindery.event.shared.EventBus;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
@@ -94,7 +94,10 @@ class AppStarter implements RunAsyncCallback {
         ListView<String> tissueView = new GridView<>("Tissues", "tissue");
         Presenter tissuePresenter = new TissuesPresenter(eventBus, tissueView);
 
-        ListView<Multiset.Entry<String>> modView = new GridView<>("Modifications", "modification");
+//        ListView<Multiset.Entry<String>> modView = new GridView<>("Modifications", "modification");
+//        Presenter modPresenter = new ModificationsPresenter(eventBus, modView);
+
+        ListView<ModificationWithPosition> modView = new GridView<>("Modifications", "modification");
         Presenter modPresenter = new ModificationsPresenter(eventBus, modView);
 
         View coverageView = new CoverageView();

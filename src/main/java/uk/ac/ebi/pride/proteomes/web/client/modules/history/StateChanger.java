@@ -1,10 +1,8 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.history;
 
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.*;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
 import uk.ac.ebi.pride.proteomes.web.client.utils.DefaultHashMap;
 
@@ -92,9 +90,13 @@ public class StateChanger {
                                       State.getToken(peptiformIDs)));
     }
 
-    public void addModificationChange(Collection<String> modificationSelection) {
+    public void addModificationChange(Collection<ModificationWithPosition> modificationSelection) {
+        Collection<String> modsIds = new ArrayList<>();
+        for(ModificationWithPosition modificationWithPosition : modificationSelection) {
+            modsIds.add(modificationWithPosition.toString());
+        }
         orderedChanges.add(new Change(Type.Modification,
-                State.getToken(modificationSelection)));
+                State.getToken(modsIds)));
     }
 
     public void addTissueChange(Collection<String> tissueSelection) {
