@@ -10,7 +10,8 @@ import java.util.Objects;
  *         Date: 04/11/13
  *         Time: 15:07
  */
-public class ModificationWithPosition implements ModifiedLocation {
+public class ModificationWithPosition implements ModifiedLocation, Comparable<ModificationWithPosition> {
+
 
     private static class EmptyModificationWithPosition extends ModificationWithPosition {
         EmptyModificationWithPosition() {
@@ -38,18 +39,21 @@ public class ModificationWithPosition implements ModifiedLocation {
     }
 
     private static volatile EmptyModificationWithPosition emptyModificationWithPosition = new EmptyModificationWithPosition();
-    private int position;
     private String modification;
+    private Integer position;
 
     private ModificationWithPosition() {}
 
 
-    public ModificationWithPosition(String modification, int postion) throws IllegalModificationPositionException  {
-        if (postion < 0 || (!(this instanceof EmptyModificationWithPosition) && postion <= 0 && (modification == null || modification.equals("")))) {
-            throw new IllegalModificationPositionException();
+    public ModificationWithPosition(String modification, Integer position) throws IllegalModificationPositionException {
+        if(position != null){
+            if (position < 0 || (!(this instanceof EmptyModificationWithPosition)
+                    && position <= 0 && (modification == null || modification.equals("")))) {
+                throw new IllegalModificationPositionException();
+            }
         }
 
-        this.position = postion;
+        this.position = position;
         this.modification = modification;
     }
 
@@ -58,7 +62,8 @@ public class ModificationWithPosition implements ModifiedLocation {
             NumberFormatException,
             IndexOutOfBoundsException {
         String[] startEnd = modificationId.split("-");
-        return new ModificationWithPosition(startEnd[1], Integer.parseInt(startEnd[0]));
+
+        return new ModificationWithPosition(startEnd[0], Integer.parseInt(startEnd[1]));
     }
 
     public static EmptyModificationWithPosition emptyModificationWithPosition() {
@@ -67,12 +72,20 @@ public class ModificationWithPosition implements ModifiedLocation {
 
     @Override
     public int getPosition() {
-        return 0;
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 
     @Override
     public String getModification() {
-        return null;
+        return modification;
+    }
+
+    public void setModification(String modification) {
+        this.modification = modification;
     }
 
     public boolean isEmpty() {
@@ -85,16 +98,29 @@ public class ModificationWithPosition implements ModifiedLocation {
     }
 
     @Override
+    public int compareTo(ModificationWithPosition o) {
+        if (this == o) return 0;
+
+        if (this.position < o.position) return -1;
+        if (this.position > o.position) return 1;
+
+        int comparison = this.modification.compareTo(o.modification);
+        if (comparison != 0) return comparison;
+
+        return 0;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ModificationWithPosition)) return false;
         ModificationWithPosition that = (ModificationWithPosition) o;
-        return position == that.position &&
+        return Objects.equals(position, that.position) &&
                 Objects.equals(modification, that.modification);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(position, modification);
+        return Objects.hash(modification, position);
     }
 }

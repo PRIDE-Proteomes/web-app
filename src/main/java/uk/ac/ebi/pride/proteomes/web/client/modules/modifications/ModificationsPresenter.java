@@ -7,6 +7,7 @@ import com.google.gwt.view.client.OrderedMultiSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
+import uk.ac.ebi.pride.proteomes.web.client.common.utils.MapSet;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
@@ -24,7 +25,6 @@ import uk.ac.ebi.pride.proteomes.web.client.modules.history.StateChanger;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListUiHandler;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListView;
-import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 import uk.ac.ebi.pride.proteomes.web.client.utils.PeptideUtils;
 
 import java.util.*;
@@ -58,8 +58,7 @@ public class ModificationsPresenter extends Presenter<ListView<ModificationWithP
     private List<? extends PeptideMatch> selectedPeptides = Collections.emptyList();
 
     // Biological modifications extracted from all the peptides of the protein.
-    // It takes into account the number of times that a modification appear
-    private List<ModificationWithPosition> proteinMods = new ArrayList<>();
+    private Set<ModificationWithPosition> proteinMods = new TreeSet<>();
 
     public ModificationsPresenter(EventBus eventBus, ListView<ModificationWithPosition> view) {
         super(eventBus, view);
@@ -67,6 +66,7 @@ public class ModificationsPresenter extends Presenter<ListView<ModificationWithP
         List<String> columnTitles = ModificationColumnProvider.getColumnTitles();
         List<String> columnWidths = ModificationColumnProvider.getColumnWidths();
 
+        dataSorter.setList(dataProvider.getList());
         view.addDataProvider(dataProvider);
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
@@ -115,7 +115,6 @@ public class ModificationsPresenter extends Presenter<ListView<ModificationWithP
         if (!groups && event.getProteins().size() > 0) {
             currentProtein = event.getProteins().get(0);
 
-//            proteinMods = currentProtein.getModifiedLocations();
             for (ModifiedLocation modifiedLocation : currentProtein.getModifiedLocations()) {
                 try {
                     proteinMods.add(new ModificationWithPosition(modifiedLocation.getModification(), modifiedLocation.getPosition()));
@@ -177,10 +176,6 @@ public class ModificationsPresenter extends Presenter<ListView<ModificationWithP
         UserAction action;
         List<PeptideMatch> filteredPeptides;
 
-        for (ModificationWithPosition modificationWithPosition : dataProvider.getList()) {
-            Console.info(modificationWithPosition.toString());
-        }
-
         // an empty selection is represented by a list with a null item,
         // we represent that with an empty list, so we have to add an
         // additional check for that.
@@ -195,7 +190,7 @@ public class ModificationsPresenter extends Presenter<ListView<ModificationWithP
         filteredPeptides = new ArrayList<>();
         for (PeptideMatch peptide : selectedPeptides) {
 
-            Collection<ModificationWithPosition> filteredModifications = new TreeSet<>();
+            Set<ModificationWithPosition> filteredModifications = new TreeSet<>();
             filteredModifications.addAll(PeptideUtils.extractModifications(peptide, currentProtein.getSequence().length()));
             filteredModifications.retainAll(proteinMods);
 
@@ -217,10 +212,6 @@ public class ModificationsPresenter extends Presenter<ListView<ModificationWithP
             action = new UserAction(UserAction.Type.modification, "Click Set");
         }
         StateChangingActionEvent.fire(this, changer, action);
-
-        for (ModificationWithPosition modificationWithPosition : dataProvider.getList()) {
-            Console.info(modificationWithPosition.toString());
-        }
     }
 
 
@@ -239,11 +230,12 @@ public class ModificationsPresenter extends Presenter<ListView<ModificationWithP
             // We calculate the set to remove possible modifications
             // present in the peptides but not in the protein
             filteredModifications.retainAll(proteinMods);
+
             updateList(Lists.newArrayList(filteredModifications));
         }
     }
 
-    private void updateList(List<? extends ModificationWithPosition> modifications) {
+    private void updateList(Collection<? extends ModificationWithPosition> modifications) {
 
         setList(modifications);
         for (ModificationWithPosition modification : selectedModifications) {
@@ -252,16 +244,39 @@ public class ModificationsPresenter extends Presenter<ListView<ModificationWithP
     }
 
     private void selectItem(ModificationWithPosition modification) {
-        selectionEventsDisabled = true;
-        getView().selectItemOn(dataProvider.getList().indexOf(modification));
-        getView().focusItemOn(dataProvider.getList().indexOf(modification));
-        selectionEventsDisabled = false;
+
+        int modPosition = -1;
+        for(int i = 0; i < dataProvider.getList().size(); i++) {
+            ModificationWithPosition mod = dataProvider.getList().get(i);
+            if(modification.getModification().equals(mod.getModification())){
+                modPosition = i;
+                break;
+            }
+        }
+
+        if(modPosition > -1) {
+            selectionEventsDisabled = true;
+            getView().selectItemOn(modPosition);
+            getView().focusItemOn(modPosition);
+            selectionEventsDisabled = false;
+        }
     }
 
     private void deselectItem(ModificationWithPosition modification) {
-        selectionEventsDisabled = true;
-        getView().deselectItemOn(dataProvider.getList().indexOf(modification));
-        selectionEventsDisabled = false;
+        int modPosition = -1;
+        for(int i = 0; i < dataProvider.getList().size(); i++) {
+            ModificationWithPosition mod = dataProvider.getList().get(i);
+            if(modification.getModification().equals(mod.getModification())){
+                modPosition = i;
+                break;
+            }
+        }
+
+        if(modPosition > -1) {
+            selectionEventsDisabled = true;
+            getView().deselectItemOn(modPosition);
+            selectionEventsDisabled = false;
+        }
     }
 
     /**
@@ -270,16 +285,36 @@ public class ModificationsPresenter extends Presenter<ListView<ModificationWithP
      * We clear the list and repopulate it because if we simply reset the
      * data provider and data sorter references to the list it won't work.
      */
-    private void setList(final List<? extends ModificationWithPosition> list) {
+    private void setList(final Collection<? extends ModificationWithPosition> list) {
+
+        MapSet<String, String> mapSet = new MapSet<>();
+        List<ModificationWithPosition> groupMods = new ArrayList<>();
+        List<List<String>> postionList = new ArrayList<>();
+
+        for (ModificationWithPosition mod : list) {
+            mapSet.add(mod.getModification(), String.valueOf(mod.getPosition()));
+        }
+
+        for (String s : mapSet.keySet()) {
+            List<String> aux = new ArrayList<>();
+            aux.add("All");
+            aux.addAll(Lists.newArrayList(mapSet.getElements(s)));
+            postionList.add(aux);
+
+            try {
+                groupMods.add(new ModificationWithPosition(s, null));
+            } catch (IllegalModificationPositionException e) {
+                logger.info("Error while converting modifications");
+            }
+        }
+
         dataProvider.getList().clear();
-        dataProvider.getList().addAll(list);
+        dataProvider.getList().addAll(groupMods);
         dataSorter.repeatSort();
         dataProvider.flush();
-        getView().loadList();
+
+        getView().loadListWithSelection(postionList);
         getView().showContent();
 
-        for (ModificationWithPosition modificationWithPosition : dataProvider.getList()) {
-            Console.info(modificationWithPosition.toString());
-        }
     }
 }

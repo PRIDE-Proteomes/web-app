@@ -1,8 +1,10 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.modifications;
 
+import com.google.gwt.cell.client.DynamicSelectionCell;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
-import com.google.gwt.user.cellview.client.TextColumn;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
 import uk.ac.ebi.pride.proteomes.web.client.modules.lists.ListSorter;
 
@@ -17,47 +19,50 @@ import java.util.List;
  *         Time: 10:53
  */
 class ModificationColumnProvider {
-        public static List<Column<ModificationWithPosition, ?>> getSortingColumns(ListSorter<ModificationWithPosition> sorter) {
-            List<Column<ModificationWithPosition, ?>> columns = new ArrayList<>();
 
-            TextColumn<ModificationWithPosition> nameColumn = new TextColumn<ModificationWithPosition>() {
-                @Override
-                public String getValue(ModificationWithPosition object) {
-                    if(object != null) {
-                        return object.getModification();
+    public static List<Column<ModificationWithPosition, ?>> getSortingColumns(ListSorter<ModificationWithPosition> sorter) {
+        List<Column<ModificationWithPosition, ?>> columns = new ArrayList<>();
 
-                    }
-                    return "PEPE";
+        Column<ModificationWithPosition, String> nameColumn = new  Column<ModificationWithPosition, String>(new TextCell()) {
+            @Override
+            public String getValue(ModificationWithPosition object) {
+                return object.getModification();
+            }
+        };
+
+        nameColumn.setSortable(false); //the indexes of the DynamicSelectionCell are not updated accordingly
+        sorter.setComparator(nameColumn, new Comparator<ModificationWithPosition>() {
+            @Override
+            public int compare(ModificationWithPosition o1, ModificationWithPosition o2) {
+                return o1.getModification().compareTo(o2.getModification());
+            }
+        });
+
+        columns.add(nameColumn);
+
+        Column<ModificationWithPosition, String> positionColumn = new Column<ModificationWithPosition, String>(new DynamicSelectionCell()) {
+            @Override
+            public String getValue(ModificationWithPosition object) {
+                return String.valueOf("All");
+            }
+        };
+        positionColumn.setFieldUpdater(new FieldUpdater<ModificationWithPosition, String>() {
+            @Override
+            public void update(int index, ModificationWithPosition object, String value) {
+                if (value!= null && !value.isEmpty() && !value.equals("All")) {
+                    object.setPosition(Integer.parseInt(value));
+                } else {
+                    object.setPosition(null);
                 }
-            };
+            }
+        });
 
-            nameColumn.setSortable(true);
-            sorter.setComparator(nameColumn, new Comparator<ModificationWithPosition>() {
-                @Override
-                public int compare(ModificationWithPosition o1, ModificationWithPosition o2) {
-                    return o1.getModification().compareTo(o2.getModification());
-                }
-            });
+        positionColumn.setSortable(false);
 
-            TextColumn<ModificationWithPosition> positionColumn = new TextColumn<ModificationWithPosition>() {
-                @Override
-                public String getValue(ModificationWithPosition object) {
-                    return String.valueOf(object.getPosition());
-                }
-            };
-            positionColumn.setSortable(true);
-            sorter.setComparator(positionColumn, new Comparator<ModificationWithPosition>() {
-                @Override
-                public int compare(ModificationWithPosition o1, ModificationWithPosition o2) {
-                    return new Integer(o1.getPosition()).compareTo(o2.getPosition());
-                }
-            });
+        columns.add(positionColumn);
 
-            columns.add(nameColumn);
-            columns.add(positionColumn);
-
-            return columns;
-        }
+        return columns;
+    }
 
 
     public static List<String> getColumnTitles() {

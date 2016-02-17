@@ -24,13 +24,9 @@ import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
-/**
- * A {@link Cell} used to render a drop-down list. Thanks to Peter Knego
- */
 public class DynamicSelectionCell extends AbstractInputCell<String, String> {
 
     interface Template extends SafeHtmlTemplates {
@@ -43,54 +39,29 @@ public class DynamicSelectionCell extends AbstractInputCell<String, String> {
 
     private static Template template;
 
-    private HashMap<String, Integer> indexForOption = new HashMap<String, Integer>();
-
-    private final List<String> options;
+    /**
+     *  key: rowIndex
+     *  value: List of options to show for this row
+     */
+    public TreeMap<Integer, List<String>> optionsMap = new TreeMap<Integer, List<String>>();
 
     /**
      * Construct a new {@link SelectionCell} with the specified options.
      *
-     * @param options the options in the cell
      */
-    public DynamicSelectionCell(List<String> options) {
+    public DynamicSelectionCell() {
         super("change");
         if (template == null) {
             template = GWT.create(Template.class);
         }
-        this.options = new ArrayList<String>(options);
-        int index = 0;
-        for (String option : options) {
-            indexForOption.put(option, index++);
-        }
     }
 
-    public void add(String newOp){
-        String option = new String(newOp);
-        options.add(option);
-        refreshIndexes();
+    public void addOptions(List<String> newOps, int rowIndex) {
+        optionsMap.put(rowIndex, newOps);
     }
 
-    public void addAll(List<String> options){
-        this.options.addAll(new ArrayList<String>(options));
-        refreshIndexes();
-
-    }
-    public void remove(String op){
-        String option = new String(op);
-        options.remove(indexForOption.get(option));
-        refreshIndexes();
-    }
-
-    public void clear(){
-        options.clear();
-        refreshIndexes();
-    }
-
-    private void refreshIndexes(){
-        int index = 0;
-        for (String option : options) {
-            indexForOption.put(option, index++);
-        }
+    public void removeOptions(int rowIndex) {
+        optionsMap.remove(rowIndex);
     }
 
     @Override
@@ -101,7 +72,7 @@ public class DynamicSelectionCell extends AbstractInputCell<String, String> {
         if ("change".equals(type)) {
             Object key = context.getKey();
             SelectElement select = parent.getFirstChild().cast();
-            String newValue = options.get(select.getSelectedIndex());
+            String newValue = optionsMap.get(context.getIndex()).get(select.getSelectedIndex());
             setViewData(key, newValue);
             finishEditing(parent, newValue, key, valueUpdater);
             if (valueUpdater != null) {
@@ -120,24 +91,27 @@ public class DynamicSelectionCell extends AbstractInputCell<String, String> {
             viewData = null;
         }
 
-        int selectedIndex = getSelectedIndex(viewData == null ? value : viewData);
+        int selectedIndex = getSelectedIndex(viewData == null ? value : viewData, context.getIndex());
         sb.appendHtmlConstant("<select tabindex=\"-1\">");
         int index = 0;
-        for (String option : options) {
-            if (index++ == selectedIndex) {
-                sb.append(template.selected(option));
-            } else {
-                sb.append(template.deselected(option));
+        try {
+            for (String option : optionsMap.get(context.getIndex())) {
+                if (index++ == selectedIndex) {
+                    sb.append(template.selected(option));
+                } else {
+                    sb.append(template.deselected(option));
+                }
             }
+        } catch (Exception e) {
+            System.out.println("error");
         }
         sb.appendHtmlConstant("</select>");
     }
 
-    private int getSelectedIndex(String value) {
-        Integer index = indexForOption.get(value);
-        if (index == null) {
+    private int getSelectedIndex(String value, int rowIndex) {
+        if (optionsMap.get(rowIndex) == null) {
             return -1;
         }
-        return index.intValue();
+        return optionsMap.get(rowIndex).indexOf(value);
     }
 }
