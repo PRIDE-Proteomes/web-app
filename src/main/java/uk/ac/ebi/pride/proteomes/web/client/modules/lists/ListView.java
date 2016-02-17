@@ -25,6 +25,8 @@ public interface ListView<T> extends View, HasUiHandlers<ListUiHandler<T>> {
 
     void loadLoadingMessage();
     void loadList();
+    //For now these is only used by the modifications but allows selection by position, not only by type. Should be more generic
+    void loadListWithSelection(List<List<String>> selection);
 
     void showContent();
     void hideContent();

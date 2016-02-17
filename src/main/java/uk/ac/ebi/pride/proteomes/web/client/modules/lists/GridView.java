@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.lists;
 
+import com.google.gwt.cell.client.DynamicSelectionCell;
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -12,7 +13,6 @@ import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.*;
 import uk.ac.ebi.pride.proteomes.web.client.images.FileImages;
 import uk.ac.ebi.pride.proteomes.web.client.modules.ViewWithUiHandlers;
-import uk.ac.ebi.pride.proteomes.web.client.utils.Console;
 import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 import uk.ac.ebi.pride.proteomes.web.client.utils.factories.ModuleContainerFactory;
 import uk.ac.ebi.pride.widgets.client.disclosure.client.ModuleContainer;
@@ -164,6 +164,22 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
     }
 
     @Override
+    public void loadListWithSelection(List<List<String>> selection) {
+        frame.setContent(flowPanel);
+        frame.clearPrimaryMessage();
+
+        int numColumns = grid.getColumnCount();
+        for(int i = 0; i < numColumns; i ++) {
+            if(grid.getColumn(i).getCell() instanceof DynamicSelectionCell){
+                int numRows = grid.getRowCount();
+                for (int j = 0; j < numRows; j++) {
+                    ((DynamicSelectionCell) grid.getColumn(i).getCell()).addOptions(selection.get(j),j);
+                }
+            }
+        }
+    }
+
+    @Override
     public void showContent() {
         frame.setOpen(true);
         grid.setVisible(true);
@@ -177,32 +193,7 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
 
     @Override
     public void addDataProvider(ListDataProvider<T> dataProvider) {
-
-        Console.info("BEFORE");
-
-        for (T t : dataProvider.getList()) {
-            Console.info(t.toString());
-        }
-
         dataProvider.addDataDisplay(grid);
-
-
-        int numRows = grid.getRowCount();
-        int numColumns = grid.getColumnCount();
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int j = 0; j < numRows; j++) {
-            for (int i = 0; i < numColumns; i++) {
-                stringBuilder.append(grid.getRowElement(j).getCells().getItem(i).getInnerText());
-                if (i < numColumns - 1) {
-                    stringBuilder.append("\t");
-                } else {
-                    stringBuilder.append("\n");
-                }
-            }
-        }
-
-        Console.info("AFTER");
-        Console.info(stringBuilder.toString());
     }
 
     @Override
@@ -248,7 +239,6 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
         grid.redraw();
     }
 
-
     @Override
     public void setSelectionModel(SelectionModel<? super T> selectionModel) {
         grid.setSelectionModel(selectionModel, selectionManager);
@@ -258,7 +248,6 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
     public void setKeyboardSelectionHandler(CellPreviewEvent.Handler<T> keyboardSelectionReg) {
         grid.setKeyboardSelectionHandler(keyboardSelectionReg);
     }
-
 
     @Override
     public KeyboardSelectionPolicy getKeyboardSelectionPolicy() {
