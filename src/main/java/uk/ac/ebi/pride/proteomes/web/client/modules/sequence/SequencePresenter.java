@@ -41,6 +41,7 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
                                           RegionUpdateEvent.Handler,
                                           PeptideUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler,
+                                          ModificationWithPositionUpdateEvent.Handler,
                                           TissueUpdateEvent.Handler {
 
     public interface ThisView extends View, HasUiHandlers<SequenceUiHandler> {
@@ -53,6 +54,8 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
         void updateModificationHighlightBetween(ModificationAdapter mod, int start, int end);
         void updateModificationHighlight(int modPosition);
         void highlightModificationsInPeptides(List<ModificationAdapter> modifications, List<PeptideAdapter> peptides);
+        void selectModifications(List<Integer> modPositions);
+
         void resetModificationHighlight();
         void updatePeptideHighlight(List<PeptideAdapter> peptides);
         void updatePeptideHighlight(PeptideAdapter peptides);
@@ -69,7 +72,9 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
     private List<String> currentTissues = Collections.emptyList();
     private List<PeptideWithPeptiforms> peptideMatchSelection = Collections.emptyList();
     private Region currentRegion = Region.emptyRegion();
-    private List<ModificationWithPosition> currentModifications = Collections.emptyList();
+    private List<String> currentModifications = Collections.emptyList();
+    private List<ModificationWithPosition> currentModWithPos = Collections.emptyList();
+
 
     public SequencePresenter(EventBus eventBus, ThisView view) {
         super(eventBus, view);
@@ -83,6 +88,7 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(ModificationUpdateEvent.getType(), this);
+        eventBus.addHandler(ModificationWithPositionUpdateEvent.getType(), this);
         eventBus.addHandler(TissueUpdateEvent.getType(), this);
     }
 
@@ -126,13 +132,14 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
         if(event.getRegions().size() > 0) {
             currentRegion = event.getRegions().get(0);
             getView().updateRegionSelection(currentRegion.getStart(), currentRegion.getEnd());
-            if (currentRegion.getLength() == 1) {
-                getView().updateModificationHighlight(currentRegion.getStart());
-            }
+//            if (currentRegion.getLength() == 1) {
+//                getView().updateModificationHighlight(currentRegion.getStart());
+//            }
         }
         else {
             currentRegion = Region.emptyRegion();
             getView().resetRegionSelection();
+            getView().resetModificationHighlight();
         }
 
 //        // Apparently when the region gets modified the peptide selection
@@ -159,14 +166,47 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
                 selectionAdapters.add(new PeptideAdapter(match));
             }
             currentPeptides = event.getPeptides();
+            getView().resetPeptideHighlight();
+            getView().resetModificationHighlight();
+            getView().resetRegionSelection();
             getView().updatePeptideSelection(selectionAdapters);
 
         }
         else {
             getView().resetPeptideSelection();
             currentPeptides = Collections.emptyList();
+
+            //If we have any filter applied before it would need to be restored
+            updatePeptideHighlight();
+
+            if(!currentModWithPos.isEmpty()){
+                updateModWithPosSelection();
+            }
+            //If we have any region applied before it would need to be restored
+            if(!currentRegion.isEmpty()){
+                getView().updateRegionSelection(currentRegion.getStart(), currentRegion.getEnd());
+            }
         }
     }
+
+    /**
+     * This event notifies a selection of one modification in the protein coverage. It contains the position of
+     * the modification
+     * @param event modification with position (in principle only one)
+     */
+    @Override
+    public void onModificationUpdateEvent(ModificationWithPositionUpdateEvent event) {
+        getView().resetModificationHighlight();
+        getView().resetRegionSelection();
+
+        currentModWithPos = event.getModifications();
+
+        if (!currentModWithPos.isEmpty()) {
+            getView().resetPeptideHighlight();
+            updateModWithPosSelection();
+        }
+    }
+
 
     /**
      * This function has to take into account that a modification can be a
@@ -176,41 +216,13 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-        List<ModificationAdapter> modificationAdapters;
-        List<PeptideAdapter> peptideAdapters;
-
         currentModifications = event.getModifications();
-        getView().resetPeptideHighlight();
-        getView().resetModificationHighlight();
-
-        if (!currentModifications.isEmpty()) {
-            List<PeptideMatch> peptides = updatePeptideHighlight();
-            //TODO Review
-            if (!peptides.isEmpty()) {
-                modificationAdapters = new ArrayList<>();
-                for (ModificationWithPosition currentModification : currentModifications) {
-                    modificationAdapters.add(
-                            new ModificationAdapter(currentModification.getModification(), currentModification.getPosition()));
-                }
-
-                peptideAdapters = new ArrayList<>();
-                for (PeptideMatch match : peptides) {
-                    peptideAdapters.add(new PeptideAdapter(match));
-                }
-
-                getView().highlightModificationsInPeptides(modificationAdapters, peptideAdapters);
-            }
-        }
-
+        updatePeptideHighlight();
     }
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
-
         currentTissues = event.getTissues();
-        getView().resetPeptideHighlight();
-        getView().resetModificationHighlight();
-
         updatePeptideHighlight();
     }
 
@@ -230,10 +242,11 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
 
             // We should keep selecting only the peptides that fit in the new
             // region
+            //TODO Review
             if(currentPeptides.size() > 0) {
                 peptides = PeptideUtils.filterPeptideMatches(currentPeptides,
                         start, end,
-                        currentTissues, currentModifications,currentProtein.getSequence().length());
+                        currentTissues, currentModifications);
 
                 changer.addPeptideChange(peptides);
             }
@@ -263,26 +276,48 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
         }
     }
 
-    private List<PeptideMatch> updatePeptideHighlight() {
-        List<PeptideMatch> peptides = Collections.emptyList();
+    private void updateModWithPosSelection() {
+        List<Integer> modPositions;
+
+        modPositions = new ArrayList<>();
+        for (ModificationWithPosition currentModification : currentModWithPos) {
+            modPositions.add(currentModification.getPosition());
+        }
+
+        getView().selectModifications(modPositions);
+    }
+
+    private void updatePeptideHighlight() {
+        List<PeptideMatch> peptides;
         List<PeptideAdapter> selectionAdapters;
+        List<ModificationAdapter> modificationAdapters;
+
+        getView().resetPeptideHighlight();
+        getView().resetModificationHighlight();
+        getView().resetRegionSelection();
 
         if(!currentTissues.isEmpty() || !currentModifications.isEmpty()) {
             peptides = PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
                     currentRegion.getStart(), currentRegion.getEnd(),
-                    currentTissues, currentModifications, currentProtein.getSequence().length());
+                    currentTissues, currentModifications);
 
             if (peptides.size() > 0) {
-                selectionAdapters = new ArrayList<>();
 
+                selectionAdapters = new ArrayList<>();
                 for (PeptideMatch match : peptides) {
                     selectionAdapters.add(new PeptideAdapter(match));
                 }
-
                 getView().updatePeptideHighlight(selectionAdapters);
+
+                //Updates the corresponding mods
+                if (!currentModifications.isEmpty()) {
+                    modificationAdapters = new ArrayList<>();
+                    for (String currentModification : currentModifications) {
+                        modificationAdapters.add(new ModificationAdapter(currentModification));
+                    }
+                    getView().highlightModificationsInPeptides(modificationAdapters, selectionAdapters);
+                }
             }
         }
-
-        return peptides;
     }
 }

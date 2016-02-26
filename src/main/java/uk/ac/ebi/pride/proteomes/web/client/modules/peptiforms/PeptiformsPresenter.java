@@ -141,34 +141,25 @@ public class PeptiformsPresenter extends Presenter<ListView<Peptide>>
 
     @Override
     public void onSelectionChanged(Collection<Peptide> items) {
-        StateChanger changer;
+        //As this list doesn't allow multiselection, this doesn't have anything to do
+    }
+
+    @Override
+    public void onSelectionChanged(Peptide peptiform) {
+        StateChanger changer = new StateChanger();
+        Set<Peptide> peptiforms = new HashSet<>();
         UserAction action;
-        // an empty selection is represented by a list with a null items,
-        // we represent that with an empty list, so we have to add an
-        // additional check for that.
-        if((items.containsAll(selectedVariances) &&
-            selectedVariances.containsAll(items)) ||
-                (items.contains(null) && selectedVariances.isEmpty())) {
-            return;
-        } else if(items.contains(null)) {
-            items = Collections.emptyList();
-        }
 
-        Set<Peptide> variances = new HashSet<>();
+        peptiforms.add(peptiform);
+        changer.addPeptiformChange(peptiforms);
 
-        for(Peptide variance : items) {
-            variances.add(variance);
-        }
-
-        changer = new StateChanger();
-        changer.addPeptiformChange(variances);
-
-        if(items.isEmpty()) {
+        if(peptiform != null) {
             action = new UserAction(UserAction.Type.peptiform, "Click Reset");
         }
         else {
             action = new UserAction(UserAction.Type.peptiform, "Click Set");
         }
+
         StateChangingActionEvent.fire(this, changer, action);
     }
 

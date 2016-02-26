@@ -1,7 +1,5 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.modifications;
 
-import com.google.gwt.cell.client.DynamicSelectionCell;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
@@ -20,46 +18,25 @@ import java.util.List;
  */
 class ModificationColumnProvider {
 
-    public static List<Column<ModificationWithPosition, ?>> getSortingColumns(ListSorter<ModificationWithPosition> sorter) {
-        List<Column<ModificationWithPosition, ?>> columns = new ArrayList<>();
+    public static List<Column<String, ?>> getSortingColumns(ListSorter<String> sorter) {
+        List<Column<String, ?>> columns = new ArrayList<>();
 
-        Column<ModificationWithPosition, String> nameColumn = new  Column<ModificationWithPosition, String>(new TextCell()) {
+        Column<String, String> nameColumn = new  Column<String, String>(new TextCell()) {
             @Override
-            public String getValue(ModificationWithPosition object) {
-                return object.getModification();
+            public String getValue(String object) {
+                return object;
             }
         };
 
-        nameColumn.setSortable(false); //the indexes of the DynamicSelectionCell are not updated accordingly
-        sorter.setComparator(nameColumn, new Comparator<ModificationWithPosition>() {
+        nameColumn.setSortable(true);
+        sorter.setComparator(nameColumn, new Comparator<String>() {
             @Override
-            public int compare(ModificationWithPosition o1, ModificationWithPosition o2) {
-                return o1.getModification().compareTo(o2.getModification());
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
             }
         });
 
         columns.add(nameColumn);
-
-        Column<ModificationWithPosition, String> positionColumn = new Column<ModificationWithPosition, String>(new DynamicSelectionCell()) {
-            @Override
-            public String getValue(ModificationWithPosition object) {
-                return String.valueOf("All");
-            }
-        };
-        positionColumn.setFieldUpdater(new FieldUpdater<ModificationWithPosition, String>() {
-            @Override
-            public void update(int index, ModificationWithPosition object, String value) {
-                if (value!= null && !value.isEmpty() && !value.equals("All")) {
-                    object.setPosition(Integer.parseInt(value));
-                } else {
-                    object.setPosition(null);
-                }
-            }
-        });
-
-        positionColumn.setSortable(false);
-
-        columns.add(positionColumn);
 
         return columns;
     }

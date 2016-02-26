@@ -1,7 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.datamodel;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
-import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalModificationPositionException;
 
 import java.util.Objects;
 
@@ -13,57 +12,31 @@ import java.util.Objects;
 public class ModificationWithPosition implements ModifiedLocation, Comparable<ModificationWithPosition> {
 
 
-    private static class EmptyModificationWithPosition extends ModificationWithPosition {
-        EmptyModificationWithPosition() {
-        }
-
-        @Override
-        public int getPosition() {
-            return 0;
-        }
-
-        @Override
-        public String getModification() {
-            return "";
-        }
-
-        @Override
-        public String toString() {
-            return "";
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return true;
-        }
-    }
-
     private static volatile EmptyModificationWithPosition emptyModificationWithPosition = new EmptyModificationWithPosition();
     private String modification;
-    private Integer position;
+    private int position;
+    private ModificationWithPosition() {
+    }
 
-    private ModificationWithPosition() {}
-
-
-    public ModificationWithPosition(String modification, Integer position) throws IllegalModificationPositionException {
-        if(position != null){
-            if (position < 0 || (!(this instanceof EmptyModificationWithPosition)
-                    && position <= 0 && (modification == null || modification.equals("")))) {
-                throw new IllegalModificationPositionException();
-            }
-        }
-
+    public ModificationWithPosition(String modification, int position) {
         this.position = position;
         this.modification = modification;
     }
 
     public static ModificationWithPosition tokenize(String modificationId) throws
-            IllegalModificationPositionException,
             NumberFormatException,
             IndexOutOfBoundsException {
+        ModificationWithPosition mod;
         String[] startEnd = modificationId.split("-");
 
-        return new ModificationWithPosition(startEnd[0], Integer.parseInt(startEnd[1]));
+        if (startEnd.length == 2) {
+            mod = new ModificationWithPosition(startEnd[0], Integer.parseInt(startEnd[1]));
+        } else {
+            //A negative value in the position, implies that the modification doesn't have positon, only type
+            mod = new ModificationWithPosition(startEnd[0], -1);
+        }
+
+        return mod;
     }
 
     public static EmptyModificationWithPosition emptyModificationWithPosition() {
@@ -94,7 +67,7 @@ public class ModificationWithPosition implements ModifiedLocation, Comparable<Mo
 
     @Override
     public String toString() {
-        return modification + "-" + Integer.toString(position);
+        return (position >= 0) ? modification + "-" + Integer.toString(position) : modification;
     }
 
     @Override
@@ -122,5 +95,30 @@ public class ModificationWithPosition implements ModifiedLocation, Comparable<Mo
     @Override
     public int hashCode() {
         return Objects.hash(modification, position);
+    }
+
+    private static class EmptyModificationWithPosition extends ModificationWithPosition {
+        EmptyModificationWithPosition() {
+        }
+
+        @Override
+        public int getPosition() {
+            return -1;
+        }
+
+        @Override
+        public String getModification() {
+            return "";
+        }
+
+        @Override
+        public String toString() {
+            return "";
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
     }
 }

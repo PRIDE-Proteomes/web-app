@@ -1,7 +1,6 @@
 package uk.ac.ebi.pride.proteomes.web.client.utils;
 
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
-import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalModificationPositionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.List;
  */
 public class ModificationUtils {
     public static List<ModificationWithPosition> tokenize(List<String> regionIds) throws
-                                                    IllegalModificationPositionException,
                                                     NumberFormatException,
                                                     IndexOutOfBoundsException {
         List<ModificationWithPosition> modList = new ArrayList<>();

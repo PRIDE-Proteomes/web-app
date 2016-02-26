@@ -11,4 +11,6 @@ import java.util.Collection;
  */
 public interface ListUiHandler<T> extends UiHandler {
     void onSelectionChanged(Collection<T> items);
+    void onSelectionChanged(T item);
+
 }

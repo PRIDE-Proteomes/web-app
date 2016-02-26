@@ -88,7 +88,7 @@ class PeptideColumnProvider {
             public String getValue(PeptideMatch object) {
                 Set<String> modSet = new HashSet<>();
                 for(ModifiedLocation modLoc : object.getModifiedLocations()) {
-                    modSet.add(modLoc.getModification());
+                    modSet.add(modLoc.getPosition() + ":" + modLoc.getModification());
                 }
                 StringBuilder sb = new StringBuilder();
                 for(String mod : modSet) {

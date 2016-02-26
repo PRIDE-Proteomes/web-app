@@ -9,13 +9,15 @@ import com.google.gwt.user.client.History;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.PeptideWithPeptiforms;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.*;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Group;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideList;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
+import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.GroupRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.PeptideRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.*;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
-import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalModificationPositionException;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.InconsistentStateException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.data.DataServer;
@@ -25,6 +27,7 @@ import uk.ac.ebi.pride.proteomes.web.client.utils.RegionUtils;
 import uk.ac.ebi.pride.proteomes.web.client.utils.StringUtils;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author Pau Ruiz Safont <psafont@ebi.ac.uk>
@@ -35,6 +38,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                                       ValueChangeHandler<String>,
                                       StateChangingActionEvent.Handler {
 
+    private static Logger logger = Logger.getLogger(AppController.class.getName());
     private static final String defaultPageTitle = "EMBL-EBI PRIDE Proteomes";
 
     private final EventBus eventBus;
@@ -326,6 +330,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             if(!isStateDataValid(stateQueue.peek())) {
                 throw new InconsistentStateException();
             }
+//            goTo(stateQueue.peek());
             goTo(revisePeptideFilters(stateQueue.peek()));
         }
         catch(InconsistentStateException e) {
@@ -339,7 +344,7 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                     "message", stateQueue.peek().getHistoryToken());
         }
         catch(Exception e) {
-            e.printStackTrace();
+            logger.finest(e.getMessage()+"\n" + e.toString());
         }
         finally {
             stateQueue.remove();
@@ -433,11 +438,11 @@ public class AppController implements HasHandlers, DataServer.DataClient,
                 boolean isContained = false;
                 for(PeptideMatch match : server.getCachedProtein(accession).getPeptides()) {
                     if(sequence.equals(match.getSequence()) && (position == -1 || position == match.getPosition())) {
+                        //TODO Review
                         isContained = PeptideUtils.isPeptideMatchNotFiltered(match,
                                 state.getSelectedRegions(),
                                 state.getSelectedModifications(),
-                                state.getSelectedTissues(),
-                                server.getCachedProtein(accession).getSequence().length());
+                                state.getSelectedTissues());
 
                         if(isContained) {
                             break;
@@ -468,7 +473,6 @@ public class AppController implements HasHandlers, DataServer.DataClient,
      * @return a state which has the peptide filters consistent with the
      * selected peptides.
      */
-    //TODO Check if the function could be removed
     private State revisePeptideFilters(State uncheckedState) {
         if(uncheckedState.getSelectedPeptides().isEmpty()) {
             return uncheckedState;
@@ -477,14 +481,18 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         StateChanger sc = new StateChanger();
         List<String> invalidTissues = new ArrayList<>();
         List<String> validTissues;
-        List<ModificationWithPosition> invalidModifications = new ArrayList<>();
-        List<ModificationWithPosition> validModifications;
+        List<String> invalidModifications = new ArrayList<>();
+        List<String> validModifications;
+
+        List<ModificationWithPosition> invalidModificationWithPos = new ArrayList<>();
+        List<ModificationWithPosition> validModificationWithPos;
         boolean contained;
 
         List<String> sequences = new ArrayList<>();
         List<String> proteins = new ArrayList<>();
         List<Integer> positions = new ArrayList<>();
         List<PeptideWithPeptiforms> peptideLists;
+
         for(String id : uncheckedState.getSelectedPeptides()) {
             String[] split = id.split(State.sepFields);
             sequences.add(split[0]);
@@ -501,10 +509,14 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             peptideLists = server.getCachedPeptiformLists(sequences, proteins);
         }
 
-        for(PeptideList peptideVariances : peptideLists) {
+        // As we retrive peptiforms, it could happend that not all of them contain the same tissues, because the
+        // symbolic peptide if the one that aggregate all the values, but it doesn't force that all peptiforms contains
+        // the same information, so in thie moment, we only remove the filter if it doesn't match at peptide level.
+        // Maybe this can change in the future
+        for(PeptideWithPeptiforms peptide : peptideLists) {
             contained = false;
             for(String tissue : uncheckedState.getSelectedTissues()) {
-                if(peptideVariances.getPeptideList().get(0).getTissues().contains(tissue)) {
+                if(peptide.getTissues().contains(tissue)) {
                     contained = true;
                     break;
                 }
@@ -515,52 +527,55 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             }
         }
 
-        for (PeptideList peptideVariances : peptideLists) {
+        for(PeptideWithPeptiforms peptide : peptideLists) {
             contained = false;
-            try {
-                for (ModifiedLocation mod : ModificationUtils.tokenize(uncheckedState.getSelectedModifications())) {
-                    // We need to check if the modification is a location or a type
-                    // because we only filter if it's a type.
-                    //TODO Review if it is possible filter by postion and type
-                    for (ModifiedLocation mLoc : peptideVariances.getPeptideList().get(0).getModifiedLocations()) {
-                        if (mLoc.equals(mod)) {
-                            contained = true;
-                            break;
-                        }
-                    }
-                    if (contained) {
-                        break;
-                    }
-                }
-
-                if (!contained) {
-                    invalidModifications.addAll(ModificationUtils.tokenize(uncheckedState.getSelectedModifications()));
+            for(String mod : uncheckedState.getSelectedModifications()) {
+                if(PeptideUtils.extractModificationTypes(peptide).contains(mod)) {
+                    contained = true;
                     break;
                 }
-            } catch (IllegalModificationPositionException ignored) {
             }
+            if(!contained) {
+                invalidModifications.addAll(uncheckedState.getSelectedModifications());
+                break;
+            }
+        }
 
+        for (PeptideWithPeptiforms peptide : peptideLists) {
+            contained = false;
+            for (ModificationWithPosition mod : ModificationUtils.tokenize(uncheckedState.getSelectedModificationWithPositions())) {
+                if (PeptideUtils.extractModifications(peptide, server.getCachedProtein(proteins.get(0)).getSequence().length()).contains(mod)) {
+                    contained = true;
+                    break;
+                }
+            }
+            if (!contained) {
+                invalidModificationWithPos.addAll(ModificationUtils.tokenize(uncheckedState.getSelectedModificationWithPositions()));
+                break;
+            }
         }
 
         validTissues = new ArrayList<>(uncheckedState.getSelectedTissues());
         validTissues.removeAll(invalidTissues);
-        if(validTissues.size() < uncheckedState.getSelectedTissues().size()) {
+        if (validTissues.size() < uncheckedState.getSelectedTissues().size()) {
             sc.addTissueChange(validTissues);
         }
+        validModifications = new ArrayList<>(uncheckedState.getSelectedModifications());
+        validModifications.removeAll(invalidModifications);
+        if (validModifications.size() < uncheckedState.getSelectedModifications().size()) {
+            sc.addModificationChange(validModifications);
+        }
 
-        try {
-            validModifications = new ArrayList<>(ModificationUtils.tokenize(uncheckedState.getSelectedModifications()));
-            validModifications.removeAll(invalidModifications);
-            if(validModifications.size() < uncheckedState.getSelectedModifications().size()) {
-                sc.addModificationChange(validModifications);
-            }
-        } catch (IllegalModificationPositionException ignored) {
+        validModificationWithPos = new ArrayList<>(ModificationUtils.tokenize(uncheckedState.getSelectedModificationWithPositions()));
+        validModificationWithPos.removeAll(invalidModificationWithPos);
+        if (validModificationWithPos.size() < uncheckedState.getSelectedModificationWithPositions().size()) {
+            sc.addModificationWithPositionChange(validModificationWithPos);
         }
 
         try {
             return sc.change(uncheckedState);
         } catch (InconsistentStateException e) {
-            e.printStackTrace();
+            logger.finest(e.getMessage()+"\n" + e.toString());
             return uncheckedState;
         }
     }
@@ -603,14 +618,14 @@ public class AppController implements HasHandlers, DataServer.DataClient,
         if(!newState.getSelectedProteins().equals(appState.getSelectedProteins())) {
             ProteinUpdateEvent.fire(this, server.getCachedProteins(newState.getSelectedProteins()));
         }
-        if(!newState.getSelectedRegions().equals(appState.getSelectedRegions())) {
+        if (!newState.getSelectedRegions().equals(appState.getSelectedRegions())) {
             try {
                 RegionUpdateEvent.fire(this, RegionUtils.tokenize(newState.getSelectedRegions()));
             } catch (IllegalRegionValueException e) {
                 // this should never happen (we checked before!)
                 appState = State.getInvalidState();
                 ErrorOnUpdateEvent.fire(this, "Application Error, please " +
-                                              "contact the PRIDE team.");
+                        "contact the PRIDE team.");
                 return;
             }
         }
@@ -641,15 +656,10 @@ public class AppController implements HasHandlers, DataServer.DataClient,
             PeptiformUpdateEvent.fire(this, server.getCachedPeptiforms(newState.getSelectedPeptiforms()));
         }
         if(!newState.getSelectedModifications().equals(appState.getSelectedModifications())) {
-            try {
-                ModificationUpdateEvent.fire(this, ModificationUtils.tokenize(newState.getSelectedModifications()));
-            } catch (IllegalModificationPositionException e) {
-                // this should never happen (we checked before!)
-                appState = State.getInvalidState();
-                ErrorOnUpdateEvent.fire(this, "Application Error, please " +
-                        "contact the PRIDE team.");
-                return;
-            }
+                ModificationUpdateEvent.fire(this, newState.getSelectedModifications());
+        }
+        if(!newState.getSelectedModificationWithPositions().equals(appState.getSelectedModificationWithPositions())) {
+            ModificationWithPositionUpdateEvent.fire(this, ModificationUtils.tokenize(newState.getSelectedModificationWithPositions()));
         }
         if(!newState.getSelectedTissues().equals(appState.getSelectedTissues())) {
             TissueUpdateEvent.fire(this, newState.getSelectedTissues());

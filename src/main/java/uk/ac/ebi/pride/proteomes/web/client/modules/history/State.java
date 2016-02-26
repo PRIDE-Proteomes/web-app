@@ -20,6 +20,7 @@ final class State {
     private  final List<String> selectedPeptideIds;
     private  final List<String> selectedPeptiformIDs;
     private  final List<String> selectedModificationIds;
+    private  final List<String> selectedModificationWithPosIds;
     private  final List<String> selectedTissueIds;
 
     private final String historyToken;
@@ -56,12 +57,12 @@ final class State {
      * so another check using all the data pointed in here must be made.
      */
     private State(String groupIds, String proteinIds, String regionIds,
-          String peptideIds, String peptiformIds, String modificationIds,
+          String peptideIds, String peptiformIds, String modificationIds, String modificationWithPosIds,
           String tissueIds)
              throws InconsistentStateException {
 
         if(!isValid(groupIds, proteinIds, regionIds, peptideIds, peptiformIds,
-                    modificationIds, tissueIds)) {
+                    modificationIds, modificationWithPosIds, tissueIds)) {
             throw new InconsistentStateException();
         }
 
@@ -85,6 +86,9 @@ final class State {
         if(!modificationIds.isEmpty()) {
             sBuild.append("modification" + sepMaps).append(modificationIds).append(sepTypes);
         }
+        if(!modificationWithPosIds.isEmpty()) {
+            sBuild.append("modificationWithPos" + sepMaps).append(modificationWithPosIds).append(sepTypes);
+        }
         if(!tissueIds.isEmpty()) {
             sBuild.append("tissue" + sepMaps).append(tissueIds).append(sepTypes);
         }
@@ -107,6 +111,7 @@ final class State {
         selectedPeptideIds = peptideIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(peptideIds.split(sepValues));
         selectedPeptiformIDs = peptiformIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(peptiformIds.split(sepValues));
         selectedModificationIds = modificationIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(modificationIds.split(sepValues));
+        selectedModificationWithPosIds =  modificationWithPosIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(modificationWithPosIds.split(sepValues));
         selectedTissueIds = tissueIds.isEmpty() ? Collections.<String>emptyList() : Arrays.asList(tissueIds.split(sepValues));
     }
 
@@ -117,6 +122,7 @@ final class State {
         selectedPeptideIds = Collections.emptyList();
         selectedPeptiformIDs = Collections.emptyList();
         selectedModificationIds = Collections.emptyList();
+        selectedModificationWithPosIds = Collections.emptyList();
         selectedTissueIds = Collections.emptyList();
         historyToken = "";
     }
@@ -132,6 +138,7 @@ final class State {
             InconsistentStateException {
         String groupIds = "", proteinIds = "",  peptideIds = "",
                 peptiformIds = "", regionIds = "", modificationIds = "",
+                modificationWithPosIds = "",
                 tissueIds = "";
 
         String[] tokens, dict;
@@ -148,25 +155,35 @@ final class State {
             String type = dict[0].toLowerCase();
 
             switch (type) {
-                case "group":        groupIds = dict[1];
-                                     break;
-                case "protein":      proteinIds = dict[1];
-                                     break;
-                case "region":       regionIds = dict[1];
-                                     break;
-                case "peptide":      peptideIds = dict[1];
-                                     break;
-                case "peptiform":    peptiformIds = dict[1];
-                                     break;
-                case "modification": modificationIds = dict[1];
-                                     break;
-                case "tissue":       tissueIds = dict[1];
-                                     break;
+                case "group":
+                    groupIds = dict[1];
+                    break;
+                case "protein":
+                    proteinIds = dict[1];
+                    break;
+                case "region":
+                    regionIds = dict[1];
+                    break;
+                case "peptide":
+                    peptideIds = dict[1];
+                    break;
+                case "peptiform":
+                    peptiformIds = dict[1];
+                    break;
+                case "modification":
+                    modificationIds = dict[1];
+                    break;
+                case "modificationWithPost":
+                    modificationWithPosIds = dict[1];
+                    break;
+                case "tissue":
+                    tissueIds = dict[1];
+                    break;
             }
         }
 
         return new State(groupIds, proteinIds, regionIds, peptideIds,
-                peptiformIds, modificationIds, tissueIds);
+                peptiformIds, modificationIds, modificationWithPosIds, tissueIds);
     }
 
     public List<String> getSelectedGroups() {
@@ -191,6 +208,10 @@ final class State {
 
     public List<String> getSelectedModifications() {
         return selectedModificationIds;
+    }
+
+    public List<String> getSelectedModificationWithPositions() {
+        return selectedModificationWithPosIds;
     }
 
     public List<String> getSelectedTissues() {
@@ -222,6 +243,7 @@ final class State {
                     String peptides,
                     String variances,
                     String modifications,
+                    String modificationsWithPos,
                     String tissues) {
         boolean isValid = true;
 
@@ -230,7 +252,7 @@ final class State {
             isValid = false;
         }
         else if((groups.isEmpty() && proteins.isEmpty()) &&
-                (!modifications.isEmpty() || !tissues.isEmpty())) {
+                (!modifications.isEmpty() || !modificationsWithPos.isEmpty() || !tissues.isEmpty())) {
             isValid = false;
         }
         else if(peptides.isEmpty() && !variances.isEmpty()) {
@@ -283,6 +305,7 @@ final class State {
      * @param peptideIds the url-encoded identifiers of the peptides
      * @param peptiformIds the url-encoded identifiers of the peptiforms
      * @param modificationIds the url-encoded identifiers of the modifications
+     * @param modificationWithPosIds the url-encoded identifiers of the modifications with positions
      * @param tissueIds the url-encoded identifiers of the tissues
      * @return a new state with a state with removed properties to make it valid
      * @throws InconsistentStateException
@@ -290,10 +313,12 @@ final class State {
     static State simplifyState(String groupIds, String proteinIds,
                                String regionIds, String peptideIds,
                                String peptiformIds, String modificationIds,
+                               String modificationWithPosIds,
                                String tissueIds)
                                        throws InconsistentStateException {
         String newRegionIds = "", newPeptideIds = "", newPeptiformIds = "",
-                newModIds = "", newTissueIds = "";
+                newModIds = "",  newModWithPosIds = "",
+                newTissueIds = "";
 
         if(!proteinIds.isEmpty()) {
             newRegionIds = regionIds;
@@ -306,11 +331,12 @@ final class State {
 
         if(!proteinIds.isEmpty() || !groupIds.isEmpty()) {
             newModIds = modificationIds;
+            newModWithPosIds = modificationWithPosIds;
             newTissueIds = tissueIds;
         }
 
         return new State(groupIds, proteinIds, newRegionIds, newPeptideIds,
-                         newPeptiformIds, newModIds, newTissueIds);
+                         newPeptiformIds, newModIds, newModWithPosIds, newTissueIds);
     }
 
     public static State getInvalidState() {

@@ -40,22 +40,22 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
                                           PeptideUpdateEvent.Handler,
                                           TissueUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler,
+                                          ModificationWithPositionUpdateEvent.Handler,
                                           PeptiformUpdateEvent.Handler {
 
     private static Logger logger = Logger.getLogger(PeptidesPresenter.class.getName());
 
-    private final ListDataProvider<PeptideMatch> dataProvider = new
-                                            ListDataProvider<>();
-    private final ListSorter<PeptideMatch> dataSorter = new
-                                    ListSorter<>(new ArrayList<PeptideMatch>());
+    private final ListDataProvider<PeptideMatch> dataProvider = new ListDataProvider<>();
+    private final ListSorter<PeptideMatch> dataSorter = new ListSorter<>(new ArrayList<PeptideMatch>());
 
     private boolean groups = true;
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
     private List<PeptideWithPeptiforms> selectedPeptidesMatches = Collections.emptyList();
     private List<String> currentTissues = Collections.emptyList();
-    private List<ModificationWithPosition> currentModifications = Collections.emptyList();
-    private List<Peptide> selectedVariances = Collections.emptyList();
+    private List<String> currentModifications = Collections.emptyList();
+    private List<ModificationWithPosition> currentModWithPos = Collections.emptyList();
+    private List<Peptide> selectedPeptiforms = Collections.emptyList();
 
     private boolean selectionEventsDisabled = false;
 
@@ -78,10 +78,8 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
-                Set<PeptideMatch> selection = new HashSet<>();
-                selection.add(selectionModel.getSelectedObject());
                 for(ListUiHandler<PeptideMatch> handler : getView().getUiHandlers()) {
-                    handler.onSelectionChanged(selection);
+                    handler.onSelectionChanged(selectionModel.getSelectedObject());
                 }
             }
         });
@@ -97,6 +95,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         eventBus.addHandler(PeptiformUpdateEvent.getType(), this);
         eventBus.addHandler(TissueUpdateEvent.getType(), this);
         eventBus.addHandler(ModificationUpdateEvent.getType(), this);
+        eventBus.addHandler(ModificationWithPositionUpdateEvent.getType(), this);
     }
 
     @Override
@@ -118,10 +117,13 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         if(!groups && event.getProteins().size() > 0) {
             currentProtein = event.getProteins().get(0);
             currentRegion = Region.emptyRegion();
+
+            for(PeptideMatch peptide : selectedPeptidesMatches) {
+                deselectItem(peptide);
+            }
+
             // we should reset filters and ordering here
-            updateList(currentProtein.getPeptides());
-            getView().loadList();
-            getView().showContent();
+            updateList(new ArrayList<>(currentProtein.getPeptides()));
         }
     }
 
@@ -135,6 +137,11 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
     @Override
     public void onRegionUpdateEvent(RegionUpdateEvent event) {
+
+        for(PeptideMatch peptide : selectedPeptidesMatches) {
+            deselectItem(peptide);
+        }
+
         // we change the peptide list
         if(event.getRegions().size() == 0) {
             currentRegion = Region.emptyRegion();
@@ -145,35 +152,42 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
 
         updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
-                currentTissues, currentModifications, currentProtein.getSequence().length()));
+                currentTissues, currentModifications, currentModWithPos, currentProtein.getSequence().length()));
     }
 
     @Override
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
+
         for(PeptideMatch peptide : selectedPeptidesMatches) {
             deselectItem(peptide);
         }
 
         selectedPeptidesMatches = new ArrayList<>(event.getPeptides());
 
-        if(!selectedPeptidesMatches.isEmpty()) {
-            // we reselect the peptides only if there are any
-            selectPeptides();
+        if(!selectedPeptidesMatches.isEmpty()){ //TODO Why do we need to check if it is empty?
+            updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
+                    currentRegion.getStart(), currentRegion.getEnd(),
+                    currentTissues, currentModifications, currentModWithPos, currentProtein.getSequence().length()));
         }
     }
 
     @Override
     public void onPeptiformUpdateEvent(PeptiformUpdateEvent event) {
-        selectedVariances = event.getPeptiforms();
+        selectedPeptiforms = event.getPeptiforms();
     }
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
+
+        for(PeptideMatch peptide : selectedPeptidesMatches) {
+            deselectItem(peptide);
+        }
+
         currentTissues = event.getTissues();
 
         updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
                 currentRegion.getStart(), currentRegion.getEnd(),
-                currentTissues, currentModifications, currentProtein.getSequence().length()));
+                currentTissues, currentModifications, currentModWithPos, currentProtein.getSequence().length()));
     }
 
     /**
@@ -185,77 +199,122 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
 
-        currentModifications = event.getModifications();
-
-        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
-                currentRegion.getStart(), currentRegion.getEnd(),
-                currentTissues, currentModifications, currentProtein.getSequence().length()));
-
-    }
-
-    @Override
-    public void onSelectionChanged(Collection<PeptideMatch> items) {
-        StateChanger changer;
-        UserAction action;
-        if(selectionEventsDisabled)
-            return;
-
-        // an empty selection is represented by a list with a null items,
-        // we represent that with an empty list, so we have to add an
-        // additional check for that.
-        if((items.containsAll(selectedPeptidesMatches) &&
-            selectedPeptidesMatches.containsAll(items)) ||
-                (items.contains(null) && selectedPeptidesMatches.isEmpty())) {
-            return;
-        } else if(items.contains(null)) {
-            items = Collections.emptyList();
-        }
-
-        // We use HashSets because we don't want duplicated and want a fast
-        // lookup
-        Set<String> peptideIds = new HashSet<>();
-        Set<Peptide> variances = new HashSet<>();
-
-        for(PeptideMatch peptide : items) {
-            peptideIds.add(peptide.getSequence());
-        }
-
-        // we should change the peptiform selection if it doesn't fit the
-        // current peptide selection
-
-        for(Peptide variance : selectedVariances) {
-            if(peptideIds.contains(variance.getSequence())) {
-                variances.add(variance);
-            }
-        }
-
-        changer = new StateChanger();
-        changer.addPeptideChange(items);
-        if(!variances.containsAll(selectedVariances)) {
-            changer.addPeptiformChange(variances);
-        }
-
-        //Regions
-        //With the selection we reset the region to avoid confusing to the user clicking outside of the region and moving it
-//        changer.addRegionChange(new ArrayList<Region>());
-
-        if(items.isEmpty()) {
-            action = new UserAction(UserAction.Type.peptide, "Click Reset");
-        }
-        else {
-            action = new UserAction(UserAction.Type.peptide, "Click Set");
-        }
-
-        StateChangingActionEvent.fire(this, changer, action);
-    }
-
-    private void updateList(List<? extends PeptideMatch> peptideList) {
         for(PeptideMatch peptide : selectedPeptidesMatches) {
             deselectItem(peptide);
         }
 
+        currentModifications = event.getModifications();
+
+        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
+                currentRegion.getStart(), currentRegion.getEnd(),
+                currentTissues, currentModifications, currentModWithPos, currentProtein.getSequence().length()));
+
+    }
+
+    @Override
+    public void onModificationUpdateEvent(ModificationWithPositionUpdateEvent event) {
+
+        for(PeptideMatch peptide : selectedPeptidesMatches) {
+            deselectItem(peptide);
+        }
+
+        currentModWithPos = event.getModifications();
+
+        updateList(PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
+                currentRegion.getStart(), currentRegion.getEnd(),
+                currentTissues, currentModifications, currentModWithPos, currentProtein.getSequence().length()));
+    }
+
+    @Override
+    public void onSelectionChanged(PeptideMatch peptide) {
+        StateChanger changer = new StateChanger();
+        List<Region> regions = new ArrayList<>();
+        List<PeptideMatch> peptides = new ArrayList<>();
+        UserAction action;
+
+        if (selectionEventsDisabled)
+            return;
+
+        if (peptide != null) {
+
+            //Peptides
+            peptides.add(peptide);
+            changer.addPeptideChange(peptides);
+
+            //Regions
+            //With the selection we reset the region to avoid confunsing to the user clicking outside of the region and moving it
+            if (!PeptideUtils.inRange(peptide, currentRegion.getStart(), currentRegion.getEnd())) {
+                changer.addRegionChange(regions);
+            }
+
+            //Peptiforms
+            List<Peptide> peptiforms = new ArrayList<>();
+            for (Peptide peptiform : selectedPeptiforms) {
+                if (peptide.getSequence().equals(peptiform.getSequence())) {
+                    peptiforms.add(peptiform);
+                }
+            }
+
+            if (!peptiforms.containsAll(selectedPeptiforms)) {
+                changer.addPeptiformChange(peptiforms);
+            }
+
+            //Modifications
+            List<String> modifications = PeptideUtils.extractModificationTypes(peptide);
+            modifications.retainAll(currentModifications);
+            if (!modifications.containsAll(currentModifications)) {
+                changer.addModificationChange(modifications);
+            }
+
+            //We need to translate the modifications to protein coordinates
+            List<ModificationWithPosition> modWithPos = PeptideUtils.extractModifications(peptide, currentProtein.getSequence().length());
+            modWithPos.retainAll(currentModWithPos);
+            if (!modWithPos.containsAll(currentModWithPos)) {
+                changer.addModificationWithPositionChange(modWithPos);
+            }
+
+            //Tissues
+            List<String> tissues = new ArrayList<>(peptide.getTissues());
+            tissues.retainAll(currentTissues);
+            if (!tissues.containsAll(currentTissues)) {
+                changer.addTissueChange(tissues);
+            }
+
+            // We use HashSets because we don't want duplicated and want a fast
+            // lookup
+            Set<Peptide> variances = new HashSet<>();
+
+            // we should change the peptiform selection if it doesn't fit the
+            // current peptide selection
+            for (Peptide variance : selectedPeptiforms) {
+                if (peptide.getSequence().equalsIgnoreCase((variance.getSequence()))) {
+                    variances.add(variance);
+                }
+            }
+            if (!variances.containsAll(selectedPeptiforms)) {
+                changer.addPeptiformChange(variances);
+            }
+
+            action = new UserAction(UserAction.Type.peptide, "Click Set");
+        } else {
+            action = new UserAction(UserAction.Type.peptide, "Click Reset");
+        }
+
+        changer.addPeptideChange(peptides);
+        StateChangingActionEvent.fire(this, changer, action);
+    }
+
+    @Override
+    public void onSelectionChanged(Collection<PeptideMatch> items) {
+        //Multiple selection is not allow in this case
+    }
+
+    private void updateList(List<? extends PeptideMatch> peptideList) {
         setList(peptideList);
-        selectPeptides();
+
+        for(PeptideMatch peptide : selectedPeptidesMatches) {
+            selectItem(peptide);
+        }
     }
 
     private void selectItem(PeptideMatch peptide) {
@@ -295,12 +354,6 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         }
     }
 
-    private void selectPeptides() {
-        for(PeptideMatch peptide : selectedPeptidesMatches) {
-            selectItem(peptide);
-        }
-    }
-
     /**
      * This method is used whenever a new list is set as the model of the view.
      *
@@ -316,5 +369,7 @@ public class PeptidesPresenter extends Presenter<ListView<PeptideMatch>>
         dataProvider.getList().addAll(peptideList);
         dataSorter.repeatSort();
         dataProvider.flush();
+        getView().loadList();
+        getView().showContent();
     }
 }

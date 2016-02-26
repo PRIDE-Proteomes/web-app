@@ -1,6 +1,5 @@
 package uk.ac.ebi.pride.proteomes.web.client.modules.lists;
 
-import com.google.gwt.cell.client.DynamicSelectionCell;
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -163,21 +162,6 @@ public class GridView<T> extends ViewWithUiHandlers<ListUiHandler<T>>
         frame.clearPrimaryMessage();
     }
 
-    @Override
-    public void loadListWithSelection(List<List<String>> selection) {
-        frame.setContent(flowPanel);
-        frame.clearPrimaryMessage();
-
-        int numColumns = grid.getColumnCount();
-        for(int i = 0; i < numColumns; i ++) {
-            if(grid.getColumn(i).getCell() instanceof DynamicSelectionCell){
-                int numRows = grid.getRowCount();
-                for (int j = 0; j < numRows; j++) {
-                    ((DynamicSelectionCell) grid.getColumn(i).getCell()).addOptions(selection.get(j),j);
-                }
-            }
-        }
-    }
 
     @Override
     public void showContent() {

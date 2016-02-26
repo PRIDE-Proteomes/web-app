@@ -122,6 +122,11 @@ public class SequenceView extends ViewWithUiHandlers<SequenceUiHandler>
     }
 
     @Override
+    public void selectModifications(List<Integer> modPositions) {
+        sequence.setSelectedModifications(modPositions);
+    }
+
+    @Override
     public void updateModificationHighlight(ModificationAdapter mod) {
         sequence.filterModification(mod);
     }

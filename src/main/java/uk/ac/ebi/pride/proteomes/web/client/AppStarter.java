@@ -74,8 +74,7 @@ class AppStarter implements RunAsyncCallback {
 
         // The two lists should have the same size
         List<Presenter> presenterList = new ArrayList<>();
-        List<AcceptsOneWidget> placeHolderList = new
-                ArrayList<>();
+        List<AcceptsOneWidget> placeHolderList = new ArrayList<>();
 
         // Startup loggers & reporters
         new Reporter(eventBus);
@@ -94,10 +93,7 @@ class AppStarter implements RunAsyncCallback {
         ListView<String> tissueView = new GridView<>("Tissues", "tissue");
         Presenter tissuePresenter = new TissuesPresenter(eventBus, tissueView);
 
-//        ListView<Multiset.Entry<String>> modView = new GridView<>("Modifications", "modification");
-//        Presenter modPresenter = new ModificationsPresenter(eventBus, modView);
-
-        ListView<ModificationWithPosition> modView = new GridView<>("Modifications", "modification");
+        ListView<String> modView = new GridView<>("Modifications", "modification");
         Presenter modPresenter = new ModificationsPresenter(eventBus, modView);
 
         View coverageView = new CoverageView();

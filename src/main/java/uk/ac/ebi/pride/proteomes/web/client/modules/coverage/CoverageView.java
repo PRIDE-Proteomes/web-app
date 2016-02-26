@@ -150,6 +150,15 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
         coverageViewer.resetModificationHighlight();
     }
 
+    @Override
+    public void resetModWithPosSelection() {
+        coverageViewer.resetModificationSelection();
+    }
+
+    @Override
+    public void updateModWithPosSelection(Integer position) {
+        coverageViewer.selectModificationsBetween(position, position);
+    }
 
     @Override
     public void updatePeptideHighlight(List<PeptideAdapter> peptides) {
@@ -244,7 +253,7 @@ public class CoverageView extends ViewWithUiHandlers<CoverageUiHandler>
         }
     }
 
-    //Modifications
+    //Modifications with position (triangles)
     @Override
     public void onModificationSelected(ModificationSelectedEvent e) {
         logger.log(Level.INFO, "ModificationSelectedEvent " + e);

@@ -12,7 +12,7 @@ public class UserAction {
     private final Type type;
 
     public enum Type {
-        group, protein, region, peptide, modification, tissue, peptiform, none
+        group, protein, region, peptide, modification, modificationWithPos, tissue, peptiform, none
     }
 
     public UserAction(Type type, String name) {
@@ -27,8 +27,6 @@ public class UserAction {
     public String getName() {
         return name;
     }
-
-
 
     public static UserAction emptyAction() {
         return emptyAction;

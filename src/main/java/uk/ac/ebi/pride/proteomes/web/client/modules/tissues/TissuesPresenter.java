@@ -7,7 +7,6 @@ import com.google.gwt.view.client.OrderedMultiSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.web.bindery.event.shared.EventBus;
 import uk.ac.ebi.pride.proteomes.web.client.UserAction;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.ModificationWithPosition;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
 import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
@@ -51,7 +50,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
 
 
     private Protein currentProtein;
-    private List<ModificationWithPosition> selectedModifications = Collections.emptyList();
+    private List<String> selectedModifications = Collections.emptyList();
     private List<String> selectedTissues = Collections.emptyList();
     private List<? extends PeptideMatch> selectedPeptides = Collections.emptyList();
 
@@ -62,6 +61,7 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         List<String> columnTitles = TissueColumnProvider.getColumnTitles();
         List<String> columnWidths = TissueColumnProvider.getColumnWidths();
 
+        dataSorter.setList(dataProvider.getList());
         view.addDataProvider(dataProvider);
         view.addColumns(columns, columnTitles, columnWidths);
         view.addColumnSortHandler(dataSorter);
@@ -197,10 +197,16 @@ public class TissuesPresenter extends Presenter<ListView<String>>
         StateChangingActionEvent.fire(this, changer, action);
     }
 
+
+    @Override
+    public void onSelectionChanged(String item) {
+        //As this list allows multiselection, this doesn't have anything to do
+    }
+
     private void updateTissues() {
         //We collect only the possible modifications available in the peptides after filtering by selected tissue and selected mods
         List<PeptideMatch> peptides = PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
-                selectedTissues, selectedModifications, currentProtein.getSequence().length());
+                selectedTissues, selectedModifications);
 
         if (!peptides.isEmpty()) {
             Set<String> filteredTissues = new TreeSet<String>();
@@ -226,9 +232,10 @@ public class TissuesPresenter extends Presenter<ListView<String>>
 
     private void selectItem(String tissue) {
         selectionEventsDisabled = true;
-        getView().selectItemOn(dataProvider.getList().indexOf(tissue));
         getView().focusItemOn(dataProvider.getList().indexOf(tissue));
+        getView().selectItemOn(dataProvider.getList().indexOf(tissue));
         selectionEventsDisabled = false;
+
     }
 
     private void deselectItem(String tissue) {
@@ -246,7 +253,6 @@ public class TissuesPresenter extends Presenter<ListView<String>>
     private void setList(final List<String> list) {
         dataProvider.getList().clear();
         dataProvider.getList().addAll(list);
-        dataSorter.repeatSort();
         dataProvider.flush();
         getView().loadList();
         getView().showContent();

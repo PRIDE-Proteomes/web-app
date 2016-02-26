@@ -40,7 +40,7 @@ public class StateChanger {
     }
 
     private enum Type {
-        Group, Protein, Region, Peptide, Peptiform, Modification, Tissue
+        Group, Protein, Region, Peptide, Peptiform, Modification, ModificationWithPos, Tissue
     }
 
     private Queue<Change> orderedChanges = new LinkedList<>();
@@ -90,12 +90,17 @@ public class StateChanger {
                                       State.getToken(peptiformIDs)));
     }
 
-    public void addModificationChange(Collection<ModificationWithPosition> modificationSelection) {
+    public void addModificationChange(Collection<String> modificationSelection) {
+        orderedChanges.add(new Change(Type.Modification,
+                State.getToken(modificationSelection)));
+    }
+
+    public void addModificationWithPositionChange(Collection<ModificationWithPosition> modificationSelection) {
         Collection<String> modsIds = new ArrayList<>();
         for(ModificationWithPosition modificationWithPosition : modificationSelection) {
             modsIds.add(modificationWithPosition.toString());
         }
-        orderedChanges.add(new Change(Type.Modification,
+        orderedChanges.add(new Change(Type.ModificationWithPos,
                 State.getToken(modsIds)));
     }
 
@@ -129,6 +134,7 @@ public class StateChanger {
             String oldPeptiforms = State.getToken(oldState.getSelectedPeptiforms());
             String oldRegions = State.getToken(oldState.getSelectedRegions());
             String oldModifications = State.getToken(oldState.getSelectedModifications());
+            String oldModificationWithPos = State.getToken(oldState.getSelectedModificationWithPositions());
             String oldTissues = State.getToken(oldState.getSelectedTissues());
 
             changedState = State.simplifyState(
@@ -138,6 +144,7 @@ public class StateChanger {
                     changesToApply.get(Type.Peptide, oldPeptides),
                     changesToApply.get(Type.Peptiform, oldPeptiforms),
                     changesToApply.get(Type.Modification, oldModifications),
+                    changesToApply.get(Type.ModificationWithPos, oldModificationWithPos),
                     changesToApply.get(Type.Tissue, oldTissues));
         }
         return changedState;
@@ -168,6 +175,9 @@ public class StateChanger {
         sb.append(changesToApply.containsKey(Type.Modification) ?
                     "modification=" + changesToApply.get(Type.Modification) + State.sepTypes:
                     "");
+        sb.append(changesToApply.containsKey(Type.ModificationWithPos) ?
+                "modificationWithPos=" + changesToApply.get(Type.ModificationWithPos) + State.sepTypes:
+                "");
         sb.append(changesToApply.containsKey(Type.Tissue) ?
                     "tissue=" + changesToApply.get(Type.Tissue) + State.sepTypes:
                     "");

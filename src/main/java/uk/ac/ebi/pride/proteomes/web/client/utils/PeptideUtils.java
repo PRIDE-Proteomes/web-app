@@ -7,7 +7,6 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
-import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalModificationPositionException;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 
 import java.util.*;
@@ -21,6 +20,61 @@ import java.util.logging.Logger;
 public class PeptideUtils {
 
     private static Logger logger = Logger.getLogger(PeptideUtils.class.getName());
+
+    public static List<PeptideMatch> filterPeptideMatches(List<? extends PeptideMatch> peptides,
+                                                          int start, int end,
+                                                          List<String> tissues,
+                                                          List<String> mods) {
+
+        return filterPeptideMatchesWithoutAnyModifications(
+                filterPeptidesNotInTissues(
+                        filterPeptideMatchesNotIn(
+                                peptides,
+                                start, end),
+                        tissues),
+                mods);
+    }
+
+    public static List<PeptideMatch> filterPeptideMatches(List<PeptideMatch> peptides,
+                                                          int start, int end,
+                                                          List<String> tissues,
+                                                          List<String> mods,
+                                                          List<ModificationWithPosition> modWithPos,
+                                                          int proteinLength) {
+
+        return filterPeptideMatchesWithoutAnyModifications(
+                filterPeptidesNotInTissues(
+                        filterPeptideMatchesNotIn(
+                                peptides,
+                                start, end),
+                        tissues),
+                mods, modWithPos, proteinLength);
+    }
+
+    public static List<PeptideMatch> filterPeptideMatches(List<PeptideMatch> peptides,
+                                                          List<String> tissues,
+                                                          List<String> mods) {
+
+        return filterPeptideMatchesWithoutAnyModifications(
+                filterPeptidesNotInTissues(
+                        peptides,
+                        tissues),
+                mods);
+
+    }
+
+    public static List<PeptideMatch> filterPeptideMatches(List<PeptideMatch> peptides,
+                                                          List<String> tissues,
+                                                          List<String> mods,
+                                                          List<ModificationWithPosition> modWithPos,
+                                                          int proteinLength) {
+
+        return filterPeptideMatchesWithoutAnyModifications(
+                filterPeptidesNotInTissues(
+                        peptides,
+                        tissues),
+                mods, modWithPos, proteinLength);
+    }
 
     /**
      * Filters the peptide matches outside a region
@@ -95,29 +149,56 @@ public class PeptideUtils {
      *                       according to the modifications
      * @param modifications List of modification that need to filter the
      *                      peptides
+     * @param modificationWithPositions List of modification ans positions that need to filter the
+     *                      peptides
      * @param proteinLength Protein sequence legth. Is used to translate the position of the modifications
-     * @return A list of items that where already contained in the original
-     * list
+     * @return A list of items that where already contained in the original list
      */
-    public static List<PeptideMatch> filterPeptideMatchesWithoutAnyModifications
-    (List<? extends PeptideMatch> peptideMatches, List<ModificationWithPosition> modifications, int proteinLength) {
-        List<PeptideMatch> filteredList = new ArrayList<>();
-       List<ModificationWithPosition> properModifications = new ArrayList<>();
+    public static List<PeptideMatch> filterPeptideMatchesWithoutAnyModifications(
+            List<? extends PeptideMatch> peptideMatches,
+            List<String> modifications,
+            List<ModificationWithPosition> modificationWithPositions,
+            int proteinLength) {
 
-        for(ModificationWithPosition mod : modifications) {
-//            if(!mod.equals("")) {
-                properModifications.add(mod);
-//            }
+        List<PeptideMatch> filteredList = (List<PeptideMatch>) peptideMatches;
+
+        if (!modifications.isEmpty() || !modificationWithPositions.isEmpty()) {
+
+            filteredList = filterPeptideMatchesWithoutAnyModifications(peptideMatches, modifications);
+            List<PeptideMatch> auxList = new ArrayList<>();
+
+            for (PeptideMatch peptide : filteredList) {
+                Collection<ModificationWithPosition> mods = extractModifications(peptide, proteinLength);
+                if (mods.containsAll(modificationWithPositions)) {
+                    auxList.add(peptide);
+                }
+            }
+
+            filteredList =auxList;
         }
 
-        if(properModifications.isEmpty()) {
+        return filteredList;
+    }
+
+    public static List<PeptideMatch> filterPeptideMatchesWithoutAnyModifications
+            (List<? extends PeptideMatch> peptideMatches, List<String> modifications) {
+        List<PeptideMatch> filteredList = new ArrayList<>();
+        List<String> properModifications = new ArrayList<>();
+
+        for(String mod : modifications) {
+            if(!mod.equals("")) {
+                properModifications.add(mod);
+            }
+        }
+
+        if (properModifications.isEmpty()) {
             return (List<PeptideMatch>) peptideMatches;
         }
 
 
-        for(PeptideMatch peptide : peptideMatches) {
-            Collection<ModificationWithPosition> mods = extractModifications(peptide, proteinLength);
-            if(mods.containsAll(modifications)){
+        for (PeptideMatch peptide : peptideMatches) {
+            Collection<String> mods = extractModificationTypes(peptide);
+            if (mods.containsAll(properModifications)) {
                 filteredList.add(peptide);
             }
         }
@@ -161,38 +242,10 @@ public class PeptideUtils {
         return end >= pepStart && start <= pepEnd;
     }
 
-    public static List<PeptideMatch> filterPeptideMatches(List<? extends PeptideMatch> peptides,
-                                                          int start, int end,
-                                                          List<String> tissues,
-                                                          List<ModificationWithPosition> mods,
-                                                          int proteinLength) {
-
-        return filterPeptideMatchesWithoutAnyModifications(
-                filterPeptidesNotInTissues(
-                        filterPeptideMatchesNotIn(
-                                peptides,
-                                start, end),
-                        tissues),
-                mods, proteinLength);
-    }
-
-    public static List<PeptideMatch> filterPeptideMatches(List<PeptideMatch> peptides,
-                                                          List<String> tissues,
-                                                          List<ModificationWithPosition> mods,
-                                                          int proteinLength) {
-
-        return filterPeptideMatchesWithoutAnyModifications(
-                filterPeptidesNotInTissues(
-                        peptides,
-                        tissues),
-                mods, proteinLength);
-    }
-
     public static boolean isPeptideMatchNotFiltered(PeptideMatch match,
                                                     List<String> regions,
                                                     List<String> mods,
-                                                    List<String> tissues,
-                                                    int proteinLength) {
+                                                    List<String> tissues) {
         boolean notFiltered;
         List<String> newRegions, newMods, newTissues;
 
@@ -236,7 +289,7 @@ public class PeptideUtils {
 
         for(String regionId : newRegions) {
             for(String tissue : newTissues) {
-                for(String modId : newMods) {
+                for(String mod : newMods) {
                     try {
                         //We want to check permutations,
                         // so we  pack the single tissues and modifications
@@ -252,24 +305,26 @@ public class PeptideUtils {
                         pList.add(match);
                         List<String> tList = new ArrayList<>();
                         tList.add(tissue);
-                        List<ModificationWithPosition> mList = new ArrayList<>();
-
-                        ModificationWithPosition mod;
-                        if(modId.equals("")) {
-                            mod = ModificationWithPosition.emptyModificationWithPosition();
-                        }
-                        else {
-                            mod = ModificationWithPosition.tokenize(regionId);
-                        }
-
+                        tList.add(tissue);
+                        List<String> mList = new ArrayList<>();
                         mList.add(mod);
+//                        List<ModificationWithPosition> mList = new ArrayList<>();
 
-                        if(!filterPeptideMatches(pList,
-                                region.getStart(), region.getEnd(),
-                                tList, mList, proteinLength).isEmpty()) {
+//                        ModificationWithPosition mod;
+//                        if(modId.equals("")) {
+//                            mod = ModificationWithPosition.emptyModificationWithPosition();
+//                        }
+//                        else {
+//                            mod = ModificationWithPosition.tokenize(regionId);
+//                        }
+
+//                        mList.add(mod);
+
+                        if(!filterPeptideMatches(pList, region.getStart(), region.getEnd(), tList, mList).isEmpty()) {
                             return true;
                         }
-                    } catch (IllegalRegionValueException | IllegalModificationPositionException ignored) {
+                    } catch (IllegalRegionValueException e) {
+                        logger.finest(e.getMessage());
                     }
                 }
             }
@@ -278,17 +333,28 @@ public class PeptideUtils {
     }
 
 
+    // Improvement for the future: this can be move as a Category in the Autobean and have the types of mods translate to the protein
+    // in the peptide
     public static List<ModificationWithPosition> extractModifications(PeptideMatch peptide, int proteinLength) {
-        Set<ModificationWithPosition> mods = new HashSet<>();
+        List<ModificationWithPosition> mods = new ArrayList<>();
 
         for (final ModifiedLocation modLoc : peptide.getModifiedLocations()) {
             final int position = translateModificationToProteinPosition(modLoc, peptide, proteinLength);
-            try {
-                mods.add(new ModificationWithPosition(modLoc.getModification(), position))   ;
-            } catch (IllegalModificationPositionException e) {
-                logger.info("Error while converting modifications");
+            if (position < 0) {
+                logger.info("Negative position. Careful");
             }
+            mods.add(new ModificationWithPosition(modLoc.getModification(), position));
 
+        }
+        return Lists.newArrayList(mods);
+    }
+
+    //Improvement for the future: this can be move as a Category in the Autobean and have the types of mods in the peptide
+    public static List<String> extractModificationTypes(Peptide peptide) {
+        Set<String> mods = new HashSet<>();
+
+        for (final ModifiedLocation modLoc : peptide.getModifiedLocations()) {
+            mods.add(modLoc.getModification());
         }
         return Lists.newArrayList(mods);
     }

@@ -23,7 +23,7 @@ class ProteinModificationAdapter implements ProteinModificationHandler {
      */
     public ProteinModificationAdapter(ModifiedLocation mod, Protein protein) {
         modifiedLocation = mod;
-        modification = new ModificationAdapter(mod.getModification(), mod.getPosition());
+        modification = new ModificationAdapter(mod.getModification());
         count = 0;
 
         for(ModifiedLocation modLoc : protein.getModifiedLocations()) {

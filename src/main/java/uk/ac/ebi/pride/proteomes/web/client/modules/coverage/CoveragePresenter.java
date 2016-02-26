@@ -9,7 +9,6 @@ import uk.ac.ebi.pride.proteomes.web.client.datamodel.Region;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ModificationAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.PeptideAdapter;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.adapters.ProteinAdapter;
-import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.ModifiedLocation;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Peptide;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.PeptideMatch;
 import uk.ac.ebi.pride.proteomes.web.client.datamodel.factory.Protein;
@@ -17,7 +16,6 @@ import uk.ac.ebi.pride.proteomes.web.client.events.requests.ProteinRequestEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.StateChangingActionEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.state.ValidStateEvent;
 import uk.ac.ebi.pride.proteomes.web.client.events.updates.*;
-import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalModificationPositionException;
 import uk.ac.ebi.pride.proteomes.web.client.exceptions.IllegalRegionValueException;
 import uk.ac.ebi.pride.proteomes.web.client.modules.HasUiHandlers;
 import uk.ac.ebi.pride.proteomes.web.client.modules.Presenter;
@@ -49,6 +47,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                                           RegionUpdateEvent.Handler,
                                           PeptideUpdateEvent.Handler,
                                           ModificationUpdateEvent.Handler,
+                                          ModificationWithPositionUpdateEvent.Handler,
                                           PeptiformUpdateEvent.Handler,
                                           TissueUpdateEvent.Handler {
 
@@ -62,6 +61,10 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         void updateModificationHighlight(ModificationAdapter mod);
         void updateModificationHighlight(int start, int end);
         void resetModificationHighlight();
+        void resetModWithPosSelection();
+
+        void updateModWithPosSelection(Integer position);
+
         void updatePeptideHighlight(List<PeptideAdapter> peptideSelection);
         void resetPeptideHighlight();
         void displayLoadingMessage();
@@ -75,7 +78,8 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     private boolean justHighlighted = false;
     private Protein currentProtein;
     private Region currentRegion = Region.emptyRegion();
-    private List<ModificationWithPosition> currentModifications = Collections.emptyList();
+    private List<String> currentModifications = Collections.emptyList();
+    private ModificationWithPosition currentModWithPos;
     private List<String> currentTissues = Collections.emptyList();
 
     private List<PeptideWithPeptiforms> peptideMatchSelection = Collections.emptyList();
@@ -96,6 +100,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         eventBus.addHandler(RegionUpdateEvent.getType(), this);
         eventBus.addHandler(PeptideUpdateEvent.getType(), this);
         eventBus.addHandler(ModificationUpdateEvent.getType(), this);
+        eventBus.addHandler(ModificationWithPositionUpdateEvent.getType(), this);
         eventBus.addHandler(TissueUpdateEvent.getType(), this);
         eventBus.addHandler(PeptiformUpdateEvent.getType(), this);
     }
@@ -131,17 +136,10 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         Region region;
         List<PeptideAdapter> selectionAdapters;
 
-//        if (event.getSource() == this) {
-//            return;
-//        }
-
         if (event.getRegions().size() > 0) {
             region = event.getRegions().get(0);
             currentRegion = region;
-            getView().updateRegionSelection(region.getStart(), region.getEnd());
-//            if (region.getLength() == 1) {
-//                getView().updateModificationHighlight(region.getStart(), region.getEnd());
-//            }
+            getView().updateRegionSelection(currentRegion.getStart(), currentRegion.getEnd());
         } else {
             currentRegion = Region.emptyRegion();
             getView().resetRegionSelection();
@@ -190,6 +188,18 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         } else {
             getView().resetPeptideSelection();
         }
+
+
+        // Apparently when the peptides gets modified the region, mods selection get reset
+        // we must set it again manually.
+
+        if (!currentRegion.isEmpty()) {
+            getView().updateRegionSelection(currentRegion.getStart(), currentRegion.getEnd());
+        }
+
+        if (currentModWithPos!=null) {
+            getView().updateModWithPosSelection(currentModWithPos.getPosition());
+        }
     }
 
     @Override
@@ -198,44 +208,48 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     }
 
     /**
-     * This function has to take into account that a modification can be a
-     * position or a type of modification
+     * This function only take into account that a modification is a type pf modification
      *
      * @param event event containing the string identifying a modification.
      */
     @Override
     public void onModificationUpdateEvent(ModificationUpdateEvent event) {
-
         currentModifications = event.getModifications();
-        getView().resetPeptideHighlight();
-        getView().resetModificationHighlight();
-
         //This bit updates the modification triangles in the proteinCoverage part
-        if (!currentModifications.isEmpty()) {
-            updatePeptideHighlight(currentRegion.getStart(),currentRegion.getEnd());
-            //TODO Fix the highlighting outside of the peptides
-            //TODO Review
-            for (ModificationWithPosition currentModification : currentModifications) {
-                getView().updateModificationHighlight(
-                        new ModificationAdapter(currentModification.getModification(), currentModification.getPosition()));
-            }
-        }
-
+        updatePeptideHighlight();
     }
 
+    @Override
+    public void onModificationUpdateEvent(ModificationWithPositionUpdateEvent event) {
+        List<PeptideAdapter> selectionAdapters;
+
+        if (event.getModifications().size() > 0) {
+            currentModWithPos = event.getModifications().get(0);
+
+        } else {
+            currentModWithPos = null;
+            getView().resetRegionSelection();
+        }
+
+        // Apparently when the region gets modified the peptide selection
+        // gets reset, we must set it again manually.
+
+        if (!peptideMatchSelection.isEmpty()) {
+            selectionAdapters = new ArrayList<>();
+            for (PeptideMatch match : peptideMatchSelection) {
+                selectionAdapters.add(new PeptideAdapter(match));
+            }
+            getView().updatePeptideSelection(selectionAdapters);
+        }
+    }
 
     @Override
     public void onTissueUpdateEvent(TissueUpdateEvent event) {
-
         currentTissues = event.getTissues();
-        getView().resetPeptideHighlight();
-        getView().resetModificationHighlight();
-
-        updatePeptideHighlight(currentRegion.getStart(),currentRegion.getEnd());
+        updatePeptideHighlight();
     }
 
     // Callbacks that handle user events from the view.
-
     @Override
     public void onRegionClickSelected(ProteinRegionSelectionEvent event) {
         onRegionClickSelected(event.getStart(), event.getLength());
@@ -281,55 +295,63 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         StateChanger changer = new StateChanger();
         List<Region> regions = new ArrayList<>();
         List<PeptideMatch> peptides = new ArrayList<>();
-        UserAction action = new UserAction(UserAction.Type.peptide,
-                "Click Set");
+        List<ModificationWithPosition> auxModWithPos = new ArrayList<>();
+        UserAction action;
 
-        //Peptides
-        PeptideAdapter peptide = (PeptideAdapter) event.getPeptide();
-        peptides.add(peptide);
-        changer.addPeptideChange(peptides);
+        if (event.getPeptide() != null) {
 
-        //Regions
-        //With the selection we reset the region to avoid confunsing to the user clicking outside of the region and moving it
-        changer.addRegionChange(regions);
+            //Peptides
+            PeptideMatch peptide = (PeptideMatch) event.getPeptide();
+            peptides.add(peptide);
 
-        //Peptiforms
-        List<Peptide> peptiforms = new ArrayList<>();
-        for (Peptide peptiform : selectedPeptiforms) {
-            if (peptide.getSequence().equals(peptiform.getSequence())) {
-                peptiforms.add(peptiform);
+            //Regions
+            //With the selection we reset the region to avoid confunsing to the user clicking outside of the region and moving it
+            if (!PeptideUtils.inRange(peptide, currentRegion.getStart(), currentRegion.getEnd())) {
+                changer.addRegionChange(regions);
             }
-        }
 
-        if (!peptiforms.containsAll(selectedPeptiforms)) {
-            changer.addPeptiformChange(peptiforms);
-        }
-
-        //Modifications
-        List<ModificationWithPosition> correctMods = new ArrayList<>();
-        for (ModifiedLocation modLoc : peptide.getModifiedLocations()) {
-            for (ModificationWithPosition mod : currentModifications) {
-                if (modLoc.equals(mod)) {
-                    try {
-                        correctMods.add(new ModificationWithPosition(mod.getModification(), mod.getPosition()));
-                    } catch (IllegalModificationPositionException e) {
-                        logger.info("Error while converting modifications");
-                    }
+            //Peptiforms
+            List<Peptide> peptiforms = new ArrayList<>();
+            for (Peptide peptiform : selectedPeptiforms) {
+                if (peptide.getSequence().equals(peptiform.getSequence())) {
+                    peptiforms.add(peptiform);
                 }
             }
+
+            if (!peptiforms.containsAll(selectedPeptiforms)) {
+                changer.addPeptiformChange(peptiforms);
+            }
+
+            //Modifications
+            List<String> modifications = PeptideUtils.extractModificationTypes(peptide);
+            modifications.retainAll(currentModifications);
+            if (!modifications.containsAll(currentModifications)) {
+                changer.addModificationChange(modifications);
+            }
+
+            //We need to translate the modifications to protein coordinates
+            //TODO Review
+            List<ModificationWithPosition> modWithPos = PeptideUtils.extractModifications(peptide, currentProtein.getSequence().length());
+            auxModWithPos.add(currentModWithPos);
+            modWithPos.retainAll(auxModWithPos);
+            if (!modWithPos.contains(auxModWithPos)) {
+                changer.addModificationWithPositionChange(modWithPos);
+            }
+
+            //Tissues
+            List<String> tissues = new ArrayList<>(peptide.getTissues());
+            //We copy the list to avoid modifies the original ones
+            tissues.retainAll(currentTissues);
+            if (!tissues.containsAll(currentTissues)) {
+                changer.addTissueChange(tissues);
+            }
+
+            action = new UserAction(UserAction.Type.peptide, "Click Set");
+        } else {
+            action = new UserAction(UserAction.Type.peptide, "Click Reset");
         }
 
-        if (!correctMods.containsAll(currentModifications)) {
-            changer.addModificationChange(correctMods);
-        }
-
-        //Tissues
-        List<String> tissues = peptide.getTissues();
-        tissues.retainAll(currentTissues);
-        if (!tissues.containsAll(currentTissues)) {
-            changer.addTissueChange(tissues);
-        }
-
+        changer.addPeptideChange(peptides);
         StateChangingActionEvent.fire(this, changer, action);
     }
 
@@ -337,11 +359,12 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     public void onModificationSelected(ModificationSelectedEvent event) {
         StateChanger changer = new StateChanger();
         List<Region> regions = new ArrayList<>();
-        List<ModificationWithPosition> modifications = new ArrayList<>();
-        UserAction action = new UserAction(UserAction.Type.modification, "Click Set");
+        UserAction action;
+
+        List<ModificationWithPosition> modWithPos = new ArrayList<>();
 
         //Regions
-        //With the selection we reset the region to avoid confunsing to the user clicking outside of the region and moving it
+        //With the selection we reset the region to avoid confusing to the user clicking outside of the region and moving it
         changer.addRegionChange(regions);
 
         // Terminal modifications are ignored for now
@@ -349,7 +372,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             if(peptideMatchSelection.size() > 0) {
                 List<PeptideMatch>  peptides = PeptideUtils.filterPeptideMatches(peptideMatchSelection,
                         event.getSite(), event.getSite(),
-                        currentTissues, currentModifications, currentProtein.getSequence().length());
+                        currentTissues, currentModifications);
 
                 changer.addPeptideChange(peptides);
             }
@@ -357,9 +380,17 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
 
             // We add the corresponding modification in this position because we can
             // use them to update the tissues filter gridView
-            modifications.addAll(extractModifications(event.getModificationList()));
+            modWithPos.addAll(extractModifications(event.getModificationList()));
 
-            changer.addModificationChange(modifications);
+            //We can only select one modification with position at a time
+            changer.addModificationWithPositionChange(modWithPos);
+        }
+        if(modWithPos.isEmpty()) {
+            action = new UserAction(UserAction.Type.modificationWithPos, "Click Reset");
+            StateChangingActionEvent.fire(this, changer, action);
+        }
+        else {
+            action = new UserAction(UserAction.Type.modificationWithPos, "Click Set");
             StateChangingActionEvent.fire(this, changer, action);
         }
     }
@@ -367,11 +398,8 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     private List<ModificationWithPosition> extractModifications(List<ProteinModificationHandler> modifications) {
         List<ModificationWithPosition> result = new ArrayList<>();
         for (final ProteinModificationHandler modification : modifications) {
-            try {
-                result.add(new ModificationWithPosition(modification.getPrideModification().getName(), modification.getSite()));
-            } catch (IllegalModificationPositionException e) {
-                logger.info("Error while converting modifications");
-            }
+            result.add(new ModificationWithPosition(modification.getPrideModification().getName(), modification.getSite()));
+
         }
 
         return  Lists.newArrayList(result);
@@ -427,7 +455,9 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                 // we want to reset the selection
                 action = new UserAction(UserAction.Type.region, "Drag Reset");
                 region = Region.emptyRegion();
-                changer.addModificationChange(Collections.<ModificationWithPosition>emptyList());
+                changer.addModificationChange(Collections.<String>emptyList());
+                changer.addModificationWithPositionChange(Collections.<ModificationWithPosition>emptyList());
+
             } else {
                 action = new UserAction(UserAction.Type.region, "Drag Set");
                 justHighlighted = false;
@@ -488,14 +518,17 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         }
     }
 
-    private void updatePeptideHighlight(int regionStart, int regionEnd) {
+    private void updatePeptideHighlight() {
         List<PeptideMatch> peptides;
         List<PeptideAdapter> selectionAdapters;
 
-        if(!currentTissues.isEmpty() || !currentModifications.isEmpty()) {
+        getView().resetPeptideHighlight();
+        getView().resetModificationHighlight();
+
+        if (!currentTissues.isEmpty() || !currentModifications.isEmpty()) {
             peptides = PeptideUtils.filterPeptideMatches(currentProtein.getPeptides(),
-                    regionStart, regionEnd,
-                    currentTissues, currentModifications, currentProtein.getSequence().length());
+                    currentRegion.getStart(),currentRegion.getEnd(),
+                    currentTissues, currentModifications);
 
             if (peptides.size() > 0) {
                 selectionAdapters = new ArrayList<>();
@@ -503,8 +536,13 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
                 for (PeptideMatch match : peptides) {
                     selectionAdapters.add(new PeptideAdapter(match));
                 }
-
                 getView().updatePeptideHighlight(selectionAdapters);
+
+                if (!currentModifications.isEmpty()) {
+                    for (String currentModification : currentModifications) {
+                        getView().updateModificationHighlight(new ModificationAdapter(currentModification));
+                    }
+                }
             }
         }
     }
