@@ -175,17 +175,17 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
         else {
             getView().resetPeptideSelection();
             currentPeptides = Collections.emptyList();
-
             //If we have any filter applied before it would need to be restored
             updatePeptideHighlight();
 
-            if(!currentModWithPos.isEmpty()){
-                updateModWithPosSelection();
-            }
             //If we have any region applied before it would need to be restored
             if(!currentRegion.isEmpty()){
                 getView().updateRegionSelection(currentRegion.getStart(), currentRegion.getEnd());
             }
+        }
+
+        if(!currentModWithPos.isEmpty()){
+            updateModWithPosSelection();
         }
     }
 
@@ -204,6 +204,10 @@ public class SequencePresenter extends Presenter<SequencePresenter.ThisView>
         if (!currentModWithPos.isEmpty()) {
             getView().resetPeptideHighlight();
             updateModWithPosSelection();
+        }
+
+        if (!currentRegion.isEmpty()){
+            getView().updateRegionSelection(currentRegion.getStart(), currentRegion.getEnd());
         }
     }
 

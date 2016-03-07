@@ -169,10 +169,6 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     public void onPeptideUpdateEvent(PeptideUpdateEvent event) {
         List<PeptideAdapter> selectionAdapters;
 
-        if (event.getSource() == this) {
-            return;
-        }
-
         // we make a copy because if we don't it somehow it sometimes gets reset
         peptideMatchSelection = new ArrayList<>(event.getPeptides());
         tempPeptides = new ArrayList<>(event.getPeptides());
@@ -217,6 +213,10 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         currentModifications = event.getModifications();
         //This bit updates the modification triangles in the proteinCoverage part
         updatePeptideHighlight();
+
+        if (!currentRegion.isEmpty()) {
+            getView().updateRegionSelection(currentRegion.getStart(), currentRegion.getEnd());
+        }
     }
 
     @Override
@@ -228,10 +228,9 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
 
         } else {
             currentModWithPos = null;
-            getView().resetRegionSelection();
         }
 
-        // Apparently when the region gets modified the peptide selection
+        // Apparently when the modification gets modified the peptide selection
         // gets reset, we must set it again manually.
 
         if (!peptideMatchSelection.isEmpty()) {
@@ -271,12 +270,12 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
     }
     @Override
     public void onRegionDragSelected(ProteinAreaSelectedEvent event) {
-        onRegionDragSelected(event.getStart(), event.getEnd());
+        onRegionDragSelected(event.isResetObjectSelection(), event.getStart(), event.getEnd());
     }
 
     @Override
     public void onRegionDragSelected(FeatureAreaSelectionEvent event) {
-        onRegionDragSelected(event.getStart(), event.getEnd());
+        onRegionDragSelected(event.isResetObjectSelection() ,event.getStart(), event.getEnd());
     }
 
 
@@ -305,7 +304,6 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             peptides.add(peptide);
 
             //Regions
-            //With the selection we reset the region to avoid confunsing to the user clicking outside of the region and moving it
             if (!PeptideUtils.inRange(peptide, currentRegion.getStart(), currentRegion.getEnd())) {
                 changer.addRegionChange(regions);
             }
@@ -334,7 +332,7 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
             List<ModificationWithPosition> modWithPos = PeptideUtils.extractModifications(peptide, currentProtein.getSequence().length());
             auxModWithPos.add(currentModWithPos);
             modWithPos.retainAll(auxModWithPos);
-            if (!modWithPos.contains(auxModWithPos)) {
+            if (!modWithPos.containsAll(auxModWithPos)) {
                 changer.addModificationWithPositionChange(modWithPos);
             }
 
@@ -364,8 +362,12 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         List<ModificationWithPosition> modWithPos = new ArrayList<>();
 
         //Regions
-        //With the selection we reset the region to avoid confusing to the user clicking outside of the region and moving it
-        changer.addRegionChange(regions);
+        //With the selection we reset the region if the modification is outside of the current one
+        if(!currentRegion.isEmpty()) {
+            if (event.getSite() < currentRegion.getStart() || event.getSite() > currentRegion.getEnd()) {
+                changer.addRegionChange(regions);
+            }
+        }
 
         // Terminal modifications are ignored for now
         if (event.getSite() > 0 && event.getSite() < currentProtein.getSequence().length() + 1) {
@@ -434,52 +436,61 @@ public class CoveragePresenter extends Presenter<CoveragePresenter.ThisView>
         }
     }
 
-    private void onRegionDragSelected(int eventRegionStart, int evenRegionEnd) {
+    //TODO Review
+    private void onRegionDragSelected(boolean resetObjectSelection, int eventRegionStart, int evenRegionEnd) {
         StateChanger changer = new StateChanger();
         List<Region> regions = new ArrayList<>();
         UserAction action = UserAction.emptyAction();
         List<PeptideMatch> peptides;
-
         Region region;
 
-        // if the selection is done right to left then start > end
-        int start = eventRegionStart < evenRegionEnd ? eventRegionStart : evenRegionEnd;
-        int end = eventRegionStart + evenRegionEnd - start;
 
-        try {
-            region = new Region(start, end);
-            // We have to check if a highlight has been done just before to
-            // know if the user wants to reset or want to select a 1-site region
-            if (region.getLength() == 0 && !justHighlighted) {
-                //we don't want to select a single aminoacid,
-                // we want to reset the selection
-                action = new UserAction(UserAction.Type.region, "Drag Reset");
-                region = Region.emptyRegion();
-                changer.addModificationChange(Collections.<String>emptyList());
-                changer.addModificationWithPositionChange(Collections.<ModificationWithPosition>emptyList());
-
-            } else {
-                action = new UserAction(UserAction.Type.region, "Drag Set");
-                justHighlighted = false;
-            }
-
-            regions.add(region);
-
-            peptides = PeptideUtils.filterPeptideMatchesNotIn(peptideMatchSelection,
-                    start, end);
-
-            if (peptides.size() != peptideMatchSelection.size()) {
-                changer.addPeptideChange(peptides);
-            }
-
-
-        } catch (IllegalRegionValueException e) {
+        if(resetObjectSelection){
             action = new UserAction(UserAction.Type.region, "Drag Reset");
             region = Region.emptyRegion();
+            changer.addModificationWithPositionChange(Collections.<ModificationWithPosition>emptyList());
+            changer.addPeptideChange(Collections.<PeptideMatch>emptyList());
             regions.add(region);
-        } finally {
             changer.addRegionChange(regions);
             StateChangingActionEvent.fire(this, changer, action);
+        }
+        else {
+            // if the selection is done right to left then start > end
+            int start = eventRegionStart < evenRegionEnd ? eventRegionStart : evenRegionEnd;
+            int end = eventRegionStart + evenRegionEnd - start;
+
+            try {
+                region = new Region(start, end);
+                // We have to check if a highlight has been done just before to
+                // know if the user wants to reset or want to select a 1-site region
+                if (region.getLength() == 0 && !justHighlighted) {
+                    //we don't want to select a single aminoacid,
+                    // we want to reset the selection
+                    action = new UserAction(UserAction.Type.region, "Drag Reset");
+                    region = Region.emptyRegion();
+                    changer.addModificationWithPositionChange(Collections.<ModificationWithPosition>emptyList());
+
+                } else {
+                    action = new UserAction(UserAction.Type.region, "Drag Set");
+                    justHighlighted = false;
+                }
+
+
+                peptides = PeptideUtils.filterPeptideMatchesNotIn(peptideMatchSelection, start, end);
+
+                if (peptides.size() != peptideMatchSelection.size()) {
+                    changer.addPeptideChange(peptides);
+                }
+
+
+            } catch (IllegalRegionValueException e) {
+                action = new UserAction(UserAction.Type.region, "Drag Reset");
+                region = Region.emptyRegion();
+                regions.add(region);
+            } finally {
+                changer.addRegionChange(regions);
+                StateChangingActionEvent.fire(this, changer, action);
+            }
         }
     }
 
